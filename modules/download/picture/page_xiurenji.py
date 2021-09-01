@@ -1,4 +1,3 @@
-import os
 import re
 
 from modules.download.picture.page_base import PageBase
