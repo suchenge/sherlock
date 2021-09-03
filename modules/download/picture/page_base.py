@@ -35,7 +35,8 @@ class PageBase(object):
 
     def __download(self, picture):
         key, value = picture
-        wget.download(key, value)
+        if not os.path.exists(value):
+            wget.download(key, value)
 
     def get_title(self, page_content):
         pass
