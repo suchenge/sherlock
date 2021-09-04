@@ -1,7 +1,8 @@
 import re
+import ssl
+import urllib.request
 
 from lxml import etree
-import urllib.request
 
 
 def get_url_content(url):
@@ -32,27 +33,57 @@ def get_url_content(url):
 def get_page_content(url, decode="utf-8"):
     return get_url_content(url).decode(decode)
 
+def get_info_0(filename):
+    url = "https://www.javhoo.org/ja/av/" + filename
+    html = get_page_content(url)
+    tree = etree.HTML(html)
+
+    title = tree.xpath("//h1/text()")
+    picture = tree.xpath("//img[@class='alignnone size-full']/@src")
+
+    if title and picture:
+        return filename.upper().strip(), format_title(title), picture
 
 def get_info_1(filename):
     site = "https://javdb.com"
     url = site + "/search?q=" + filename + "&f=all"
+
+    print("开始访问信息页面:")
+    print("url：" + url)
     tree = etree.HTML(get_page_content(url))
 
     links = tree.xpath("//div[@class='grid-item column']/a/@href")
     uids = tree.xpath("//div[@class='grid-item column']/a/div[@class='uid']/text()")
 
     if 0 < len(links) == len(uids) > 0:
-        index = uids.index(filename)
+        index = 0
+
+        if filename in uids:
+            index = uids.index(filename)
+        else:
+            for i in range(len(uids)):
+                if uids[i] in filename:
+                    index = i
+                    break
+
+        if index < 0:
+            print("页面中没有查询到信息")
+            return None, None, None
+
         uid = uids[index]
 
         if index > -1:
             link = links[index]
+            print("url：" + link)
             tree = etree.HTML(get_page_content(site + link))
+
             title = tree.xpath("//h2[@class='title is-4']/strong/text()")[-1]
             picture = tree.xpath("//img[@class='video-cover']/@src")[-1]
+
             if title and picture and uid:
                 return uid.upper().strip(), format_title(title), picture
-
+    else:
+        print("页面中没有查询到信息")
 
 def format_title(title):
     return re.compile("[?:*'<>/\\\]").sub("", title).strip()

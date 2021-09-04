@@ -3,6 +3,7 @@ import os
 
 dict_path = "D:\\dictionary\\indexs\\"
 
+
 def add(uid, filename):
     file_path = dict_path + uid + ".json"
 
@@ -10,9 +11,12 @@ def add(uid, filename):
         with open(file_path, "r", encoding="utf-8") as file:
             content = file.read()
         json_object = json.loads(content)
-        json_object["paths"].append(filename)
+        if json_object["paths"].index(filename) < 0:
+            json_object["paths"].append(filename)
     else:
         json_object = {"sn": uid, "paths": [filename]}
 
     with open(file_path, "w", encoding="utf-8") as file:
         file.write(json.dumps(json_object, sort_keys=True, indent=4, ensure_ascii=False))
+
+    print("写入字典")
