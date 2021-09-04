@@ -1,19 +1,16 @@
-import json, os
-import re
 from modules.av.collate.collator import Collator, FileType
 from modules.download.creeper import Creeper
-
 
 # 抓取图片程序
 # Creeper().run()
 
 # 整理文件程序
-file_type = FileType.FILE
-# path_param = ["F:\软件\Done\BGSD-410.mp4", "F:\软件\Done\REBDB-169.mkv", "F:\软件\Done\MBRAP-023", "F:\软件\Done\GASO-0011", "F:\软件\Done\DUNF-001 ぱいぱいパラダイス！藤井あかり", "F:\软件\Done\MBRAZ-029 放課後、夕立…君と僕。川口彩夏"]
-path_param = "F:\软件\Done\PRBYB-009.mp4"
+# file_type = FileType.FILE
+# path_param = ["F:\软件\Done\BGSD-410.mp4", "F:\软件\Done\REBDB-169.mkv", "F:\软件\Done\MBRAP-023", "F:\软件\Done\GASO-0011"]
+# path_param = "F:\软件\Done\PRBYB-009.mp4"
 # path_param = "F:\软件\Done\MBRAP-023"
 
-#file_type = FileType.DIR
-#path_param = "F:\软件\Done"
+# file_type = FileType.DIR
+# path_param = "F:\软件\Done"
 
-#Collator(path_param, file_type).run()
+# Collator(path_param, file_type).run()
