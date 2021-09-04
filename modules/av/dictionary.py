@@ -11,7 +11,7 @@ def add(uid, filename):
         with open(file_path, "r", encoding="utf-8") as file:
             content = file.read()
         json_object = json.loads(content)
-        if json_object["paths"].index(filename) < 0:
+        if filename in json_object["paths"]:
             json_object["paths"].append(filename)
     else:
         json_object = {"sn": uid, "paths": [filename]}

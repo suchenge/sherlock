@@ -74,7 +74,7 @@ def get_info_1(filename):
 
         if index > -1:
             link = links[index]
-            print("url：" + link)
+            print("url：" + site + link)
             tree = etree.HTML(get_page_content(site + link))
 
             title = tree.xpath("//h2[@class='title is-4']/strong/text()")[-1]
