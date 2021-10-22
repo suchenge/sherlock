@@ -1,5 +1,4 @@
 import os
-import re
 import shutil
 import concurrent.futures
 
@@ -7,6 +6,7 @@ from pathlib import Path
 from enum import IntEnum
 
 from modules.av import dictionary
+from modules.av.collate.resolver import Resolver
 from modules.av.collate.parse import parser
 
 
@@ -41,102 +41,40 @@ class Collator(object):
 
         try:
             info = None
-            if os.path.isfile(path):
-                info = self.__file_neaten(path)
-            else:
-                info = self.__dir_neaten(path)
+            is_file = os.path.isfile(path)
 
-            dictionary.add(info["uid"], info["dir"])
+            # 解析文件信息
+            file_info = Resolver(self.__get_info_function)
+            file_info.resolve(path)
+
+            if not is_file:
+                # 重命名文件夹
+                os.rename(path, file_info.dir)
+            else:
+                # 创建文件夹
+                Path(file_info.dir).mkdir(exist_ok=True)
+                # 移动文件
+                shutil.move(path, file_info.dir + "/" + file_info.file_name)
+
+            # 下载封面
+            if not os.path.exists(file_info.picture["path"]):
+                self.__save_picture(file_info.picture["content"], file_info.picture["path"])
+                print("完成封面下载")
+
+            # 下载剧照
+            if file_info.stage_photos is not None and len(file_info.stage_photos) > 0:
+                for stage_photo in file_info.stage_photos:
+                    self.__save_picture(stage_photo["content"], stage_photo["path"])
+                print("完成剧照下载")
+
+            dictionary.add(file_info.uid, file_info.dir)
+
         except Exception as error:
             print("处理出错:")
             print(error)
             os.system("pause")
 
         print("处理完成 " + path)
-
-    def __dir_neaten(self, dirpath):
-        dir, file = os.path.split(dirpath)
-
-        if not self.__match_file_name(file):
-            print("文件名称不符合规范")
-            return
-
-        # 获取文件信息
-        uid, title, picture = self.__get_info_function(file)
-        print("获取文件信息：")
-        print("uid：" + uid)
-        print("title：" + title)
-        print("picture：" + picture)
-
-        # 获取图片内容
-        print("获取图片内容")
-        picture_content = parser.get_url_content(picture)
-
-        if uid and title and picture:
-            new_dir = dir + "/" + title
-            new_picturename = uid + os.path.splitext(picture)[-1]
-            new_picturepath = new_dir + "/" + new_picturename
-
-            print("获取处理路径信息：")
-            print("new_dir：" + new_dir)
-            print("new_picturename：" + new_picturename)
-            print("new_picturepath：" + new_picturepath)
-
-            # 重命名文件夹
-            os.rename(dirpath, new_dir)
-            # 下载图片
-            if not os.path.exists(new_picturepath):
-                self.__save_picture(picture_content, new_picturepath)
-                print("完成图片保存")
-
-        return {"uid": uid, "dir": new_dir}
-
-    def __file_neaten(self, filepath):
-        dir, file = os.path.split(filepath)
-        filename, filesuffix = os.path.splitext(file)
-
-        if not self.__match_file_name(filename):
-            print("文件名称不符合规范")
-            return
-
-        # 获取文件信息
-        uid, title, picture = self.__get_info_function(filename)
-        print("获取文件信息：")
-        print("uid：" + uid)
-        print("title：" + title)
-        print("picture：" + picture)
-
-        # 获取图片内容
-        print("获取图片内容")
-        picture_content = parser.get_url_content(picture)
-
-        if uid and title and picture:
-            new_dir = dir + "/" + title
-            new_filename = uid + filesuffix
-            new_picturename = uid + os.path.splitext(picture)[-1]
-            new_filepath = new_dir + "/" + new_filename
-            new_picturepath = new_dir + "/" + new_picturename
-
-            print("获取处理路径信息：")
-            print("new_dir：" + new_dir)
-            print("new_filename：" + new_filename)
-            print("new_filepath：" + new_filepath)
-            print("new_picturename：" + new_picturename)
-            print("new_picturepath：" + new_picturepath)
-
-            # 创建文件夹
-            Path(new_dir).mkdir(exist_ok=True)
-            # 移动文件
-            shutil.move(filepath, new_filepath)
-            # 下载图片
-            if not os.path.exists(new_picturepath):
-                self.__save_picture(picture_content, new_picturepath)
-                print("完成图片保存")
-
-        return {"uid": uid, "dir": new_dir}
-
-    def __match_file_name(self, name):
-        return re.match("^[a-z0-9A-Z-]+$", name) is not None
 
     def __save_picture(self, picture_content, picture_path):
         with open(picture_path, "ab") as image:

@@ -39,7 +39,8 @@ class PageBase(object):
             wget.download(key, value)
 
     def get_title(self, page_content):
-        pass
+        result = re.findall('<h1 class=\"article-title\">(.*?)</h1>', page_content)[0]
+        return result
 
     def get_picture_list(self, page_content):
         regex = re.compile('<img onload="size\(this\)" .*? src="(.*?)".*?>', re.DOTALL)
@@ -88,6 +89,8 @@ class PageBase(object):
             executor.map(self.__download, picture_dict)
 
         # self.__to_zip(picture_folder)
+
+        return picture_folder
 
     def __to_zip(self, picture_folder):
         zip_file = picture_folder + ".zip"

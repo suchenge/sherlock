@@ -40,9 +40,10 @@ def get_info_0(filename):
 
     title = tree.xpath("//h1/text()")
     picture = tree.xpath("//img[@class='alignnone size-full']/@src")
+    stage_photos = tree.xpath("//a[@class='dt-mfp-item']/@href")
 
     if title and picture:
-        return filename.upper().strip(), format_title(title), picture
+        return filename.upper().strip(), format_title(title), picture, stage_photos
 
 def get_info_1(filename):
     site = "https://javdb.com"
@@ -79,9 +80,10 @@ def get_info_1(filename):
 
             title = tree.xpath("//h2[@class='title is-4']/strong/text()")[-1]
             picture = tree.xpath("//img[@class='video-cover']/@src")[-1]
+            stage_photos = tree.xpath("//div[@class='tile-images preview-images']/a[@class='tile-item']/@href")
 
             if title and picture and uid:
-                return uid.upper().strip(), format_title(title), picture
+                return uid.upper().strip(), format_title(title), picture, stage_photos
     else:
         print("页面中没有查询到信息")
 

@@ -14,8 +14,8 @@ class Creeper(object):
 
     def __download(self, url):
         page_instance = PageFactory.get_instance(url)(url)
-        page_instance.download(self.download_folder)
-        self.page_url.done(url)
+        folder = page_instance.download(self.download_folder)
+        self.page_url.done(url, folder)
 
     def run(self):
         with concurrent.futures.ThreadPoolExecutor(max_workers=self.__threadCount) as executor:
