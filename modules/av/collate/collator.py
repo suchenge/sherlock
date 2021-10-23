@@ -20,23 +20,23 @@ class Collator(object):
         self.__paths = []
 
         if file_type == FileType.FILE:
-            self.__append_files(path)
+            self.__append_files__(path)
         else:
-            self.__append_dirfiles(path)
+            self.__append_dirfiles__(path)
 
-        self.__get_info_function = lambda file: parser.get_info_1(file)
+        self.__get_info_function__ = lambda file: parser.get_info_1(file)
 
-    def __append_files(self, file_paths):
+    def __append_files__(self, file_paths):
         if isinstance(file_paths, str):
             self.__paths.append(file_paths)
         else:
             self.__paths.extend(file_paths)
 
-    def __append_dirfiles(self, dir_path):
+    def __append_dirfiles__(self, dir_path):
         for file in os.listdir(dir_path):
             self.__paths.append(dir_path + "/" + file)
 
-    def __neaten(self, path):
+    def __neaten__(self, path):
         print("开始处理：" + path)
 
         try:
@@ -44,7 +44,7 @@ class Collator(object):
             is_file = os.path.isfile(path)
 
             # 解析文件信息
-            file_info = Resolver(self.__get_info_function)
+            file_info = Resolver(self.__get_info_function__)
             file_info.resolve(path)
 
             if not is_file:
@@ -58,13 +58,13 @@ class Collator(object):
 
             # 下载封面
             if not os.path.exists(file_info.picture["path"]):
-                self.__save_picture(file_info.picture["content"], file_info.picture["path"])
+                self.__save_picture__(file_info.picture["content"], file_info.picture["path"])
                 print("完成封面下载")
 
             # 下载剧照
             if file_info.stage_photos is not None and len(file_info.stage_photos) > 0:
                 for stage_photo in file_info.stage_photos:
-                    self.__save_picture(stage_photo["content"], stage_photo["path"])
+                    self.__save_picture__(stage_photo["content"], stage_photo["path"])
                 print("完成剧照下载")
 
             dictionary.add(file_info.uid, file_info.dir)
@@ -76,10 +76,10 @@ class Collator(object):
 
         print("处理完成 " + path)
 
-    def __save_picture(self, picture_content, picture_path):
+    def __save_picture__(self, picture_content, picture_path):
         with open(picture_path, "ab") as image:
             image.write(picture_content)
 
     def run(self):
         with concurrent.futures.ThreadPoolExecutor(max_workers=5) as threadExecutor:
-            threadExecutor.map(lambda path: self.__neaten(path), self.__paths)
+            threadExecutor.map(lambda path: self.__neaten__(path), self.__paths)

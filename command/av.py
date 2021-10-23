@@ -17,4 +17,3 @@ else:
 
 Collator(paths, FileType[file_type]).run()
 
-

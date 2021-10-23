@@ -1,1 +1,1 @@
-C:\Users\vitos\AppData\Local\Programs\Python\Python39\python.exe D:\Project\sherlock\command\av.py %1 "DIR"
+"C:\Program Files\Python39\python.exe" D:\Project\sherlock\command\av.py %1 "DIR"

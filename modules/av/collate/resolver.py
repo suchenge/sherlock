@@ -9,7 +9,7 @@ class Resolver(object):
         self.dir, self.uid, self.title, self.file_name = None, None, None, None
         self.picture, self.stage_photos = None, []
 
-        self.__get_function = get_function
+        self.__get_function__ = get_function
 
     def __match_file_name__(self, name):
         return re.match("^[a-z0-9A-Z-_]+$", name) is not None
@@ -54,7 +54,7 @@ class Resolver(object):
             return
 
         # 获取文件信息
-        self.uid, self.title, picture_url, stage_photos_url = self.__get_function(path_info)
+        self.uid, self.title, picture_url, stage_photos_url = self.__get_function__(path_info)
         if self.uid is None or self.title is None or picture_url is None:
             print("文件解析失败")
             return
