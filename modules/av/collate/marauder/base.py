@@ -39,8 +39,8 @@ class BaseMarauder(object):
 
     def __get_stage_photo__(self, stage_photos_url):
         print("获取剧照内容")
+        stage_photos = []
         if stage_photos_url is not None and len(stage_photos_url) > 0:
-            stage_photos = []
             for stage_photo_url in stage_photos_url:
                 print(stage_photo_url)
                 stage_photo_name = os.path.split(stage_photo_url)[-1]
@@ -50,7 +50,7 @@ class BaseMarauder(object):
                     "content": self.__get_url_content__(stage_photo_url, False)
                 })
 
-            return stage_photos
+        return stage_photos
 
     def __get_picture__(self, uid, picture_url):
         print("获取封面内容")
