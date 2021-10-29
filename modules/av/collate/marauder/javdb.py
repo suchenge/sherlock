@@ -9,12 +9,6 @@ class MarauderJavdb(BaseMarauder):
         super().__init__(open_proxy)
         self.baseUrl = "https://javdb33.com"
 
-        proxy_address = "suchenge:suyuan2UnionPay@jp2.go2https.com"
-        self.proxy = {
-            "http": "http://" + proxy_address
-            , "https": "https://" + proxy_address
-        }
-
     def maraud(self, filename):
         url = self.baseUrl + '/search?q=' + filename + '&f=all'
 

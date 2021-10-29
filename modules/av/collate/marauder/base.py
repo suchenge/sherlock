@@ -21,6 +21,12 @@ class BaseMarauder(object):
             'Cookie': 'theme=auto; over18=1; _ym_d=1633615771; _ym_uid=163361577147146056; locale=zh; remember_me_token=eyJfcmFpbHMiOnsibWVzc2FnZSI6IkluQmxNV3A2YUhOSFRVZ3llWGRVWjI5eWJVTjRJZz09IiwiZXhwIjoiMjAyMS0xMC0yOVQwMzo1NDo1NS4wMDBaIiwicHVyIjoiY29va2llLnJlbWVtYmVyX21lX3Rva2VuIn19--a4fc9d154fd862fcafea2558c182187c8bb5b510; _ym_isad=1; _jdb_session=Lwhd0aqrITh18nGnY1Xim7XtRAlg%2Bxxy9KMALBWQAB2usUgnjcJpipZNkvNsECbaTd1UaG04AI6%2BOiFdf8AHd%2Fx79sxP425vEP1UC825U6mTwLlZdYd0gTdVrlymXlbjNoUstszaXZRXR%2BA6ep1Lubgpbg3Ht1eaYB1RpnuM%2FBoO3tLg1NCDcPmvrqcAW4uHvC%2BibE1YlBVHW3k63g7HRfjC8fkKrHrQMpdBB15RpDlEiZ2PaxLRtNeL59hUSAb62LChrnnIYW54eH7yRWjhaZwczXMAJdnU7ywbNPe2%2FYiuQJVhNMGvspj%2FweOPSraxfkvNDUwbzIRLDvQ7A55cEkrWyNo5bEa%2FmR0%2FGdah%2BWj8HDUt7IOh2AREMEH0RgfR9Sg%3D--pQrKHpNvmvw5waYR--%2BhRb3P9XrK4cC%2FLHUJkQvg%3D%3D'
         }
 
+        proxy_address = "suchenge:suyuan2UnionPay@jp2.go2https.com"
+        self.proxy = {
+            "http": "http://" + proxy_address
+            , "https": "https://" + proxy_address
+        }
+
     def __format_title__(self, title):
         return re.compile("[?:*'<>/\\\]").sub("", title).strip()
 
