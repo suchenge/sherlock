@@ -7,7 +7,7 @@ from enum import IntEnum
 
 from modules.av import dictionary
 from modules.av.collate.resolver import Resolver
-from modules.av.collate.parse import parser
+from modules.av.collate.marauder.javdb import MarauderJavdb
 
 
 class FileType(IntEnum):
@@ -24,7 +24,7 @@ class Collator(object):
         else:
             self.__append_dirfiles__(path)
 
-        self.__get_info_function__ = lambda file: parser.get_info_1(file)
+        self.marauder = MarauderJavdb(True)
 
     def __append_files__(self, file_paths):
         if isinstance(file_paths, str):
@@ -44,7 +44,7 @@ class Collator(object):
             is_file = os.path.isfile(path)
 
             # 解析文件信息
-            file_info = Resolver(self.__get_info_function__)
+            file_info = Resolver(self.marauder)
             file_info.resolve(path)
 
             if not is_file:
