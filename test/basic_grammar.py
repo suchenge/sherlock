@@ -1,5 +1,4 @@
 import unittest
-import urllib.request
 import requests
 
 
