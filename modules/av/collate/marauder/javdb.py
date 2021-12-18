@@ -7,14 +7,15 @@ from modules.av.collate.marauder.base import BaseMarauder
 class MarauderJavdb(BaseMarauder):
     def __init__(self, open_proxy):
         super().__init__(open_proxy)
-        self.baseUrl = "https://javdb33.com"
+        self.baseUrl = "https://javdb34.com"
 
     def maraud(self, filename):
         url = self.baseUrl + '/search?q=' + filename + '&f=all'
 
         print("开始访问信息页面:")
         print("url：" + url)
-        tree = etree.HTML(self.__get_url_content__(url))
+        html_content = self.__get_url_content__(url)
+        tree = etree.HTML(html_content)
 
         links = tree.xpath("//div[@class='grid-item column']/a/@href")
         uids = tree.xpath("//div[@class='grid-item column']/a/div[@class='uid']/text()")
