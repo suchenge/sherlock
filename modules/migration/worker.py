@@ -1,4 +1,5 @@
 import os
+import shutil
 import time
 import threading
 import xml.dom.minidom as xml
@@ -18,6 +19,7 @@ class Worker(object):
             self.__document__ = etree.ElementTree(root)
         else:
             self.__document__ = etree.parse(self.__path__)
+            shutil.copyfile(self.__path__, self.__path__ + '.' + time.strftime("%Y%m%d%H%M%S", time.localtime()) + '.bak')
 
     def start(self):
         self.__stop_thread__ = False

@@ -1,6 +1,6 @@
-from modules.migration.pathfinder import Pathfinder
 from modules.migration.hamal import Hamal
-from modules.migration.recorder import Recorder
+from modules.migration.pathfinder import Pathfinder
+
 
 sources = 'H:\影视'
 target = 'G:\影视'
