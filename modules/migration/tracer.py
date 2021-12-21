@@ -1,24 +1,37 @@
-def source_trace(fun):
+import time
+import threading
+
+from modules.migration.task import TaskState
+
+
+def monitoring(fun):
     def wrapper(*args, **kwargs):
+        obj = args[0]
         task = args[1]
-        print('\r' + task.get_source_path() + ' | ' + str(task.get_source_size()))
-        fun(*args)
-
-    return wrapper
-
-
-def target_trace(fun):
-    def wrapper(*args, **kwargs):
-        task = args[1]
-        fun(*args)
 
         source_size = task.get_source_size()
-        source_size_len = len(str(source_size))
+        print('\r' + task.get_source_path() + ' | ' + str(source_size))
+
+        threading.Thread(target=fun, args=[obj, task]).start()
+
         target_size = task.get_target_size()
+        while True:
+            source_size_len = len(str(source_size))
+            current_size = task.get_target_size()
+            if current_size == target_size:
+                task.set_repetition(task.get_repetition() + 1)
+            else:
+                target_size = current_size
 
-        print(task.get_target_path()
-              + ' | ' + str(target_size).zfill(source_size_len)
-              + ' | ' + str('{:.2%}'.format(task.get_completeness() / 100))
-              + ' | ' + str(task.get_repetition()))
+            print(task.get_target_path()
+                  + ' | ' + str(current_size).zfill(source_size_len)
+                  + ' | ' + str('{:.2%}'.format(task.get_completeness() / 100)).zfill(7)
+                  + ' | ' + str(task.get_repetition()).zfill(2)
+                  + ' | ' + str(time.time()))
 
+            if task.get_status() != TaskState.NEW:
+                print('-----------------------------------------------------------')
+                break
+
+            time.sleep(5)
     return wrapper

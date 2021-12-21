@@ -1,4 +1,4 @@
-import enum
+import os.path
 from enum import IntEnum
 from xml.etree.ElementTree import Element
 
@@ -66,14 +66,13 @@ class Task(object):
         elif self.get_repetition() >= self.__max_repetition_count__:
             self.__status__ = TaskState.REPETITION
             self.set_errors(self.get_errors() + 1)
-
         return self.__status__
 
     def set_status(self, value: TaskState):
         self.__status__ = value
         if value == TaskState.DONE:
             self.__set_attribute('completeness', '100.00%')
-            self.__set_attribute('size', self.get_source_size(), self.__element__[1])
+            # self.__set_attribute('size', self.get_source_size(), self.__element__[1])
             self.set_errors(0)
         if value == TaskState.ERROR:
             self.set_errors(self.get_errors() + 1)
