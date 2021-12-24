@@ -12,9 +12,12 @@ def monitoring(fun):
         source_size = task.get_source_size()
         print('\r' + task.get_source_path() + ' | ' + str(source_size))
 
-        threading.Thread(target=fun, args=[obj, task]).start()
+        copy_thread = threading.Thread(target=fun, args=[obj, task])
+        copy_thread.setDaemon(True)
+        copy_thread.start()
 
         target_size = task.get_target_size()
+
         while True:
             source_size_len = len(str(source_size))
             current_size = task.get_target_size()

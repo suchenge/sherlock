@@ -17,12 +17,6 @@ class Overseer(Worker):
 
         self.__task_index__ = -1
 
-    def start(self):
-        super(Overseer, self).start()
-
-    def stop(self):
-        super(Overseer, self).stop()
-
     def get_task(self):
         self.__task_index__ += 1
         if self.__task_index__ < len(self.__tasks__):

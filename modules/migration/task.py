@@ -1,4 +1,3 @@
-import os.path
 from enum import IntEnum
 from xml.etree.ElementTree import Element
 
@@ -11,7 +10,7 @@ class TaskState(IntEnum):
 
 
 class Task(object):
-    def __init__(self, element: Element, max_repetition_count=10):
+    def __init__(self, element: Element, max_repetition_count=20):
         self.__element__ = element
         self.__max_repetition_count__ = max_repetition_count
         self.__status__ = TaskState.NEW
