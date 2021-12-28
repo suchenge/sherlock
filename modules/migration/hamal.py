@@ -1,7 +1,7 @@
 import os.path
 
 from modules.migration.overseer import Overseer
-from modules.migration.task import TaskState
+from modules.migration.task import TaskState, Task
 from modules.migration.tracer import monitoring
 
 
@@ -19,41 +19,45 @@ class Hamal(object):
             self.carry()
 
     @monitoring
-    def __copy_file__(self, task):
-        source_path = task.get_source_path()
-        target_path = task.get_target_path()
+    def __copy_file__(self, task: Task):
+        try:
+            source_path = task.source_path
+            target_path = task.target_path
 
-        with open(source_path, 'rb') as source_file, open(target_path, 'wb+') as target_file:
-            target_size = os.path.getsize(target_path)
-            try:
-                while True:
-                    source_data = source_file.read(1024 * 1024)
-                    if not source_data:
-                        task.set_status(TaskState.DONE)
-                        break
+            with open(source_path, 'rb') as source_file, open(target_path, 'ab+') as target_file:
+                target_size = os.path.getsize(target_path)
+                try:
+                    source_file.seek(target_size)
+                    while True:
+                        source_data = source_file.read(1024 * 1024)
+                        if not source_data:
+                            task.status = TaskState.DONE
+                            break
 
-                    target_file.write(source_data)
-                    target_size += len(source_data)
-                    task.set_target_size(target_size)
-            except Exception as error:
-                print('\r' + str(error))
-                task.set_status(TaskState.ERROR)
-            finally:
-                source_file.close()
-                target_file.close()
+                        target_file.write(source_data)
+                        target_size += len(source_data)
+                        task.target_size = target_size
+                except Exception as error:
+                    print('\r' + str(error))
+                    task.status = TaskState.ERROR
+                finally:
+                    source_file.close()
+                    target_file.close()
 
-                if task.get_status() == TaskState.DONE:
-                    self.__remove_txt__(task)
+                    if task.status == TaskState.DONE:
+                        self.__remove_txt__(task)
 
-                if task.get_status() == TaskState.ERROR:
-                    self.__remove_target_file(task)
+                    if task.status == TaskState.ERROR:
+                        self.__remove_target_file__(task)
+        except Exception as error:
+            pass
 
-    def __remove_txt__(self, task):
-        txt_path = task.get_target_path() + '.txt'
+    def __remove_txt__(self, task: Task):
+        txt_path = task.target_path + '.txt'
         if os.path.exists(txt_path):
             os.remove(txt_path)
 
-    def __remove_target_file(self, task):
-        if os.path.exists(task.get_target_path()):
-            os.remove(task.get_target_path())
+    def __remove_target_file__(self, task: Task):
+        if os.path.exists(task.target_path):
+            os.remove(task.target_path)
 

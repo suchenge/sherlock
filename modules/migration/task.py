@@ -15,66 +15,78 @@ class Task(object):
         self.__max_repetition_count__ = max_repetition_count
         self.__status__ = TaskState.NEW
 
-        self.set_repetition(0)
+        self.repetition = 0
 
-    def get_repetition(self) -> int:
+    @property
+    def repetition(self) -> int:
         return int(self.__get_attribute__('repetition', 0))
 
-    def get_errors(self) -> int:
+    @repetition.setter
+    def repetition(self, value):
+        self.__set_attribute('repetition', value)
+
+    @property
+    def errors(self) -> int:
         return int(self.__get_attribute__('errors', 0))
 
-    def get_source_path(self) -> str:
+    @errors.setter
+    def errors(self, value: int):
+        self.__set_attribute('errors', value)
+
+    @property
+    def source_path(self) -> str:
         return self.__element__[0].text
 
-    def get_source_size(self) -> int:
+    @property
+    def source_size(self) -> int:
         return int(self.__get_attribute__('size', 0, self.__element__[0]))
 
-    def get_target_path(self) -> str:
+    @property
+    def target_path(self) -> str:
         return self.__element__[1].text
 
-    def get_target_size(self) -> int:
+    @property
+    def target_size(self) -> int:
         return int(self.__get_attribute__('size', 0, self.__element__[1]))
 
-    def get_completeness(self) -> float:
+    @property
+    def completeness(self) -> float:
         completeness = self.__get_attribute__('completeness', 0)
         if completeness != 0:
             completeness = completeness.replace('%', '')
         return float(completeness)
 
-    def set_errors(self, value: int):
-        self.__set_attribute('errors', value)
-
-    def set_target_size(self, value: int):
-        repetition = self.get_repetition()
-        if value == self.get_target_size():
+    @target_size.setter
+    def target_size(self, value: int):
+        repetition = self.repetition
+        if value == self.target_size:
             repetition += 1
         else:
             repetition = 0
 
         self.__set_attribute('repetition', repetition)
-        completeness = '{:.2%}'.format(value / self.get_source_size())
+        completeness = '{:.2%}'.format(value / self.source_size)
         self.__set_attribute('completeness', completeness)
         self.__set_attribute('size', value, self.__element__[1])
 
-    def set_repetition(self, value: int):
-        self.__set_attribute('repetition', value)
-
-    def get_status(self) -> TaskState:
-        if self.get_completeness() == 100:
+    @property
+    def status(self) -> TaskState:
+        if self.completeness == 100:
             self.__status__ = TaskState.DONE
-        elif self.get_repetition() >= self.__max_repetition_count__:
+        elif self.repetition >= self.__max_repetition_count__:
             self.__status__ = TaskState.REPETITION
-            self.set_errors(self.get_errors() + 1)
+            self.errors += 1
         return self.__status__
 
-    def set_status(self, value: TaskState):
+    @status.setter
+    def status(self, value: TaskState):
         self.__status__ = value
         if value == TaskState.DONE:
             self.__set_attribute('completeness', '100.00%')
             # self.__set_attribute('size', self.get_source_size(), self.__element__[1])
-            self.set_errors(0)
+            self.errors = 0
         if value == TaskState.ERROR:
-            self.set_errors(self.get_errors() + 1)
+            self.errors += 1
 
     def __get_attribute__(self, attribute_name, default_value: any, element=None) -> any:
         if element is None:

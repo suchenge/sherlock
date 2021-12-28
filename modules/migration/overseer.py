@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 
 from modules.migration.worker import Worker
 from modules.migration.task import Task
@@ -17,15 +18,38 @@ class Overseer(Worker):
 
         self.__task_index__ = -1
 
-    def get_task(self):
+    def get_task(self) -> Optional[Task]:
         self.__task_index__ += 1
         if self.__task_index__ < len(self.__tasks__):
             task = self.__tasks__[self.__task_index__]
-            if task.get_status() == TaskState.DONE or (os.path.exists(task.get_target_path()) and task.get_source_size() == os.stat(task.get_target_path()).st_size):
-                task.set_status(TaskState.DONE)
+            if task.status == TaskState.DONE or (
+                    os.path.exists(task.target_path) and task.source_size == os.stat(task.target_path).st_size):
+                task.status = TaskState.DONE
                 return self.get_task()
             else:
-                task.set_repetition(0)
+                task.repetition = 0
                 return task
         else:
             return None
+
+    def __thread_write__(self):
+        try:
+            root = self.__document__.getroot()
+
+            # 删除已经完成的file节点
+            file_elements = root.findall('.//file[@completeness="100.00%"]')
+            for element in file_elements:
+                parent = root.find('.//path/file[@name="' + element.get('name') + '"]/...')
+                parent.remove(element)
+
+            if len(file_elements) > 0:
+                # 删除所有file子节点都完成的path节点
+                path_elements = [path for path in self.__document__.findall('.//path')
+                                 if len([child for child in path.iter() if child is not path]) == 0]
+                for element in path_elements:
+                    parent = root.find('.//path[@name="' + element.get('name') + '"]/...')
+                    parent.remove(element)
+        except Exception as error:
+            print(error)
+        finally:
+            super(Overseer, self).__thread_write__()
