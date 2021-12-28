@@ -23,7 +23,7 @@ class Task(object):
 
     @repetition.setter
     def repetition(self, value):
-        self.__set_attribute('repetition', value)
+        self.__set_attribute__('repetition', value)
 
     @property
     def errors(self) -> int:
@@ -31,7 +31,7 @@ class Task(object):
 
     @errors.setter
     def errors(self, value: int):
-        self.__set_attribute('errors', value)
+        self.__set_attribute__('errors', value)
 
     @property
     def source_path(self) -> str:
@@ -64,10 +64,10 @@ class Task(object):
         else:
             repetition = 0
 
-        self.__set_attribute('repetition', repetition)
+        self.__set_attribute__('repetition', repetition)
         completeness = '{:.2%}'.format(value / self.source_size)
-        self.__set_attribute('completeness', completeness)
-        self.__set_attribute('size', value, self.__element__[1])
+        self.__set_attribute__('completeness', completeness)
+        self.__set_attribute__('size', value, self.__element__[1])
 
     @property
     def status(self) -> TaskState:
@@ -82,7 +82,7 @@ class Task(object):
     def status(self, value: TaskState):
         self.__status__ = value
         if value == TaskState.DONE:
-            self.__set_attribute('completeness', '100.00%')
+            self.__set_attribute__('completeness', '100.00%')
             # self.__set_attribute('size', self.get_source_size(), self.__element__[1])
             self.errors = 0
         if value == TaskState.ERROR:
@@ -98,7 +98,7 @@ class Task(object):
         else:
             return default_value
 
-    def __set_attribute(self, attribute_name, value: any, element=None):
+    def __set_attribute__(self, attribute_name, value: any, element=None):
         if element is None:
             element = self.__element__
 
