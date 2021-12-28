@@ -32,7 +32,7 @@ class Overseer(Worker):
         else:
             return None
 
-    def __thread_write__(self):
+    def __write_xml__(self):
         try:
             root = self.__document__.getroot()
 
@@ -52,4 +52,4 @@ class Overseer(Worker):
         except Exception as error:
             print(error)
         finally:
-            super(Overseer, self).__thread_write__()
+            super(Overseer, self).__write_xml__()
