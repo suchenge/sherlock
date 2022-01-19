@@ -44,7 +44,8 @@ class MarauderJavdb(BaseMarauder):
 
                 title = tree.xpath("//h2[@class='title is-4']/strong/text()")[-1]
                 picture = tree.xpath("//img[@class='video-cover']/@src")[-1]
-                stage_photos = tree.xpath("//div[@class='tile-images preview-images']/a[@class='tile-item']/@href")
+                # stage_photos = tree.xpath("//div[@class='tile-images preview-images']/a[@class='tile-item']/@href")
+                stage_photos = None
 
                 if title and picture and uid:
                     uid = uid.upper().strip()

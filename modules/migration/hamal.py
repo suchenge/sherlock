@@ -12,6 +12,7 @@ class Hamal(object):
 
     def carry(self):
         task = self.__overseer__.get_task()
+
         if task is None:
             self.__overseer__.stop()
         else:

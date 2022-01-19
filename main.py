@@ -6,4 +6,4 @@ target = 'G:\传输'
 
 # Pathfinder(sources, target).pathfinding()
 
-Hamal(target).carry()
+Hamal(target).carry() 
