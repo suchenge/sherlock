@@ -39,7 +39,7 @@ class BaseMarauder(object):
             else:
                 return response.content
         else:
-            raise Exception('get url content error, response status code:' + response.status_code)
+            raise Exception('get url content error, response status code:' + str(response.status_code))
 
     def __get_stage_photo__(self, stage_photos_url):
         print("获取剧照内容")
