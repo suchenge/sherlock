@@ -2,11 +2,12 @@ import os
 import re
 
 
-class Cleaner(object):
+class Dustman(object):
     def __init__(self):
-        self.__bookmarks_path__ = os.path.abspath("../data/bookmarks/bookmarks_2022_3_30.html")
+        self.__bookmarks_path__ = os.path.abspath("./data/bookmarks/bookmarks_2022_3_30.html")
         self.__bookmarks_context__ = []
         self.__bookmarks_groups__ = {}
+        self.__bookmarks_domains__ = []
 
         line_index = 0
         with open(self.__bookmarks_path__, encoding='utf-8', mode='r') as bookmarks:
@@ -27,11 +28,12 @@ class Cleaner(object):
                         title = match[0][2]
                         keys = self.__get_key__(title, href)
                         overdue = self.__dictionary_is_exists__(keys)
-
+                        self.__append_to_domain__(domain)
                         for key in keys:
                             self.__append_to_groups__(self.__build_context__(line_index, line, href, domain, title, key, overdue))
 
-    def run(self):
+    def clean_up(self):
+        print(self.__bookmarks_domains__);
         print(self.__bookmarks_context__[len(self.__bookmarks_context__) - 1]['line_index'])
         print(len(self.__bookmarks_groups__.values()))
 
@@ -45,18 +47,33 @@ class Cleaner(object):
 
     def __clear_bookmarks_context__(self, group):
         # 如果链接组有一个已经失效，那此链接组中所有链接都失效
-        if True in self.__get_value_by_group__(group, 'delete'):
+        self.__clear_bookmarks_context_by_deleted__(group)
+        # 如果当前链接组中有重复的链接，则只保留一个链接
+        self.__clear_bookmarks_context_by_repeated__(group)
+        # 如果链接组中含有指定domain的链接，则其他链接失效
+        self.__clear_bookmarks_context_by_domain__(group, 'javdb.com')
+        self.__clear_bookmarks_context_by_domain__(group, 'www.javhoo.org')
+
+    def __clear_bookmarks_context_by_deleted__(self, group):
+        if True in self.__get_group_value_by_key__(group, 'delete'):
             for context in group:
                 context['delete'] = True
-        # 如果当前链接组中有重复的链接，则只保留一个链接
 
-        # 如果链接组中含有‘javdb’的链接，则其他链接失效
-        elif 'javdb.com' in self.__get_value_by_group__(group, 'domain'):
+    def __clear_bookmarks_context_by_repeated__(self, group):
+        urls = []
+        for context in group:
+            if context['href'] in urls:
+                context['delete'] = True
+            else:
+                urls.append(context['href'])
+
+    def __clear_bookmarks_context_by_domain__(self, group, domain):
+        if domain in self.__get_group_value_by_key__(group, 'domain'):
             for context in group:
-                if 'javdb.com' not in context['domain']:
+                if not context['delete'] and domain not in context['domain'] and 'javdb' not in context['domain']:
                     context['delete'] = True
 
-    def __get_value_by_group__(self, group, key):
+    def __get_group_value_by_key__(self, group, key):
         result = []
         for value in group:
             result.append(value[key])
@@ -69,6 +86,10 @@ class Cleaner(object):
             self.__bookmarks_groups__[key].append(context)
         else:
             self.__bookmarks_groups__[key] = [context]
+
+    def __append_to_domain__(self, domain):
+        if domain not in self.__bookmarks_domains__:
+            self.__bookmarks_domains__.append(domain)
 
     def __is_effective_line__(self, line):
         domains = ['141jav', 'javdb', 'javhoo', 'watchjavonline', 'sehuatang', 'taohuazu9', 'c700', 'sis001', 'javtorrent', 'maddawgjav', 'mgstage', 'jpvrporn', 'bejav', 'ivworld', 'watchjavidol', 'youivr', 'canchah2016', 'dmm']
