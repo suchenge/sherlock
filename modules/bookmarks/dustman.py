@@ -1,11 +1,12 @@
 import os
 import re
+import time
 
 
 class Dustman(object):
     def __init__(self):
-        self.__bookmarks_path__ = os.path.abspath("./data/bookmarks/bookmarks_2022_3_30.html")
-        self.__bookmarks_context__ = []
+        self.__bookmarks_path__ = os.path.abspath("../data/bookmarks/bookmarks_2022_3_30.html")
+        self.__bookmarks_context__ = {}
         self.__bookmarks_groups__ = {}
         self.__bookmarks_domains__ = []
 
@@ -17,7 +18,7 @@ class Dustman(object):
                 if not line:
                     break
 
-                self.__bookmarks_context__.append({'line_index': line_index, 'context': line})
+                self.__bookmarks_context__[line_index] = line
 
                 if 'HREF' in line and self.__is_effective_line__(line):
                     match = re.compile(r'<A HREF=\"(http[s]?://(.*?)/.*?)\".*?>(.*?)</A>').findall(line)
@@ -28,13 +29,14 @@ class Dustman(object):
                         title = match[0][2]
                         keys = self.__get_key__(title, href)
                         overdue = self.__dictionary_is_exists__(keys)
-                        self.__append_to_domain__(domain)
+                        # self.__append_to_domain__(domain)
                         for key in keys:
-                            self.__append_to_groups__(self.__build_context__(line_index, line, href, domain, title, key, overdue))
+                            self.__append_to_groups__(
+                                self.__build_context__(line_index, line, href, domain, title, key, overdue))
 
     def clean_up(self):
-        print(self.__bookmarks_domains__);
-        print(self.__bookmarks_context__[len(self.__bookmarks_context__) - 1]['line_index'])
+        print(self.__bookmarks_domains__)
+        print(len(self.__bookmarks_context__))
         print(len(self.__bookmarks_groups__.values()))
 
         for key, values in self.__bookmarks_groups__.items():
@@ -43,7 +45,16 @@ class Dustman(object):
             print(key)
             for value in values:
                 print('key:%s | delete:%s | domain:%s  | line_index: %s| href:%s' % (value['key'], value['delete'], value['domain'], value['line_index'], value['href']))
+
+                if value['delete'] and value['line_index'] in self.__bookmarks_context__.keys():
+                    delete_line = self.__bookmarks_context__.pop(value['line_index'])
+
             print('--------------------------------------------------------------')
+
+        new_bookmarks_path = self.__bookmarks_path__ + '.' + time.strftime("%Y%m%d%H%M%S", time.localtime()) + '.html'
+        with open(new_bookmarks_path, encoding='utf-8', mode='w+') as new:
+            for value in self.__bookmarks_context__.values():
+                new.write(value)
 
     def __clear_bookmarks_context__(self, group):
         # 如果链接组有一个已经失效，那此链接组中所有链接都失效
@@ -92,7 +103,9 @@ class Dustman(object):
             self.__bookmarks_domains__.append(domain)
 
     def __is_effective_line__(self, line):
-        domains = ['141jav', 'javdb', 'javhoo', 'watchjavonline', 'sehuatang', 'taohuazu9', 'c700', 'sis001', 'javtorrent', 'maddawgjav', 'mgstage', 'jpvrporn', 'bejav', 'ivworld', 'watchjavidol', 'youivr', 'canchah2016', 'dmm']
+        domains = ['141jav', 'javdb', 'javhoo', 'watchjavonline', 'sehuatang', 'taohuazu9', 'c700', 'sis001',
+                   'javtorrent', 'maddawgjav', 'mgstage', 'jpvrporn', 'bejav', 'ivworld', 'watchjavidol', 'youivr',
+                   'canchah2016', 'dmm']
         for domain in domains:
             if domain in line:
                 return True
@@ -126,5 +139,3 @@ class Dustman(object):
                 return True
 
         return False
-
-
