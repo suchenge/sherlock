@@ -39,7 +39,11 @@ class Proxies(object):
 
         self.__items__ = [Proxy(proxy) for proxy in self.__proxies__]
         self.__current_item__ = None
-        threading.Thread(target=self.__write__).start()
+
+        thread = threading.Thread(target=self.__write__)
+        thread.setDaemon(True)
+        thread.start()
+        # threading.Thread(target=self.__write__).start()
 
     @monitoring
     def get(self):

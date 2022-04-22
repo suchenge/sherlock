@@ -85,3 +85,5 @@ class Collator(object):
     def run(self):
         with concurrent.futures.ThreadPoolExecutor(max_workers=5) as threadExecutor:
             threadExecutor.map(lambda path: self.__neaten__(path), self.__paths__)
+
+        print('全部完成')

@@ -30,10 +30,9 @@ class BaseMarauder(object):
 
         if stage_photos_url is not None and len(stage_photos_url) > 0:
             with ThreadPoolExecutor(max_workers=5) as executor:
-                tasks = [executor.submit(self.__build_stage_photo__, uid, index, stage_photos_url) for index in range(0, len(stage_photos_url))]
+                tasks = executor.map(lambda index: self.__build_stage_photo__(uid, index, stage_photos_url), range(0, len(stage_photos_url)))
 
-                for future in as_completed(tasks):
-                    result = future.result()
+                for result in tasks:
                     stage_photos.append(result)
 
         return stage_photos
