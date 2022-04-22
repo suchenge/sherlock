@@ -62,12 +62,11 @@ class Collator(object):
                 print("完成封面下载")
 
             # 下载剧照
-            '''
             if file_info.stage_photos is not None and len(file_info.stage_photos) > 0:
                 for stage_photo in file_info.stage_photos:
                     self.__save_picture__(stage_photo["content"], stage_photo["path"])
                 print("完成剧照下载")
-            '''
+
             dictionary.add(file_info.uid, file_info.dir)
 
         except Exception as error:

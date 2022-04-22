@@ -1,5 +1,3 @@
-import requests
-
 from lxml import etree
 from modules.av.collate.marauder.base import BaseMarauder
 
@@ -44,11 +42,11 @@ class MarauderJavdb(BaseMarauder):
 
                 title = tree.xpath("//h2[@class='title is-4']/strong/text()")[-1]
                 picture = tree.xpath("//img[@class='video-cover']/@src")[-1]
-                # stage_photos = tree.xpath("//div[@class='tile-images preview-images']/a[@class='tile-item']/@href")
-                stage_photos = None
+                stage_photos = tree.xpath("//div[@class='tile-images preview-images']/a[@class='tile-item']/@href")
+                # stage_photos = None
 
                 if title and picture and uid:
                     uid = uid.upper().strip()
-                    return uid, self.__format_title__(title), self.__get_picture__(uid, picture), self.__get_stage_photo__(stage_photos)
+                    return uid, self.__format_title__(title), self.__get_picture__(uid, picture), self.__get_stage_photo__(uid, stage_photos)
         else:
             print("页面中没有查询到信息")
