@@ -17,7 +17,7 @@ class FileType(IntEnum):
 
 class Collator(object):
     def __init__(self, path, file_type=FileType.FILE):
-        self.__paths = []
+        self.__paths__ = []
 
         if file_type == FileType.FILE:
             self.__append_files__(path)
@@ -28,13 +28,13 @@ class Collator(object):
 
     def __append_files__(self, file_paths):
         if isinstance(file_paths, str):
-            self.__paths.append(file_paths)
+            self.__paths__.append(file_paths)
         else:
-            self.__paths.extend(file_paths)
+            self.__paths__.extend(file_paths)
 
     def __append_dirfiles__(self, dir_path):
         for file in os.listdir(dir_path):
-            self.__paths.append(dir_path + "/" + file)
+            self.__paths__.append(dir_path + "/" + file)
 
     def __neaten__(self, path):
         print("开始处理：" + path)
@@ -82,4 +82,4 @@ class Collator(object):
 
     def run(self):
         with concurrent.futures.ThreadPoolExecutor(max_workers=5) as threadExecutor:
-            threadExecutor.map(lambda path: self.__neaten__(path), self.__paths)
+            threadExecutor.map(lambda path: self.__neaten__(path), self.__paths__)

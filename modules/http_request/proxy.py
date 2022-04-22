@@ -43,6 +43,9 @@ class Proxies(object):
 
     @monitoring
     def get(self):
+        if self.__current_item__ is not None and self.__current_item__.available == True:
+            return self.__current_item__
+
         available_items = sorted(
             [item for item in self.__items__ if item.available == True and item != self.__current_item__],
             key=lambda x: x.rate, reverse=True)
