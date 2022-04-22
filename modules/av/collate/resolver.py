@@ -6,6 +6,7 @@ class Resolver(object):
     def __init__(self, marauder):
         self.dir, self.uid, self.title, self.file_name = None, None, None, None
         self.picture, self.stage_photos = None, []
+        self.type = None
 
         self.__marauder__ = marauder
 
@@ -22,6 +23,7 @@ class Resolver(object):
         if os.path.isfile(path):
             path_info, file_suffix = os.path.splitext(file)
             self.file_name = file
+            self.type = file_suffix.replace('.', '')
 
         if not self.__match_file_name__(path_info):
             print("文件名称不符合规范")

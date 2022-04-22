@@ -67,7 +67,9 @@ class Collator(object):
                     self.__save_picture__(stage_photo["content"], stage_photo["path"])
                 print("完成剧照下载")
 
-            dictionary.add(file_info.uid, file_info.dir)
+            excluded_types = ['torrent', 'jpg', 'png', 'gif']
+            if file_info.type is not None and file_info.type not in excluded_types:
+                dictionary.add(file_info.uid, file_info.dir)
 
         except Exception as error:
             print("处理出错:")
