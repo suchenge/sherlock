@@ -40,7 +40,10 @@ class Resolver(object):
         print("title：" + self.title)
         print("picture：" + self.picture["url"])
 
-        self.dir = dir + "/" + self.title
+        if self.title in dir:
+            self.dir = dir
+        else:
+            self.dir = dir + "/" + self.title
 
         self.picture["path"] = self.dir + "/" + self.picture["name"]
 

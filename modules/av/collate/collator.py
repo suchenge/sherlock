@@ -51,10 +51,14 @@ class Collator(object):
                 # 重命名文件夹
                 os.rename(path, file_info.dir)
             else:
-                # 创建文件夹
-                Path(file_info.dir).mkdir(exist_ok=True)
-                # 移动文件
-                shutil.move(path, file_info.dir + "/" + file_info.file_name)
+                if not os.path.exists(file_info.dir):
+                    # 创建文件夹
+                    Path(file_info.dir).mkdir(exist_ok=True)
+
+                new_path = file_info.dir + "/" + file_info.uid + '.' + file_info.type
+                if path != new_path:
+                    # 移动文件
+                    shutil.move(path, file_info.dir + "/" + file_info.uid + '.' + file_info.type)
 
             # 下载封面
             if not os.path.exists(file_info.picture["path"]):

@@ -4,7 +4,7 @@
 
 
 "D:\Project\sherlock\context_menu\bat\collator_directory.bat" "%V"
-"D:\Project\sherlock\context_menu\bat\collator_files.bat" %1
+"D:\Project\sherlock\context_menu\bat\collator_files.bat" "%V"
 
 C:\Users\vitos\AppData\Local\Programs\Python\Python39\python.exe D:\Project\sherlock\command\av.py %1 "DIR"
 C:\Users\vitos\AppData\Local\Programs\Python\Python39\python.exe D:\Project\sherlock\command\av.py %1 "FILE"

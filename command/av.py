@@ -7,6 +7,7 @@ sys.path.append(module_path)
 
 from modules.av.collate.collator import FileType, Collator
 
+print(sys.argv[0])
 paths = sys.argv[1]
 file_type = sys.argv[2]
 
