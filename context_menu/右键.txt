@@ -1,7 +1,7 @@
 
 计算机\HKEY_CLASSES_ROOT\Directory\Background\shell\整理当前目录
 计算机\HKEY_CLASSES_ROOT\AllFilesystemObjects\shell\整理所选文件
+计算机\HKEY_CLASSES_ROOT\AllFilesystemObjects\shell\分割所选文件
 
 "D:\Project\sherlock\context_menu\bat\collator.bat" "%V"
-
-C:\Users\vitos\AppData\Local\Programs\Python\Python39\python.exe D:\Project\sherlock\command\av.py %1
+"D:\Project\sherlock\context_menu\bat\clip.bat" "%V"

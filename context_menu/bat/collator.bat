@@ -1,1 +1,1 @@
-"C:\Program Files\Python39\python.exe" D:\Project\sherlock\command\av.py %1
+"C:\Program Files\Python39\python.exe" D:\Project\sherlock\command\collator.py %1
