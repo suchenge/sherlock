@@ -7,6 +7,7 @@ from modules.http_request.request import Request
 from modules.http_request.proxy import Proxies
 from modules.av.collate.file import File
 from modules.av.collate.porter import Porter
+from modules.av import dictionary
 
 
 class Collator(object):
@@ -23,11 +24,13 @@ class Collator(object):
 
     def __neaten__(self, file):
         print("开始处理文件：" + file.path)
+        print(' name：%s\n type：%s\n title：%s\n folder：%s\n path：%s\n'
+              % (file.name, file.type, file.title, file.folder, file.path))
+
+        if file.type == 'torrent' and dictionary.exists(file.title):
+            return
 
         try:
-            print(' name：%s\n type：%s\n title：%s\n folder：%s\n path：%s\n'
-                  % (file.name, file.type, file.title, file.folder, file.path))
-
             marauder = marauder_factory.get_marauder(file, self.__request__)
             film = marauder.to_film()
 
