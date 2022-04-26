@@ -7,7 +7,7 @@ sys.path.append(module_path)
 
 from modules.av.collate.collator import Collator
 
-os.system("pause")
+# os.system("pause")
 Collator(sys.argv[1]).run()
 
 
