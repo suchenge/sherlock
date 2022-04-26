@@ -19,4 +19,7 @@ def add(uid, filename):
     with open(file_path, "w", encoding="utf-8") as file:
         file.write(json.dumps(json_object, sort_keys=True, indent=4, ensure_ascii=False))
 
-    print("写入字典")
+
+def exists(uid):
+    file_path = dict_path + uid + ".json"
+    return os.path.exists(file_path)

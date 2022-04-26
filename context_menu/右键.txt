@@ -2,9 +2,6 @@
 计算机\HKEY_CLASSES_ROOT\Directory\Background\shell\整理当前目录
 计算机\HKEY_CLASSES_ROOT\AllFilesystemObjects\shell\整理所选文件
 
+"D:\Project\sherlock\context_menu\bat\collator.bat" "%V"
 
-"D:\Project\sherlock\context_menu\bat\collator_directory.bat" "%V"
-"D:\Project\sherlock\context_menu\bat\collator_files.bat" "%V"
-
-C:\Users\vitos\AppData\Local\Programs\Python\Python39\python.exe D:\Project\sherlock\command\av.py %1 "DIR"
-C:\Users\vitos\AppData\Local\Programs\Python\Python39\python.exe D:\Project\sherlock\command\av.py %1 "FILE"
+C:\Users\vitos\AppData\Local\Programs\Python\Python39\python.exe D:\Project\sherlock\command\av.py %1

@@ -1,6 +1,5 @@
 import requests
 from urllib.parse import urlparse
-from modules.http_request.proxy import Proxies
 
 
 def header(base_url):
@@ -14,37 +13,49 @@ def header(base_url):
     }
 
 
+def monitoring(fun):
+    def wrapper(*args, **kwargs):
+        url = args[1]
+        print("获取页面内容：" + url)
+        result = fun(*args, **kwargs)
+        return result
+
+    return wrapper
+
+
 class Request(object):
-    def __get_response__(self, url, headers, open_proxy=False):
+    def __init__(self, proxies=None):
+        self.__proxies__ = proxies
+
+    def __get_response__(self, url, headers):
         proxy = None
 
-        if open_proxy:
-            proxy = Proxies().get()
+        if self.__proxies__:
+            proxy = self.__proxies__.get()
 
             if proxy is None:
-                raise Exception('没有可用的Proxy')
-
-        response = None
+                raise Exception("没有获取到页面内容")
 
         try:
             response = requests.get(url, headers, proxies=proxy.address)
+            if response and response.status_code == 200:
+                if proxy:
+                    proxy.rate += 1
+                return response
+            else:
+                if proxy:
+                    proxy.available = False
+                    return self.__get_response__(url, headers)
         except Exception as error:
-            if open_proxy:
+            if proxy:
                 proxy.available = False
-                return self.__get_response__(url, headers, open_proxy)
+                return self.__get_response__(url, headers)
 
-        if response.status_code == 200:
-            proxy.rate += 1
-            return response
-        else:
-            if open_proxy:
-                proxy.available = False
-                return self.__get_response__(url, headers, open_proxy)
-
-    def get(self, url, open_proxy=False):
+    @monitoring
+    def get(self, url):
         url_parse = urlparse(url)
         base_url = '%s://%s/' % (url_parse.scheme, url_parse.hostname)
         headers = header(base_url)
-        response = self.__get_response__(url, headers, open_proxy)
+        response = self.__get_response__(url, headers)
 
         return response

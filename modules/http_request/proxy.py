@@ -1,7 +1,5 @@
 import json
 import os
-import time
-import threading
 import modules.http_request.json_path
 
 
@@ -20,7 +18,12 @@ def monitoring(fun):
     def wrapper(*args, **kwargs):
         obj = args[0]
         current_item = obj.__current_item__
+
         result = fun(*args, **kwargs)
+
+        if result is None:
+            print('没有可用的Proxy')
+
         if current_item != result:
             print('当前Proxy：' + result.__proxyObj__['address'])
 
@@ -40,11 +43,6 @@ class Proxies(object):
         self.__items__ = [Proxy(proxy) for proxy in self.__proxies__]
         self.__current_item__ = None
 
-        thread = threading.Thread(target=self.__write__)
-        thread.setDaemon(True)
-        thread.start()
-        # threading.Thread(target=self.__write__).start()
-
     @monitoring
     def get(self):
         if self.__current_item__ is not None and self.__current_item__.available == True:
@@ -60,14 +58,9 @@ class Proxies(object):
         else:
             return None
 
-    def __write__(self):
-        while True:
-            try:
-                with open(self.__path__, 'w') as json_file:
-                    json.dump(self.__proxies__, json_file, indent=4)
-            except Exception as error:
-                print(error)
-            time.sleep(10)
+    def close(self):
+        with open(self.__path__, 'w') as json_file:
+            json.dump(self.__proxies__, json_file, indent=4)
 
 
 class Proxy(object):

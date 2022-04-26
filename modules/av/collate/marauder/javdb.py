@@ -3,16 +3,16 @@ from modules.av.collate.marauder.base import BaseMarauder
 
 
 class MarauderJavdb(BaseMarauder):
-    def __init__(self, open_proxy):
-        super().__init__(open_proxy)
-        self.baseUrl = "https://javdb34.com"
+    def __init__(self, file, request):
+        super().__init__(file, request)
 
-    def maraud(self, filename):
-        url = self.baseUrl + '/search?q=' + filename + '&f=all'
+        self.__base_url__ = "https://javdb34.com"
+        search_url = self.__base_url__ + '/search?q=' + file.title + '&f=all'
+        html_content = self.__get_url_content__(search_url)
 
-        print("开始访问信息页面:")
-        print("url：" + url)
-        html_content = self.__get_url_content__(url)
+        if html_content is None:
+            raise Exception("没有获取到页面内容")
+
         tree = etree.HTML(html_content)
 
         links = tree.xpath("//div[@class='grid-item column']/a/@href")
@@ -21,32 +21,26 @@ class MarauderJavdb(BaseMarauder):
         if 0 < len(links) == len(uids) > 0:
             index = 0
 
-            if filename in uids:
-                index = uids.index(filename)
+            if file.title in uids:
+                index = uids.index(file.title)
             else:
                 for i in range(len(uids)):
-                    if uids[i] in filename:
+                    if uids[i] in file.title:
                         index = i
                         break
 
-            if index < 0:
-                print("页面中没有查询到信息")
-                return None, None, None, None
-
-            uid = uids[index]
-
             if index > -1:
                 link = links[index]
-                print("url：" + self.baseUrl + link)
-                tree = etree.HTML(self.__get_url_content__(self.baseUrl + link))
+                self.__content__ = self.__get_url_content__(self.__base_url__ + link)
+                tree = etree.HTML(self.__content__)
 
-                title = tree.xpath("//h2[@class='title is-4']/strong/text()")[-1]
-                picture = tree.xpath("//img[@class='video-cover']/@src")[-1]
-                stage_photos = tree.xpath("//div[@class='tile-images preview-images']/a[@class='tile-item']/@href")
-                # stage_photos = None
-
-                if title and picture and uid:
-                    uid = uid.upper().strip()
-                    return uid, self.__format_title__(title), self.__get_picture__(uid, picture), self.__get_stage_photo__(uid, stage_photos)
+                self.__id__ = uids[index]
+                self.__title__ = tree.xpath("//h2[@class='title is-4']/strong/text()")[-1]
+                self.__poster__ = tree.xpath("//img[@class='video-cover']/@src")[-1]
+                self.__stills__ = tree.xpath("//div[@class='tile-images preview-images']/a[@class='tile-item']/@href")
         else:
-            print("页面中没有查询到信息")
+            self.__content__ = None
+
+
+
+

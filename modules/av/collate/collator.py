@@ -1,93 +1,55 @@
 import os
-import shutil
 import concurrent.futures
 
-from pathlib import Path
-from enum import IntEnum
+import modules.av.collate.marauder.marauder_factory as marauder_factory
 
-from modules.av import dictionary
-from modules.av.collate.resolver import Resolver
-from modules.av.collate.marauder.javdb import MarauderJavdb
-
-
-class FileType(IntEnum):
-    DIR = 1,
-    FILE = 2
+from modules.http_request.request import Request
+from modules.http_request.proxy import Proxies
+from modules.av.collate.file import File
+from modules.av.collate.porter import Porter
 
 
 class Collator(object):
-    def __init__(self, path, file_type=FileType.FILE):
-        self.__paths__ = []
+    def __init__(self, path):
+        self.__files__ = []
 
-        if file_type == FileType.FILE:
-            self.__append_files__(path)
+        if os.path.isfile(path):
+            self.__files__.append(File(path))
         else:
-            self.__append_dirfiles__(path)
+            self.__files__ = [File(os.path.join(path, file_name)) for file_name in os.listdir(path)]
 
-        self.marauder = MarauderJavdb(True)
+        self.__proxies__ = Proxies()
+        self.__request__ = Request(self.__proxies__)
 
-    def __append_files__(self, file_paths):
-        if isinstance(file_paths, str):
-            self.__paths__.append(file_paths)
-        else:
-            self.__paths__.extend(file_paths)
-
-    def __append_dirfiles__(self, dir_path):
-        for file in os.listdir(dir_path):
-            self.__paths__.append(dir_path + "/" + file)
-
-    def __neaten__(self, path):
-        print("开始处理：" + path)
+    def __neaten__(self, file):
+        print("开始处理文件：" + file.path)
 
         try:
-            info = None
-            is_file = os.path.isfile(path)
+            print(' name：%s\n type：%s\n title：%s\n folder：%s\n path：%s\n'
+                  % (file.name, file.type, file.title, file.folder, file.path))
 
-            # 解析文件信息
-            file_info = Resolver(self.marauder)
-            file_info.resolve(path)
+            marauder = marauder_factory.get_marauder(file, self.__request__)
+            film = marauder.to_film()
 
-            if not is_file:
-                # 重命名文件夹
-                os.rename(path, file_info.dir)
-            else:
-                if not os.path.exists(file_info.dir):
-                    # 创建文件夹
-                    Path(file_info.dir).mkdir(exist_ok=True)
+            print('文件解析结果\n id:%s\n title:%s\n posters:%s\n stills:\n%s\n'
+                  % (film.id, film.title, film.poster['url'], '\n'.join(['       ' + stills['url'] for stills in film.stills])))
 
-                new_path = file_info.dir + "/" + file_info.uid + '.' + file_info.type
-                if path != new_path:
-                    # 移动文件
-                    shutil.move(path, file_info.dir + "/" + file_info.uid + '.' + file_info.type)
-
-            # 下载封面
-            if not os.path.exists(file_info.picture["path"]):
-                self.__save_picture__(file_info.picture["content"], file_info.picture["path"])
-                print("完成封面下载")
-
-            # 下载剧照
-            if file_info.stage_photos is not None and len(file_info.stage_photos) > 0:
-                for stage_photo in file_info.stage_photos:
-                    self.__save_picture__(stage_photo["content"], stage_photo["path"])
-                print("完成剧照下载")
-
-            excluded_types = ['torrent', 'jpg', 'png', 'gif']
-            if file_info.type is not None and file_info.type not in excluded_types:
-                dictionary.add(file_info.uid, file_info.dir)
+            porter = Porter(film)
+            porter.move()
+            porter.save_poster(self.__request__)
+            porter.save_stills(self.__request__)
+            porter.append_to_dictionary()
 
         except Exception as error:
             print("处理出错:")
             print(error)
             os.system("pause")
 
-        print("处理完成 " + path)
-
-    def __save_picture__(self, picture_content, picture_path):
-        with open(picture_path, "ab") as image:
-            image.write(picture_content)
+        print("处理文件完成 " + file.path)
 
     def run(self):
         with concurrent.futures.ThreadPoolExecutor(max_workers=5) as threadExecutor:
-            threadExecutor.map(lambda path: self.__neaten__(path), self.__paths__)
+            threadExecutor.map(lambda file: self.__neaten__(file), self.__files__)
 
         print('全部完成')
+        self.__proxies__.close()

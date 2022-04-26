@@ -1,65 +1,62 @@
 import os
 import re
 
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from modules.http_request.request import Request
+from modules.av.collate.film import Film
 
 
 class BaseMarauder(object):
-    def __init__(self, open_proxy=False):
-        self.open_proxy = open_proxy
-        self.http_request = Request()
+    def __init__(self, file, request):
+        self.__file__ = file
+        self.__http_request__ = request
 
-    def __format_title__(self, title):
-        return re.compile("[?:*'<>/\\\]").sub("", title).strip()
+        self.__content__, self.__id__, self.__title__, self.__poster__, self.__stills__ = None, None, None, None, None
 
-    def __get_url_content__(self, url, is_html=True):
-        response = self.http_request.get(url, self.open_proxy)
+    def to_film(self) -> Film:
+        return Film(self.__file__
+                    , content=self.__content__
+                    , id=self.__id__
+                    , title=self.__format_title__()
+                    , poster=self.__get_poster__()
+                    , stills=self.__get_stills__())
 
-        if response.status_code == 200:
-            if is_html:
-                return response.text
-            else:
-                return response.content
+    def __get_url_content__(self, url):
+        response = self.__http_request__.get(url)
+
+        if response:
+            return response.text
         else:
             raise Exception('get url content error, response status code:' + str(response.status_code))
 
-    def __get_stage_photo__(self, uid, stage_photos_url):
-        print("获取剧照内容")
-        stage_photos = []
+    def __format_title__(self):
+        return re.compile("[?:*'<>/\\\]").sub("", self.__title__).strip()
 
-        if stage_photos_url is not None and len(stage_photos_url) > 0:
-            with ThreadPoolExecutor(max_workers=5) as executor:
-                tasks = executor.map(lambda index: self.__build_stage_photo__(uid, index, stage_photos_url), range(0, len(stage_photos_url)))
+    def __get_poster__(self):
+        if self.__content__ is None:
+            return None
 
-                for result in tasks:
-                    stage_photos.append(result)
-
-        return stage_photos
-
-    def __build_stage_photo__(self, uid, index, stage_photos_url):
-        stage_photo_url = stage_photos_url[index]
-        stage_photo_name = os.path.split(stage_photo_url)[-1]
-        stage_photo_type = stage_photo_name.split('.')[-1]
-
-        print('index = %d, stage_photo_url = %s' % (index, stage_photo_url))
-
+        name = self.__id__ + os.path.splitext(self.__poster__)[-1]
         return {
-            "name": '%s_%s.%s' % (uid, index, stage_photo_type),
-            "url": stage_photo_url,
-            "content": self.__get_url_content__(stage_photo_url, False),
+            "name": name,
+            "url": self.__poster__,
         }
 
-    def __get_picture__(self, uid, picture_url):
-        print("获取封面内容")
-        print(picture_url)
-        picture_name = uid + os.path.splitext(picture_url)[-1]
-        return {
-            "name": picture_name,
-            "url": picture_url,
-            "content": self.__get_url_content__(picture_url, False)
-        }
+    def __get_stills__(self):
+        stills = []
+        if self.__content__ is None:
+            return None
 
-    def maraud(self, filename):
-        pass
+        if self.__stills__ is not None and len(self.__stills__) > 0:
+            for index in range(0, len(self.__stills__)):
+                url = self.__stills__[index]
+                name = os.path.split(url)[-1]
+                type = name.split('.')[-1]
+
+                stills.append({
+                    "name": '%s_%s.%s' % (self.__id__, index, type),
+                    "url": url,
+                })
+
+        return stills
+
+
 
