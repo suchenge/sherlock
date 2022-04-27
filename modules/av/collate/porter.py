@@ -35,8 +35,9 @@ class Porter(object):
 
             # 判断需要移动的文件是否已经存在
             new_file_path = '%s/%s.%s' % (film.folder, film.id, film.file.type)
-            # 移动文件
-            shutil.move(film.file.path, new_file_path)
+            if not os.path.exists(new_file_path):
+                # 移动文件
+                shutil.move(film.file.path, new_file_path)
 
     def save_poster(self, request):
         print("封面下载")

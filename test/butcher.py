@@ -1,5 +1,5 @@
-from modules.movie_cut.butcher import Butcher
+import re
 
-path_param = "E:\\Movie\\Halo.mp4"
+start_time = '001258'
 
-Butcher(path_param).chop()
+

@@ -1,3 +1,4 @@
+import re
 import concurrent.futures
 
 from ffmpy import FFmpeg
@@ -20,6 +21,18 @@ def computation_time(fun):
         print("%s|%02d:%02d:%02d" % (int(index) + 1, h, m, s))
 
     return wrapper
+
+
+def __format_time___(time):
+    result = time
+    if '.' in time:
+        result = result.replace('.', ':')
+
+    match = re.compile(r'(\d{2})(\d{2})(\d{2})').findall(time)
+    if match:
+        result = ':'.join(match[0])
+
+    return result.strip()
 
 
 class Butcher(object):
@@ -52,7 +65,7 @@ class Butcher(object):
                     break
 
                 lines = line.split(' ')
-                timers.append({'start': lines[0].replace('.', ':'), 'end': lines[1].replace('.', ':')})
+                timers.append({'start': __format_time___(lines[0]), 'end': __format_time___(lines[1])})
 
         return timers
 
@@ -94,8 +107,8 @@ class Butcher(object):
         output_name = '%s_%s.%s' % (self.__file__.title, str(timer_index + 1).zfill(name_length), self.__file__.type)
         output_path = os.path.join(self.__file__.folder, output_name)
 
-        start_time = self.__timers__[timer_index]['start'].strip()
-        end_time = self.__timers__[timer_index]['end'].strip()
+        start_time = self.__timers__[timer_index]['start']
+        end_time = self.__timers__[timer_index]['end']
 
         start_datetime = datetime.strptime(start_time, '%H:%M:%S')
         end_datetime = datetime.strptime(end_time, '%H:%M:%S')
