@@ -15,8 +15,8 @@ class MarauderJavdb(BaseMarauder):
 
         tree = etree.HTML(html_content)
 
-        links = tree.xpath("//div[@class='grid-item column']/a/@href")
-        uids = tree.xpath("//div[@class='grid-item column']/a/div[@class='uid']/text()")
+        links = tree.xpath("//div[@class='item']/a/@href")
+        uids = tree.xpath("//div[@class='video-title']/strong/text()")
 
         if 0 < len(links) == len(uids) > 0:
             index = 0

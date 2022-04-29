@@ -1,25 +1,11 @@
 import re
 import os
+import threading
 
 from ffmpy import FFmpeg
 from datetime import datetime
 from modules.movie_cut.file import File
-
-
-def computation_time(fun):
-    def wrapper(*args, **kwargs):
-        begin = datetime.now()
-        index = args[1]
-
-        fun(*args, **kwargs)
-
-        end = datetime.now()
-        seconds = (end - begin).seconds
-        m, s = divmod(seconds, 60)
-        h, m = divmod(m, 60)
-        print("%s|%02d:%02d:%02d" % (int(index) + 1, h, m, s))
-
-    return wrapper
+from modules.movie_cut.overseer import Overseer
 
 
 def __format_time___(time):
@@ -69,41 +55,61 @@ class Butcher(object):
         return timers
 
     def chop(self):
+        tasks = []
+
+        for index in range(0, len(self.__timers__)):
+            timer_info = self.__get_video_info__(index)
+            current_timer = datetime.now()
+
+            tasks.append({'timer_info': timer_info,
+                          'status': 'waiting',
+                          'start_time': current_timer,
+                          'end_time': current_timer,
+                          'executor': threading.Thread(target=self.__chop__, args=[timer_info])
+                          })
+
+        overseer = Overseer(tasks)
+        overseer.start()
+
+        for task in tasks:
+            task['executor'].start()
+            task['status'] = 'running'
+            task['start_time'] = datetime.now()
+
+        for task in tasks:
+            task['executor'].join()
+            task['status'] = 'ending'
+            task['end_time'] = datetime.now()
+
+        overseer.join()
+
+    def __chop__(self, timer_info):
         try:
-            for index in range(0, len(self.__timers__)):
-                self.__chop__(index)
+            output_name, output_path, start_time, end_time, length_time = timer_info
 
+            ffmpeg = FFmpeg(
+                inputs={self.__file__.path: [
+                    '-y', '-itsoffset', '00:00:00.600'
+                ]},
+                outputs={output_path: [
+                    '-ss', start_time,
+                    '-t', length_time,
+                    '-vcodec', 'copy',
+                    '-acodec', 'copy',
+                    '-threads', '5',
+                    '-v', 'warning'
+
+                ]}, executable=self.__ffmpeg_path__
+            )
+
+            # print(ffmpeg.cmd)
+            ffmpeg.run(stdout=None)
         except Exception as error:
-            raise error
-
-    @computation_time
-    def __chop__(self, timer_index):
-        output_name, output_path, start_time, end_time, length_time = self.__get_video_info__(timer_index)
-
-        ffmpeg = FFmpeg(
-            inputs={self.__file__.path: [
-                '-y', '-itsoffset', '00:00:00.600'
-            ]},
-            outputs={output_path: [
-                '-ss', start_time,
-                '-t', length_time,
-                '-vcodec', 'copy',
-                '-acodec', 'copy',
-                '-threads', '5',
-                '-v', 'warning'
-
-            ]}, executable=self.__ffmpeg_path__
-        )
-
-        print(ffmpeg.cmd)
-        ffmpeg.run(stdout=None)
+            print(error)
 
     def __get_video_info__(self, timer_index):
-        name_length = len(self.__timers__)
-        if name_length < 5:
-            name_length = 5
 
-        output_name = '%s_%s.%s' % (self.__file__.title, str(timer_index + 1).zfill(name_length), self.__file__.type)
+        output_name = '%s_%s.%s' % (self.__file__.title, str(timer_index + 1).zfill(5), self.__file__.type)
         output_path = os.path.join(self.__file__.folder, output_name)
 
         start_time = self.__timers__[timer_index]['start']
@@ -118,5 +124,5 @@ class Butcher(object):
 
         length_time = '%02d:%02d:%02d' % (length_time_hour, length_time_minute, length_time_second)
 
-        print('%s|%s|%s|%s|' % (output_name, start_time, end_time, length_time))
+        # print('%s|%s|%s|%s|' % (output_name, start_time, end_time, length_time))
         return output_name, output_path, start_time, end_time, length_time

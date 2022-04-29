@@ -12,6 +12,9 @@ class BaseMarauder(object):
         self.__content__, self.__id__, self.__title__, self.__poster__, self.__stills__ = None, None, None, None, None
 
     def to_film(self) -> Film:
+        if self.__content__ is None:
+            raise Exception("没有获取到页面内容")
+
         return Film(self.__file__
                     , content=self.__content__
                     , id=self.__id__

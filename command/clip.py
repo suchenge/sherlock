@@ -7,7 +7,7 @@ sys.path.append(module_path)
 
 from modules.movie_cut.butcher import Butcher
 
-# os.system("pause")
+os.system("pause")
 
 path_param = sys.argv[1]
 func = lambda path: Butcher(path).chop()
