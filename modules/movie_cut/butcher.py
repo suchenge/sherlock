@@ -1,9 +1,8 @@
 import re
-import concurrent.futures
+import os
 
 from ffmpy import FFmpeg
 from datetime import datetime
-from moviepy.editor import *
 from modules.movie_cut.file import File
 
 
