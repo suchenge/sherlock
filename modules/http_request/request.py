@@ -1,5 +1,13 @@
 import requests
 from urllib.parse import urlparse
+from datetime import datetime
+
+
+def __mistiming_time__(start_time, end_time):
+    seconds = (end_time - start_time).seconds
+    m, s = divmod(seconds, 60)
+    h, m = divmod(m, 60)
+    return "%02d:%02d:%02d" % (h, m, s)
 
 
 def header(base_url):
@@ -9,15 +17,18 @@ def header(base_url):
         'Accept-Language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7,ja;q=0.6,zh-TW;q=0.5',
         'Connection': 'keep-alive',
         'Referer': base_url,
-        'Cookie': 'theme=auto; over18=1; _ym_d=1633615771; _ym_uid=163361577147146056; locale=zh; _ym_isad=1; _jdb_session=VdlRFeDJ6IGRWPP5OGxl3WiG7P70eD%2F3QhpReNsbIE5LTrLhft7w5Y%2BCyH9CKWwTX9DlNWmOApPTMi1VIo3pe%2FjuDn7gMUv%2FnhogVY8%2BDeF0MhL%2Fpsy%2FYKu%2BKG7xUenbzqy1T8Hb2gcG6XCS0HElLCYSLj9NCp1BR%2FekXAauZaaI301uyrgEacbZSXYbQw74mGA%2BnIuRTw%2FBGVWDoyKlEmCmW9usIDGlv89eeHt15d6Bb1fAh1x4sfbxsajLpReIDo26M83dOJzrFb8aWJvdVpq7l5rIREAON9bS8M9a3xa1uG93q4EXhky0BT1nKz3xlTNDXa%2Fsj6G%2BY3yiBsJ24rU0IG3J1qTM6HMqKfHQbOglIZWH4Uh8hgyV%2Bttj%2FJ6%2BYrQ%3D--Ikf31DPn7D2a%2FEpY--4CJw51wWzsDPndUqqLKTRA%3D%3D'
+        'Cookie': 'locale=zh; path=/; expires=Thu, 24 Jun 2027 10:54:57 GMT; SameSite=Lax;_jdb_session=qEIOkqLiro+wLxE8nnC1PHm9a9Y7dDcL2UQFPfOm5Blufq3JC8xLZL9h4W0pjzUJfMWLpNoVYjUBp831fhZPq+QDa7JLMxeLiKIpUM7oXid84ZWuj17GmdVC78Js5IOeDo8MPoOfBK9h07bhOiJK2tjg5t+ObflPYm0wnbeb5nBOsiXczMfozhvnLfrmhxaYuVhOqGUCzEZ5BkNUAly3k9K7sCrDXZf5hHL47nNg1LfKY9jHHypUgaa0s7AtQDZE/FQhOMb4nhXLpIQf92/JXg4n7+7MEheHTxvQPn3CTpNJLI6XXRoaqr9B+euXeSPgHfytv1M5s+a1OhD038IRBM+7I6xagj/7vLuXi53YiKCEu06EEaA0YleWnwVpwQ6MFcs=--4UMlp4y7NikHbzbx--XVysO9JH6l+uzpQjI0BS0A==; path=/; expires=Sat, 09 Jul 2022 10:54:57 GMT; secure; HttpOnly; SameSite=None'
     }
 
 
 def monitoring(fun):
     def wrapper(*args, **kwargs):
         url = args[1]
-        print("获取页面内容：" + url)
+        # print("开始获取页面内容:%s" % url)
+        task_start_time = datetime.now()
         result = fun(*args, **kwargs)
+        task_end_time = datetime.now()
+        print("获取到页面内容[%s]:%s" % (__mistiming_time__(task_start_time, task_end_time), url))
         return result
 
     return wrapper
@@ -34,7 +45,7 @@ class Request(object):
             proxy = self.__proxies__.get()
 
             if proxy is None:
-                raise Exception("没有获取到页面内容")
+                raise Exception("没有可用的Proxy，无法获取页面内容")
 
         try:
             response = requests.get(url, headers, proxies=proxy.address)

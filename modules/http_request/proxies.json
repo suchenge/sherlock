@@ -1,178 +1,178 @@
 [
     {
         "address": "jp1.go2https.com",
-        "rate": 0
+        "rate": -7
     },
     {
         "address": "jp2.go2https.com",
-        "rate": 0
+        "rate": -12
     },
     {
         "address": "jp3.go2https.com",
-        "rate": 0
+        "rate": -15
     },
     {
         "address": "jp4.go2https.com",
-        "rate": 0
+        "rate": -10
     },
     {
         "address": "jp5.go2https.com",
-        "rate": 6
+        "rate": -23
     },
     {
         "address": "ajp1.go2https.com",
-        "rate": 1
+        "rate": -14
     },
     {
         "address": "ajp2.go2https.com",
-        "rate": 0
+        "rate": -19
     },
     {
         "address": "ajp3.go2https.com",
-        "rate": 0
+        "rate": -17
     },
     {
         "address": "ajp4.go2https.com",
-        "rate": 0
+        "rate": -16
     },
     {
         "address": "S1.go2https.com",
-        "rate": 48
+        "rate": 412
     },
     {
         "address": "S2.go2https.com",
-        "rate": 0
+        "rate": 45
     },
     {
         "address": "S3.go2https.com",
-        "rate": 3044
+        "rate": 9464
     },
     {
         "address": "S4.go2https.com",
-        "rate": 0
+        "rate": -28
     },
     {
         "address": "S5.go2https.com",
-        "rate": 0
+        "rate": -44
     },
     {
         "address": "S6.go2https.com",
-        "rate": 0
+        "rate": -61
     },
     {
         "address": "S7.go2https.com",
-        "rate": 0
+        "rate": -42
     },
     {
         "address": "S8.go2https.com",
-        "rate": 0
+        "rate": -36
     },
     {
         "address": "S9.go2https.com",
-        "rate": 0
+        "rate": -52
     },
     {
         "address": "us1.go2https.com",
-        "rate": 0
+        "rate": -31
     },
     {
         "address": "us2.go2https.com",
-        "rate": 0
+        "rate": -51
     },
     {
         "address": "us3.go2https.com",
-        "rate": 0
+        "rate": -65
     },
     {
         "address": "us4.go2https.com",
-        "rate": 0
+        "rate": -49
     },
     {
         "address": "SG01.go2https.com",
-        "rate": 0
+        "rate": -20
     },
     {
         "address": "SG02.go2https.com",
-        "rate": 0
+        "rate": -28
     },
     {
         "address": "SG03.go2https.com",
-        "rate": 0
+        "rate": -27
     },
     {
         "address": "UK01.go2https.com",
-        "rate": 0
+        "rate": -33
     },
     {
         "address": "HK01.go2https.com",
-        "rate": 0
+        "rate": -11
     },
     {
         "address": "HK02.go2https.com",
-        "rate": 0
+        "rate": -8
     },
     {
         "address": "HK03.go2https.com",
-        "rate": 0
+        "rate": -48
     },
     {
         "address": "DE.go2https.com",
-        "rate": 0
+        "rate": -46
     },
     {
         "address": "DE1.go2https.com",
-        "rate": 0
+        "rate": -47
     },
     {
         "address": "DE2.go2https.com",
-        "rate": 0
+        "rate": -47
     },
     {
         "address": "DE3.go2https.com",
-        "rate": 0
+        "rate": -39
     },
     {
         "address": "au1.go2https.com",
-        "rate": 0
+        "rate": -49
     },
     {
         "address": "au2.go2https.com",
-        "rate": 0
+        "rate": -53
     },
     {
         "address": "Ejp1.go2https.com",
-        "rate": 0
+        "rate": -44
     },
     {
         "address": "Ejp2.go2https.com",
-        "rate": 0
+        "rate": -48
     },
     {
         "address": "Ejp3.go2https.com",
-        "rate": 0
+        "rate": -28
     },
     {
         "address": "Ejp4.go2https.com",
-        "rate": 0
+        "rate": -16
     },
     {
         "address": "Eus1.go2https.com",
-        "rate": 0
+        "rate": -29
     },
     {
         "address": "Eus2.go2https.com",
-        "rate": 0
+        "rate": -17
     },
     {
         "address": "Eus3.go2https.com",
-        "rate": 0
+        "rate": -40
     },
     {
         "address": "ESG1.go2https.com",
-        "rate": 0
+        "rate": -57
     },
     {
         "address": "ESG2.go2https.com",
-        "rate": 0
+        "rate": -52
     }
 ]

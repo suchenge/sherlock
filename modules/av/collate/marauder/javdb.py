@@ -6,7 +6,7 @@ class MarauderJavdb(BaseMarauder):
     def __init__(self, file, request):
         super().__init__(file, request)
 
-        self.__base_url__ = "https://javdb34.com"
+        self.__base_url__ = "https://javdb.com/"
         search_url = self.__base_url__ + '/search?q=' + file.title + '&f=all'
         html_content = self.__get_url_content__(search_url)
 
