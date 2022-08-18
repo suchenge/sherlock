@@ -1,5 +1,4 @@
-from modules.migration.hamal import Hamal
-from modules.migration.pathfinder import Pathfinder
+from modules.service.migration.hamal import Hamal
 
 sources = r'H:\影视'
 target = r'G:\影视'
