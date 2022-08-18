@@ -37,7 +37,7 @@ class BaseMarauder(object):
             raise Exception('get url content error, response status code:' + str(response.status_code))
 
     def __format_title__(self):
-        return re.compile("[?:*'<>./\\\]").sub("", self.__title__).strip()
+        return re.compile("[?:*'<>./\\\]").sub("", self.__title__).strip()[0:150]
 
     def __get_poster__(self):
         if self.__content__ is None:

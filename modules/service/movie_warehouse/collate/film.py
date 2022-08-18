@@ -6,6 +6,9 @@ class Film(object):
         self.__file__ = file
         self.__content__, self.__id__, self.__title__, self.__poster__, self.__stills__ = kwargs['content'], kwargs['id'], kwargs['title'], kwargs['poster'], kwargs['stills']
 
+    def __str__(self):
+        return 'id:%s\n title:%s\n posters:%s\n stills:\n%s\n' % (self.id, self.title, self.poster['url'], '\n'.join(['       ' + stills['url'] for stills in self.stills]))
+
     @property
     def file(self):
         return self.__file__

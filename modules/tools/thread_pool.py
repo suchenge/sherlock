@@ -22,7 +22,11 @@ class ThreadPool(object):
         return threading.Thread(target=self.__task_executor__)
 
     def execute(self):
-        executors = [self.__thread_executor__() for i in range(0, self.__parallel_count__)]
+        count = self.__parallel_count__
+        if self.__queue__.qsize() < count:
+            count = self.__queue__.qsize()
+
+        executors = [self.__thread_executor__() for i in range(0, count)]
 
         for executor in executors:
             executor.start()

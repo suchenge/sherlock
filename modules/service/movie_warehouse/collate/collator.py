@@ -5,6 +5,8 @@ import traceback
 
 from pathlib import Path
 
+from modules.framework.error_exception import ErrorException
+
 from modules.service.movie_warehouse.collate.porter import Porter
 from modules.service.movie_warehouse.collate.marauder import marauder_factory
 from modules.service.movie_warehouse import dictionary
@@ -29,10 +31,7 @@ class Collator(object):
         self.__request__ = Request(self.__proxies__)
 
     def __neaten__(self, file):
-        print("开始处理文件：" + file.path)
-        print(' name：%s\n type：%s\n title：%s\n folder：%s\n path：%s\n'
-              % (file.name, file.type, file.title, file.folder, file.path))
-
+        print("开始处理文件：" + str(file))
         if file.type == 'torrent' and dictionary.exists(file.title):
             os.remove(file.path)
         else:
@@ -41,9 +40,7 @@ class Collator(object):
                 marauder = marauder_factory.get_marauder(**{'file': file, 'request': self.__request__})
                 film = marauder.to_film()
 
-                print('文件解析结果\n id:%s\n title:%s\n posters:%s\n stills:\n%s\n'
-                      % (film.id, film.title, film.poster['url'],
-                         '\n'.join(['       ' + stills['url'] for stills in film.stills])))
+                print('文件解析结果\n %s' % str(film))
 
                 porter = Porter(film)
                 porter.move()
@@ -52,7 +49,7 @@ class Collator(object):
                 porter.append_to_dictionary()
 
             except Exception as error:
-                self.__exceptions__.put(error)
+                self.__exceptions__.put(ErrorException(error, file))
                 try:
                     if file is not None and file.type == 'torrent':
                         exception_path = str.replace(file.path, file.type, 'exception.' + file.type)
@@ -63,9 +60,7 @@ class Collator(object):
                                 Path(film.folder).rmdir()
 
                 except Exception as error1:
-                    self.__exceptions__.put(error1)
-
-
+                    self.__exceptions__.put(ErrorException(error, file))
 
         print("处理文件完成 " + file.path)
 
@@ -79,16 +74,7 @@ class Collator(object):
         has_errors = not self.__exceptions__.empty()
         while not self.__exceptions__.empty():
             e = self.__exceptions__.get()
-
-            print('str(Exception):\t', str(Exception))
-            print('str(e):\t\t', str(e))
-            print('repr(e):\t', repr(e))
-
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            print('e.message:\t', exc_value)
-            print("Note, object e and exc of Class %s is %s the same." % (type(exc_value), ('not', '')[exc_value is e]))
-            print('traceback.print_exc(): ', traceback.print_exc())
-            print('traceback.format_exc():\n%s' % traceback.format_exc())
+            print(str(e))
 
         if has_errors:
             os.system("pause")
