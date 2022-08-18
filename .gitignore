@@ -1,6 +1,3 @@
-# source code
-config
-config/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -132,6 +129,8 @@ dmypy.json
 .pyre/
 data
 data/
+config
+config/
 .idea
 .idea/
 .vs
