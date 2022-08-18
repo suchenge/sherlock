@@ -23,6 +23,7 @@ def __format_time___(time):
 class Butcher(object):
     def __init__(self, path):
         self.__file__ = File(path)
+        self.__timer_path__ = os.path.join(self.__file__.folder, self.__file__.title + '.txt')
 
         types = ['mkv', 'mp4', 'avi', 'wmv']
         if self.__file__.type.lower() not in types:
@@ -37,12 +38,11 @@ class Butcher(object):
 
     def __get_timers__(self):
         timers = []
-        timer_path = os.path.join(self.__file__.folder, self.__file__.title + '.txt')
 
-        if not os.path.exists(timer_path):
+        if not os.path.exists(self.__timer_path__):
             return
 
-        with open(timer_path, 'r') as fs:
+        with open(self.__timer_path__, 'r') as fs:
             while True:
                 line = fs.readline()
 
@@ -82,6 +82,9 @@ class Butcher(object):
             task['end_time'] = datetime.now()
 
         overseer.join()
+
+        os.remove(self.__file__.path)
+        os.remove(self.__timer_path__)
 
     def __chop__(self, timer_info):
         try:

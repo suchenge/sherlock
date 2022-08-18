@@ -2,18 +2,20 @@ import os
 import shutil
 
 from pathlib import Path
-from concurrent.futures import ThreadPoolExecutor
 from modules.av import dictionary
+from modules.av.collate.thread_pool import ThreadPool
 
 
-def __save_image__(image, request):
+def __save_image__(args):
+    image = args[0]
+    request = args[1]
+
     path = image['path']
     url = image['url']
 
-    if not os.path.exists(path):
-        content = request.get(url).content
-        with open(path, "ab") as fs:
-            fs.write(content)
+    content = request.get(url).content
+    with open(path, "ab") as fs:
+        fs.write(content)
 
 
 class Porter(object):
@@ -41,13 +43,15 @@ class Porter(object):
 
     def save_poster(self, request):
         print("封面下载")
-        __save_image__(self.__film__.poster, request)
+        __save_image__([self.__film__.poster, request])
 
     def save_stills(self, request):
         print("剧照下载")
         if self.__film__.stills is not None and len(self.__film__.stills) > 0:
-            with ThreadPoolExecutor(max_workers=5) as executor:
-                executor.map(lambda still: __save_image__(still, request), self.__film__.stills)
+            tasks = [{'executor': __save_image__, 'args': [still, request]} for still in self.__film__.stills]
+
+            thread_pool = ThreadPool(tasks)
+            thread_pool.execute()
 
     def scan_directory(self):
         if self.__film__.id:
@@ -58,8 +62,8 @@ class Porter(object):
         return dictionary.exists(uid)
 
     def append_to_dictionary(self):
-        print('写入字典')
         film = self.__film__
         excluded_types = ['torrent', 'jpg', 'png', 'gif']
         if film.file.type is not None and film.file.type not in excluded_types:
+            print('写入字典')
             dictionary.add(self.__film__.id, self.__film__.folder)
