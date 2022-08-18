@@ -3,7 +3,7 @@
     "proxies": [
         {
             "address": "S3.go2https.com",
-            "rate": 10744
+            "rate": 10770
         },
         {
             "address": "S1.go2https.com",

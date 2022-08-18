@@ -4,8 +4,7 @@ import os
 class Film(object):
     def __init__(self, file, **kwargs):
         self.__file__ = file
-        self.__content__, self.__id__, self.__title__, self.__poster__, self.__stills__ = kwargs['content'], kwargs[
-            'id'], kwargs['title'], kwargs['poster'], kwargs['stills']
+        self.__content__, self.__id__, self.__title__, self.__poster__, self.__stills__ = kwargs['content'], kwargs['id'], kwargs['title'], kwargs['poster'], kwargs['stills']
 
     @property
     def file(self):

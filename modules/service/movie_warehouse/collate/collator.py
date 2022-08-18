@@ -3,6 +3,8 @@ import queue
 import sys
 import traceback
 
+from pathlib import Path
+
 from modules.service.movie_warehouse.collate.porter import Porter
 from modules.service.movie_warehouse.collate.marauder import marauder_factory
 from modules.service.movie_warehouse import dictionary
@@ -58,7 +60,7 @@ class Collator(object):
 
                         if film is not None:
                             if os.path.exists(film.folder):
-                                os.remove(film.folder)
+                                Path(film.folder).rmdir()
 
                 except Exception as error1:
                     self.__exceptions__.put(error1)
