@@ -1,4 +1,3 @@
-from modules.service.download import Creeper
-
+from modules.service.download.creeper import Creeper
 # 抓取图片程序
 Creeper().run()

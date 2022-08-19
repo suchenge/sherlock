@@ -29,7 +29,11 @@ class PageBase(object):
         return picture_suffix
 
     def __get_picture_list(self, page_url):
-        page_content = self.get_page_content(self.domain_url + page_url)
+        url = page_url
+        if "http" not in page_url:
+            url = self.domain_url + "/" + page_url
+
+        page_content = self.get_page_content(url)
         picture_list = self.get_picture_list(page_content)
         return picture_list
 
@@ -81,7 +85,10 @@ class PageBase(object):
 
         picture_dict = []
         for index in range(len(picture_list)):
-            picture_url = self.domain_url + picture_list[index]
+            picture_url = picture_list[index]
+            if "http" not in picture_url:
+                picture_url = self.domain_url + picture_url
+
             picture_path = picture_folder + "/" + str(index).zfill(5) + "." + self.__get_picture_suffix(picture_url)
             picture_dict.append((picture_url, picture_path))
 
