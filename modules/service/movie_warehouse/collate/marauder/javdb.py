@@ -39,7 +39,13 @@ class MarauderJavdb(BaseMarauder):
                 tree = etree.HTML(self.__content__)
 
                 self.__id__ = uids[index]
-                self.__title__ = tree.xpath("//h2[@class='title is-4']/strong/text()")[-1]
+
+                self.__title__ = tree.xpath("//span[@class='origin-title']/text()")[-1]
+                if self.__title__ is None:
+                    self.__title__ = tree.xpath("//strong[@class='current-title']/text()")[-1]
+
+                self.__title__ = self.__id__ + " " + self.__title__
+
                 self.__poster__ = tree.xpath("//img[@class='video-cover']/@src")[-1]
                 self.__stills__ = tree.xpath("//div[@class='tile-images preview-images']/a[@class='tile-item']/@href")
         else:
