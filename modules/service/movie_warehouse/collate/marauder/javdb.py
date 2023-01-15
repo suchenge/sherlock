@@ -40,9 +40,11 @@ class MarauderJavdb(BaseMarauder):
 
                 self.__id__ = uids[index]
 
-                self.__title__ = tree.xpath("//span[@class='origin-title']/text()")[-1]
-                if self.__title__ is None:
-                    self.__title__ = tree.xpath("//strong[@class='current-title']/text()")[-1]
+                title_element = tree.xpath("//span[@class='origin-title']/text()")
+                if title_element is None or len(title_element) == 0:
+                    title_element = tree.xpath("//strong[@class='current-title']/text()")
+
+                self.__title__ = title_element[-1]
 
                 self.__title__ = self.__id__ + " " + self.__title__
 
