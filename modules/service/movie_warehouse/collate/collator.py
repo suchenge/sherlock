@@ -72,7 +72,7 @@ class Collator(object):
 
         if files is not None:
             tasks = [{'executor': self.__neaten__, 'args': file} for file in files]
-            thread_pool = ThreadPool(tasks, 1)
+            thread_pool = ThreadPool(tasks, 10)
             thread_pool.execute()
 
         self.__proxies__.close()
