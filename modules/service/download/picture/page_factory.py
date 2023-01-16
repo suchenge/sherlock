@@ -1,14 +1,18 @@
 from modules.service.download.picture.page_base import PageBase
+from modules.service.download.picture.page_jpmnb import PageJpmnb
+from modules.service.download.picture.page_jpxgmn import PageJpxgmn
 from modules.service.download.picture.page_xiurenji import PageXiuRenJi
 from modules.service.download.picture.page_xiannvku import PageXinannvku
+from modules.service.download.picture.page_xiurenba import PageXiurenba
 
 
 class PageFactory(object):
     settings = {
         'xiurenji': PageXiuRenJi,
-        'xiannvku': PageXinannvku
-        # , 'jpmnb': PageJpmnb
-        # , 'jpxgmn': PageJpxgmn
+        'xiannvku': PageXinannvku,
+        'xiurenba': PageXiurenba,
+        'jpmnb': PageJpmnb,
+        'jpxgmn': PageJpxgmn
     }
 
     @staticmethod
