@@ -10,6 +10,8 @@ from pathlib import Path
 from urllib.request import urlopen
 from urllib.parse import urlparse
 
+from lxml import etree
+
 
 class PageBase(object):
     __threadCount = 10
@@ -18,6 +20,7 @@ class PageBase(object):
         self.url = url
         self.domain_url, self.url_path = self.__parse_url()
         self.charset = "utf-8"
+        self.__page_html__ = None
 
     def __parse_url(self):
         url_info = urlparse(self.url)
@@ -62,6 +65,7 @@ class PageBase(object):
     def get_page_content(self, page_url):
         page_content = urlopen(page_url, context=ssl._create_unverified_context()).read()
         page_content = page_content.decode(self.charset)
+        self.__page_html__ = etree.HTML(page_content)
         return page_content
 
     def download(self, download_folder):
