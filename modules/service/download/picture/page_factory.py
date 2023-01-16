@@ -4,6 +4,7 @@ from modules.service.download.picture.page_jpxgmn import PageJpxgmn
 from modules.service.download.picture.page_xiurenji import PageXiuRenJi
 from modules.service.download.picture.page_xiannvku import PageXinannvku
 from modules.service.download.picture.page_xiurenba import PageXiurenba
+from modules.service.download.picture.page_xrmn import PageXrmn
 
 
 class PageFactory(object):
@@ -11,6 +12,7 @@ class PageFactory(object):
         'xiurenji': PageXiuRenJi,
         'xiannvku': PageXinannvku,
         'xiurenba': PageXiurenba,
+        'xrmn': PageXrmn,
         'jpmnb': PageJpmnb,
         'jpxgmn': PageJpxgmn
     }

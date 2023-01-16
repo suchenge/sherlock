@@ -19,7 +19,7 @@ class PageXinannvku(PageBase):
         page_links = self.__page_html__.xpath("//div[@id='pages']/a/text()")
         max_page_count = page_links[len(page_links) - 2]
 
-        for index in range(2, max_page_count):
+        for index in range(2, int(max_page_count) + 1):
             result.append(url_template + "-" + str(index) + ".html")
 
         return result
