@@ -1,6 +1,7 @@
 import os
 import re
-from modules.service.movie_warehouse import dictionary
+from modules.service import \
+    dictionary
 
 path = 'G:\\种子\\002'
 

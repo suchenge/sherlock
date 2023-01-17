@@ -1,12 +1,8 @@
 import os
 
-from pathlib import Path
-
-from modules.framework.error_exception import ErrorException
-
 from modules.service.movie_warehouse.collate.porter import Porter
 from modules.service.movie_warehouse.collate.marauder import marauder_factory
-from modules.service.movie_warehouse import dictionary
+from modules.service import dictionary
 from modules.service.movie_warehouse.collate.file import File
 
 from modules.tools.http_request.request import Request
@@ -51,7 +47,7 @@ class Collator(object):
 
         print("开始处理文件：" + str(file))
 
-        if file.type == 'torrent' and dictionary.exists(file.title):
+        if file.type == 'torrent' and dictionary.exists(file.title, file.path):
             os.remove(file.path)
         else:
             marauder = marauder_factory.get_marauder(**{'file': file, 'request': self.__request__})
