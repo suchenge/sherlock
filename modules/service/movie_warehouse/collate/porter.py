@@ -65,6 +65,7 @@ class Porter(object):
     def append_to_dictionary(self):
         film = self.__film__
         excluded_types = ['torrent', 'jpg', 'png', 'gif']
+
         if film.file.type is not None and film.file.type not in excluded_types:
             print('写入字典')
-            dictionary.add(self.__film__.id, self.__film__.folder)
+            dictionary.add(film.file)

@@ -48,8 +48,11 @@ class Collator(object):
 
         print("开始处理文件：" + str(file))
 
-        if file.type == 'torrent' and dictionary.exists(file.title, file.path):
-            os.remove(file.path)
+        # if file.type in ['torrent', 'mp4', 'avi', 'mkv'] and dictionary.exists(file):
+        #   os.remove(file.path)
+        if dictionary.exists(file):
+            exists_path = str.replace(file.path, file.type, 'exists.' + file.type)
+            os.rename(file.path, exists_path)
         else:
             marauder = marauder_factory.get_marauder(**{'file': file, 'request': self.__request__})
             film = marauder.to_film()

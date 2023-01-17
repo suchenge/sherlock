@@ -26,11 +26,13 @@ def exists(file_info: File):
     file_path = dict_path + file_info.name + ".json"
     json_exists = os.path.exists(file_path)
     if json_exists:
+        print("%s exists %s" % (file_info.name, file_path))
         return True
     else:
         es_result = search(file_info.name)
         for es_path, es_filename in es_result:
             if file_info.path not in es_path and file_info.name in es_filename:
+                print("%s exists %s" % (file_info.name, es_path))
                 return True
 
         return False
