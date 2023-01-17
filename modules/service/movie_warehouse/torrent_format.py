@@ -1,6 +1,6 @@
 import os
 import re
-from modules.service import \
+from modules.service.movie_warehouse.collate import \
     dictionary
 
 path = 'G:\\种子\\002'

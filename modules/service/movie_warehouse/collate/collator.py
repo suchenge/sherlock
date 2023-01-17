@@ -2,7 +2,8 @@ import os
 
 from modules.service.movie_warehouse.collate.porter import Porter
 from modules.service.movie_warehouse.collate.marauder import marauder_factory
-from modules.service import dictionary
+from modules.service.movie_warehouse.collate import \
+    dictionary
 from modules.service.movie_warehouse.collate.file import File
 
 from modules.tools.http_request.request import Request
