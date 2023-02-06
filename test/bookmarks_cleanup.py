@@ -1,3 +1,3 @@
 from modules.service.bookmarks.dustman import Dustman
 
-Dustman().clean_up()
+Dustman('E:\\Download\\bookmarks_2023_2_6.html', 'E:\\Download\\bookmarks.json').clean_up()

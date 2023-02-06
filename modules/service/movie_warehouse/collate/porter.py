@@ -2,8 +2,7 @@ import os
 import shutil
 
 from pathlib import Path
-from modules.service.movie_warehouse.collate import \
-    dictionary
+from modules.service.movie_warehouse.collate import dictionary
 from modules.tools.thread_pool import ThreadPool
 
 
