@@ -40,12 +40,20 @@ class Dustman(object):
             bookmarks = json.load(json_file)
 
         for bookmark in bookmarks:
-            marauder = MarauderJavdb(**{'file': bookmark.id, 'request': request})
-            film = marauder.to_film()
-            porter = Porter(film)
-            porter.save_poster(request)
-            porter.save_stills(request)
-            porter.save_torrents(request)
+            try:
+                marauder = MarauderJavdb(**{'file': bookmark.id, 'request': request})
+                film = marauder.to_film()
+                porter = Porter(film)
+                porter.save_poster(request)
+                porter.save_stills(request)
+                porter.save_torrents(request)
+
+                bookmark['status'] = 'done'
+            except Exception as error:
+                print(error)
+
+        with open(self.__url_file_path__, 'w', encoding='utf-8') as json_file:
+            json.dump(self.__url_file_path__, json_file, indent=4, ensure_ascii=False)
 
     def __get_bookmark_info__(self, bookmark):
         href, title, key = None, None, None

@@ -1,5 +1,5 @@
 from lxml import etree
-from modules.service.movie_warehouse.collate.marauder.base import BaseMarauder, find_configuration_node
+from modules.service.movie_warehouse.collate.marauder.base import BaseMarauder, find_configuration_node, build_torrent_url
 from modules.framework.configuration_manager.configuration_setting import configuration_setting
 
 
@@ -50,5 +50,17 @@ class MarauderJavdb(BaseMarauder):
 
                 self.__poster__ = tree.xpath("//img[@class='video-cover']/@src")[-1]
                 self.__stills__ = tree.xpath("//div[@class='tile-images preview-images']/a[@class='tile-item']/@href")
+                magent_links = tree.xpath("//div[@id='magnets-content]")[-1]
+
+                if magent_links is not None and len(magent_links) > 0:
+                    index = 0
+                    for link in magent_links:
+                        index = index + 1
+                        url = link.xpath("a/@href")
+                        size = link.xpath("span[@class='meta']/text()")
+                        self.__torrents__.append({
+                            "url": build_torrent_url(url),
+                            "name": self.__id__ + '_' + str(index) + '_' + size + '.torrent'
+                        })
         else:
             self.__content__ = None

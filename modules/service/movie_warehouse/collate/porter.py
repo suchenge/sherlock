@@ -53,6 +53,14 @@ class Porter(object):
             thread_pool = ThreadPool(tasks)
             thread_pool.execute()
 
+    def save_torrents(self, request):
+        print("种子下载")
+        if self.__film__.torrents is not None and len(self.__film__.torrents) > 0:
+            tasks = [{'executor': __save_image__, 'args': [torrents, request]} for torrents in self.__film__.torrents]
+
+            thread_pool = ThreadPool(tasks)
+            thread_pool.execute()
+
     def scan_directory(self):
         if self.__film__.id:
             uid = self.__film__.id

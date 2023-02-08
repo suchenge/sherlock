@@ -10,12 +10,20 @@ def find_configuration_node(json_setting, name):
             return website['url']
 
 
+def build_torrent_url(magent_url):
+    match = re.compile(r'/magnet\:\?xt=urn\:btih\:(.*?)&dn=.*?/').findall(magent_url)
+    if match:
+        return 'https://itorrents.org/torrent/%s.torrent' % match[1]
+    else:
+        return None
+
+
 class BaseMarauder(object):
     def __init__(self, **kwargs):
         self.__file__ = kwargs['file']
         self.__http_request__ = kwargs['request']
 
-        self.__content__, self.__id__, self.__title__, self.__poster__, self.__stills__ = None, None, None, None, None
+        self.__content__, self.__id__, self.__title__, self.__poster__, self.__stills__, self.__torrents__ = None, None, None, None, None, None
 
     def to_film(self) -> Film:
         if self.__content__ is None:
@@ -26,7 +34,8 @@ class BaseMarauder(object):
                     , id=self.__id__
                     , title=self.__format_title__()
                     , poster=self.__get_poster__()
-                    , stills=self.__get_stills__())
+                    , stills=self.__get_stills__()
+                    , torrents=self.__get_torrents__())
 
     def __get_url_content__(self, url):
         response = self.__http_request__.get(url)
@@ -66,3 +75,6 @@ class BaseMarauder(object):
                 })
 
         return stills
+
+    def __get_torrents__(self):
+        return self.__torrents__

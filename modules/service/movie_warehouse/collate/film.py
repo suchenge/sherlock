@@ -4,7 +4,7 @@ import os
 class Film(object):
     def __init__(self, file, **kwargs):
         self.__file__ = file
-        self.__content__, self.__id__, self.__title__, self.__poster__, self.__stills__ = kwargs['content'], kwargs['id'], kwargs['title'], kwargs['poster'], kwargs['stills']
+        self.__content__, self.__id__, self.__title__, self.__poster__, self.__stills__, self.__torrents__ = kwargs['content'], kwargs['id'], kwargs['title'], kwargs['poster'], kwargs['stills'], kwargs['torrents']
 
     def __str__(self):
         return 'id:%s\n title:%s\n posters:%s\n stills:\n%s\n' % (self.id, self.title, self.poster['url'], '\n'.join(['       ' + stills['url'] for stills in self.stills]))
@@ -32,8 +32,11 @@ class Film(object):
 
     @property
     def stills(self):
-        return [{'name': still['name'], 'url': still['url'], 'path': os.path.join(self.folder, still['name'])} for still
-                in self.__stills__]
+        return [{'name': still['name'], 'url': still['url'], 'path': os.path.join(self.folder, still['name'])} for still in self.__stills__]
+
+    @property
+    def torrents(self):
+        return [{'name': torrent['name'], 'url': torrent['url'], 'path': os.path.join(self.folder, torrent['name'])} for torrent in self.__torrents__] 
 
     @property
     def folder(self):
