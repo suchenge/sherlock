@@ -1,3 +1,5 @@
+import \
+    os.path
 import re
 import json
 
@@ -41,8 +43,16 @@ class Dustman(object):
 
         for bookmark in bookmarks:
             try:
-                marauder = MarauderJavdb(**{'file': bookmark.id, 'request': request})
+                file = {
+                    "name": "",
+                    "title": bookmark.key,
+                    "folder": os.path.join(save_base_path, bookmark.title),
+                    "path": os.path.dirname(save_base_path)
+                }
+
+                marauder = MarauderJavdb(**{'file': file, 'request': request})
                 film = marauder.to_film()
+
                 porter = Porter(film)
                 porter.save_poster(request)
                 porter.save_stills(request)
