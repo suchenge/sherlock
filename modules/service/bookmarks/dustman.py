@@ -21,7 +21,7 @@ class Dustman(object):
         self.__url_file_path__ = url_file_path
 
         if os.path.exists(url_file_path) is False:
-            line_index = 1
+            line_index = 0
             url_contents = []
 
             with open(bookmarks_file_path, encoding='utf-8', mode='r') as bookmarks:
