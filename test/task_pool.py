@@ -1,6 +1,8 @@
 import time
 import random
 
+from multiprocessing import Process
+
 from modules.tools.thread_pools.task import Task
 from modules.tools.thread_pools.task_pool import TaskPool
 
@@ -8,17 +10,18 @@ from modules.tools.thread_pools.task_pool import TaskPool
 def task(args):
     r = random.randint(1, 10)
     time.sleep(2 / r)
-    # print(str(args) + time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
+    print(str(args) + time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
 
 
-TaskPool.set_count(10)
-TaskPool.append_task(Task(task, '时间01:'))
-TaskPool.append_task(Task(task, '时间02:'))
+if __name__ == '__main__': #不加这句就会报错
+    TaskPool.set_count(10)
+    TaskPool.append_task(Task(task, '时间01:'))
+    TaskPool.append_task(Task(task, '时间02:'))
 
-tasks = []
-for i in range(0, 100):
-    tasks.append(Task(task, '时间' + str(i) + ":"))
+    tasks = []
+    for i in range(0, 100):
+        tasks.append(Task(task, '时间' + str(i) + ":"))
 
-TaskPool.append_tasks(tasks)
+    TaskPool.append_tasks(tasks)
 
-TaskPool.stop()
+    TaskPool.stop()

@@ -60,10 +60,10 @@ class Dustman(object):
                         "title": bookmark["key"],
                         "folder": os.path.join(save_base_path, bookmark["title"]),
                         "path": os.path.dirname(save_base_path),
-                        "href": bookmark["href"]
+                        "url": bookmark["href"]
                     }
 
-                    marauder = MarauderJavdb(**{'file': VirtualFile(file), 'request': request, 'url': 'https://javdb.com/'})
+                    marauder = MarauderJavdb(**{'file': VirtualFile(file), 'request': request})
                     film = marauder.to_film()
 
                     porter = Porter(film)

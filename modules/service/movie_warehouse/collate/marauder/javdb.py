@@ -13,7 +13,7 @@ class MarauderJavdb(BaseMarauder):
         super().__init__(**kwargs)
 
         if isinstance(self.__file__, VirtualFile) and self.__file__.need_search is False:
-            self.__build__(self.__file__.href, self.__file__.title)
+            self.__build__(self.__file__.url, self.__file__.title)
         else:
             self.__base_url__ = kwargs["url"]
 

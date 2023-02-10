@@ -1,5 +1,8 @@
 import threading
 import queue
+
+from multiprocessing import Process
+
 from modules.tools.thread_pools.task import Task
 
 
@@ -18,6 +21,7 @@ class TaskPool(object):
 
         for i in range(0, TaskPool.__count__):
             threads.append(threading.Thread(target=TaskPool.__task_executor__))
+            # threads.append(Process(target=TaskPool.__task_executor__))
 
         for thread in threads:
             thread.start()

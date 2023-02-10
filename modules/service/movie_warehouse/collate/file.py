@@ -72,14 +72,14 @@ class VirtualFile(File):
         self.__name__ = obj["name"]
         self.__title__ = obj["title"]
         self.__path__ = obj["path"]
-        self.__href__ = obj["href"]
+        self.__url__ = obj["url"]
 
     @property
-    def href(self):
-        return self.__href__
+    def url(self):
+        return self.__url__
 
     @property
     def need_search(self):
-        return 'javdb.com/v/' not in self.__href__
+        return 'javdb.com/v/' not in self.__url__
 
 
