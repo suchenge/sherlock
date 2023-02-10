@@ -64,3 +64,22 @@ class File(object):
     @property
     def type(self):
         return self.__type__
+
+
+class VirtualFile(File):
+    def __init__(self, obj):
+        self.__folder__ = obj["folder"]
+        self.__name__ = obj["name"]
+        self.__title__ = obj["title"]
+        self.__path__ = obj["path"]
+        self.__href__ = obj["href"]
+
+    @property
+    def href(self):
+        return self.__href__
+
+    @property
+    def need_search(self):
+        return 'javdb.com/v/' not in self.__href__
+
+

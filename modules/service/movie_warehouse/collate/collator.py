@@ -7,7 +7,7 @@ from modules.service.movie_warehouse.collate.file import File
 
 from modules.tools.http_request.request import Request
 from modules.tools.http_request.proxy import Proxies
-from modules.tools.thread_pool import ThreadPool
+from modules.tools.thread_pools.thread_pool import ThreadPool
 from modules.tools.exception_container.exception_wrapper import exception_wrapper
 
 
