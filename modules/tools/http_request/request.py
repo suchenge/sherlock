@@ -70,3 +70,9 @@ class Request(object):
         response = self.__get_response__(url, headers)
 
         return response
+
+    @monitoring
+    def download(self, url):
+        response = self.__get_response__(url, headers=None)
+
+        return response

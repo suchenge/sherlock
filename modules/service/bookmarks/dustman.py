@@ -1,7 +1,6 @@
 import os.path
 import re
 import json
-import requests
 
 from modules.tools.http_request.request import Request
 from modules.tools.http_request.proxy import Proxies
@@ -59,7 +58,7 @@ class Dustman(object):
                         "name": "",
                         "title": bookmark["key"],
                         "folder": os.path.join(save_base_path, bookmark["title"]),
-                        "path": os.path.dirname(save_base_path),
+                        "path": save_base_path,
                         "url": bookmark["href"]
                     }
 
@@ -67,6 +66,7 @@ class Dustman(object):
                     film = marauder.to_film()
 
                     porter = Porter(film)
+                    # porter.create_folder()
                     porter.save_poster(request)
                     porter.save_stills(request)
                     porter.save_torrents(request)

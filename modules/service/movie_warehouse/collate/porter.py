@@ -2,6 +2,7 @@ import os
 import shutil
 
 from pathlib import Path
+
 from modules.service.movie_warehouse.collate import dictionary
 from modules.tools.thread_pools.task import Task
 from modules.tools.thread_pools.task_pool import TaskPool
@@ -14,9 +15,21 @@ def __save_image__(args):
     path = image['path']
     url = image['url']
 
-    content = request.get(url).content
-    with open(path, "ab") as fs:
-        fs.write(content)
+    if path is not None and url is not None:
+        folder = os.path.dirname(path)
+
+        if not os.path.exists(folder):
+            Path(folder).mkdir(exist_ok=True)
+
+        if 'torrent' in url:
+            response = request.download(url)
+        else:
+            response = request.get(url)
+
+        content = response.content
+
+        with open(path, "ab") as fs:
+            fs.write(content)
 
 
 class Porter(object):
@@ -42,6 +55,11 @@ class Porter(object):
                 # 移动文件
                 shutil.move(film.file.path, new_file_path)
 
+    def create_folder(self):
+        folder = os.path.join(self.__film__.file.path, self.__film__.title)
+        if not os.path.exists(folder):
+            Path(folder).mkdir(exist_ok=True)
+
     def save_poster(self, request):
         print("封面下载")
         TaskPool.append_task(Task(__save_image__, [self.__film__.poster, request]))
@@ -61,6 +79,7 @@ class Porter(object):
         if self.__film__.torrents is not None and len(self.__film__.torrents) > 0:
             tasks = [Task(__save_image__, [torrents, request]) for torrents in self.__film__.torrents]
             TaskPool.append_tasks(tasks)
+
             # thread_pool = ThreadPool(tasks)
             # thread_pool.execute()
 

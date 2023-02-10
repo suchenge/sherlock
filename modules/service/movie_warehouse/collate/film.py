@@ -1,4 +1,5 @@
 import os
+from modules.service.movie_warehouse.collate.file import VirtualFile
 
 
 class Film(object):
@@ -40,6 +41,10 @@ class Film(object):
 
     @property
     def folder(self):
+        if isinstance(self.__file__, VirtualFile):
+            return os.path.join(self.__file__.path, self.title)
+
         if self.__title__ in self.__file__.folder:
             return self.__file__.folder
+
         return os.path.join(self.__file__.folder, self.__title__)

@@ -1,4 +1,4 @@
-from modules.service.movie_cut import Butcher
+from modules.service.movie_cut.butcher import Butcher
 
 path_params = [
     r""

@@ -21,7 +21,7 @@ class MarauderJavdb(BaseMarauder):
             html_content = self.__get_url_content__(search_url)
 
             if html_content is None:
-                raise Exception("没有获取到页面内容")
+                raise Exception("没有获取到页面内容:" + search_url)
 
             tree = etree.HTML(html_content)
 
@@ -75,6 +75,10 @@ class MarauderJavdb(BaseMarauder):
 
     def __build__(self, link, id):
         self.__content__ = self.__get_url_content__(link)
+
+        if self.__content__ is None:
+            raise Exception("没有获取到页面内容:" + link)
+
         tree = etree.HTML(self.__content__)
 
         self.__id__ = id
@@ -89,14 +93,15 @@ class MarauderJavdb(BaseMarauder):
 
         self.__poster__ = tree.xpath("//img[@class='video-cover']/@src")[-1]
         self.__stills__ = tree.xpath("//div[@class='tile-images preview-images']/a[@class='tile-item']/@href")
-        magent_links = tree.xpath("//div[@id='magnets-content]")[-1]
+        magent_links = tree.xpath("//div[@id='magnets-content']")[-1]
 
         if magent_links is not None and len(magent_links) > 0:
             index = 0
             for link in magent_links:
                 index = index + 1
-                url = link.xpath("a/@href")
-                size = link.xpath("span[@class='meta']/text()")
+                info = link.getchildren()[0].find("a")
+                url = info.get("href")
+                size = info.getchildren()[2].text.strip()
                 self.__torrents__.append({
                     "url": build_torrent_url(url),
                     "name": self.__id__ + '_' + str(index) + '_' + size + '.torrent'
