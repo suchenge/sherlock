@@ -63,7 +63,9 @@ class Dustman(object):
                     }
 
                     marauder = MarauderJavdb(**{'file': VirtualFile(file), 'request': request})
+
                     film = marauder.to_film()
+                    bookmark['film'] = film
 
                     porter = Porter(film)
                     # porter.create_folder()

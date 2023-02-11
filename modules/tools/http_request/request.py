@@ -28,7 +28,7 @@ def monitoring(fun):
         task_start_time = datetime.now()
         result = fun(*args, **kwargs)
         task_end_time = datetime.now()
-        print("获取到页面内容[%s]:%s" % (__mistiming_time__(task_start_time, task_end_time), url))
+        print("获取到请求内容[%s]:%s" % (__mistiming_time__(task_start_time, task_end_time), url))
         return result
 
     return wrapper
