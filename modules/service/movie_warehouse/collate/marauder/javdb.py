@@ -104,6 +104,7 @@ class MarauderJavdb(BaseMarauder):
                 size = info.getchildren()[2].text.strip()
                 self.__torrents__.append({
                     "url": build_torrent_url(url),
+                    "line": url,
                     "name": self.__id__ + '_' + str(index) + '_' + size + '.torrent'
                 })
 
