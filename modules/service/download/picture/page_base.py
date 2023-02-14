@@ -132,16 +132,3 @@ class PageBase(object):
             executor.map(self.__download__, picture_dict)
 
         return picture_folder
-
-    def __to_zip(self, picture_folder):
-        zip_file = picture_folder + ".zip"
-        zip = zipfile.ZipFile(zip_file, "w", zipfile.ZIP_DEFLATED)
-
-        for dirpath, dirnames, filenames in os.walk(picture_folder):
-            file_path = dirpath.replace(picture_folder, "")
-            file_path = file_path and file_path + os.sep or ''
-
-            for file_name in filenames:
-                zip.write(os.path.join(dirpath, file_name), file_path + file_name)
-
-        zip.close()

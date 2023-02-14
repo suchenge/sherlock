@@ -68,10 +68,9 @@ class Dustman(object):
                     bookmark['film'] = film
 
                     porter = Porter(film)
-                    # porter.create_folder()
                     porter.save_poster(request)
                     porter.save_stills(request)
-                    porter.save_torrents(request)
+                    porter.save_torrents(request, save_info=True)
 
                     bookmark['status'] = 'done'
 

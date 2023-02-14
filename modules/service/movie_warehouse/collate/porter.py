@@ -1,8 +1,10 @@
+import json
 import os
 import shutil
 
 from pathlib import Path
 
+from modules.service.movie_warehouse.collate.film import Film
 from modules.service.movie_warehouse.collate import dictionary
 from modules.tools.thread_pools.task import Task
 from modules.tools.thread_pools.task_pool import TaskPool
@@ -33,7 +35,7 @@ def __save_image__(args):
 
 
 class Porter(object):
-    def __init__(self, film):
+    def __init__(self, film: Film):
         self.__film__ = film
 
     def move(self):
@@ -74,9 +76,16 @@ class Porter(object):
             # thread_pool = ThreadPool(tasks)
             # thread_pool.execute()
 
-    def save_torrents(self, request):
+    def save_torrents(self, request, save_info=False):
         print("种子下载")
         if self.__film__.torrents is not None and len(self.__film__.torrents) > 0:
+            if save_info is True:
+                if not os.path.exists(self.__film__.folder):
+                    Path(self.__film__.folder).mkdir(exist_ok=True)
+
+                with open(os.path.join(self.__film__.folder, 'torrent.json'), 'w', encoding='utf-8') as json_file:
+                    json.dump(self.__film__.torrents, json_file, indent=4, ensure_ascii=False)
+
             tasks = [Task(__save_image__, [torrents, request]) for torrents in self.__film__.torrents]
             TaskPool.append_tasks(tasks)
 

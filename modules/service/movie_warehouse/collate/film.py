@@ -33,11 +33,26 @@ class Film(object):
 
     @property
     def stills(self):
-        return [{'name': still['name'], 'url': still['url'], 'path': os.path.join(self.folder, still['name'])} for still in self.__stills__]
+        return [
+                    {
+                        'name': still['name'],
+                        'url': still['url'],
+                        'path': os.path.join(self.folder, still['name'])
+                    }
+                    for still in self.__stills__
+                ]
 
     @property
     def torrents(self):
-        return [{'name': torrent['name'], 'url': torrent['url'], 'path': os.path.join(self.folder, torrent['name'])} for torrent in self.__torrents__] 
+        return [
+                    {
+                        'name': torrent['name'],
+                        'url': torrent['url'],
+                        'path': os.path.join(self.folder, torrent['name']),
+                        'link': torrent['link']
+                     }
+                    for torrent in self.__torrents__
+                ]
 
     @property
     def folder(self):
