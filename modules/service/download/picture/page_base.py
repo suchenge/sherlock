@@ -62,15 +62,13 @@ class PageBase(object):
         key, value = picture
         if not os.path.exists(value):
             try:
+                print('下载请求[%s]：%s' % try_count if try_count < 5 else 'end', key)
                 wget.download(key, value)
             except Exception as e:
                 if try_count < 5:
                     try_count += 1
                     time.sleep(3)
-                    print("\rtry|" + str(try_count) + "|" + key)
                     self.__download__(picture, try_count)
-                else:
-                    print("\rend|" + str(try_count) + "|" + key)
 
     def get_title(self, page_content):
         result = re.findall('<h1 class=\"article-title\">(.*?)</h1>', page_content)[0]
