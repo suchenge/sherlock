@@ -5,6 +5,7 @@ from modules.service.movie_warehouse.collate.file import VirtualFile
 class Film(object):
     def __init__(self, file, **kwargs):
         self.__file__ = file
+        self.__url__ = kwargs['url']
         self.__content__, self.__id__, self.__title__, self.__poster__, self.__stills__, self.__torrents__ = kwargs['content'], kwargs['id'], kwargs['title'], kwargs['poster'], kwargs['stills'], kwargs['torrents']
 
     def __str__(self):
@@ -13,6 +14,10 @@ class Film(object):
     @property
     def file(self):
         return self.__file__
+
+    @property
+    def url(self):
+        return self.__url__
 
     @property
     def id(self):

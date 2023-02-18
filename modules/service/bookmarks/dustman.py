@@ -1,115 +1,86 @@
 import os.path
 import re
-import json
 
 from modules.tools.http_request.request import Request
 from modules.tools.http_request.proxy import Proxies
-
-from modules.tools.thread_pools.task import Task
 from modules.tools.thread_pools.task_pool import TaskPool
 
 from modules.service.movie_warehouse.collate.file import VirtualFile
-from modules.service.movie_warehouse.collate.porter import Porter
 from modules.service.movie_warehouse.collate.marauder.javdb import MarauderJavdb
+
+from modules.service.bookmarks.bookmark import Bookmark
+from modules.service.bookmarks.bookmark_group import BookmarkGroup
 
 
 class Dustman(object):
-    def __init__(self, bookmarks_file_path, url_file_path):
+    def __init__(self, bookmarks_html_file_path):
+        self.__bookmarks_html_file_path__ = bookmarks_html_file_path
+        self.__bookmarks_json_file_folder = os.path.dirname(bookmarks_html_file_path)
+
+    def save(self, group_line_qty=500):
+        bookmarks = self.__get_bookmarks__(self.__bookmarks_html_file_path__)
+        bookmarks_groups = [bookmarks[i: i + group_line_qty] for i in range(0, len(bookmarks), group_line_qty)]
+
+        index = 0
+        for bookmarks_group_items in bookmarks_groups:
+            index = index + 1
+            bookmark_group = BookmarkGroup(self.__bookmarks_json_file_folder, index)
+            bookmark_group.items = bookmarks_group_items
+            bookmark_group.inspection()
+
+    def download(self, save_base_path):
         TaskPool.set_count(1)
-
-        self.__url_file_path__ = url_file_path
-
-        if os.path.exists(url_file_path) is False:
-            line_index = 0
-            url_contents = []
-
-            with open(bookmarks_file_path, encoding='utf-8', mode='r') as bookmarks:
-                while True:
-                    line = bookmarks.readline()
-                    if not line:
-                        break
-
-                    if 'HREF' in line:
-                        bookmark = self.__get_bookmark_info__(line)
-                        if bookmark is not None:
-                            line_index = line_index + 1
-                            bookmark["index"] = line_index
-                            bookmark["status"] = 'open'
-                            url_contents.append(bookmark)
-
-            if url_contents and len(url_contents) > 0:
-                with open(url_file_path, 'w', encoding='utf-8') as json_file:
-                    json.dump(url_contents, json_file, indent=4, ensure_ascii=False)
-
-    def clean_up(self, save_base_path):
         request = Request(Proxies(**{}))
-        # request = requests
 
-        with open(self.__url_file_path__, 'r', encoding='utf-8') as json_file:
-            bookmarks = json.load(json_file)
+        bookmark_groups = []
 
-        task_count = 0
-        bookmark_count = len(bookmarks)
+        for file_name in os.listdir(self.__bookmarks_json_file_folder):
+            bookmark_group = BookmarkGroup.build(os.path.join(self.__bookmarks_json_file_folder, file_name))
 
-        for bookmark in bookmarks:
-            if bookmark['status'] != 'done':
-                try:
-                    file = {
-                        "name": "",
-                        "title": bookmark["key"],
-                        "folder": os.path.join(save_base_path, bookmark["title"]),
-                        "path": save_base_path,
-                        "url": bookmark["href"]
-                    }
+            if bookmark_group is not None:
+                bookmark_groups.append(bookmark_group)
 
-                    marauder = MarauderJavdb(**{'file': VirtualFile(file), 'request': request})
+        for bookmark_group in bookmark_groups:
+            bookmark_group.download(lambda bookmark: self.__build_film__(bookmark, save_base_path, request), request)
 
-                    film = marauder.to_film()
-                    bookmark['film'] = film
+    def __build_film__(self, bookmark, save_base_path, request):
+        file = {
+            "name": "",
+            "title": bookmark["key"],
+            "folder": os.path.join(save_base_path,bookmark["title"]),
+            "path": save_base_path,
+            "url": bookmark["href"]
+        }
 
-                    porter = Porter(film)
-                    porter.save_poster(request)
-                    porter.save_stills(request)
-                    porter.save_torrents(request, save_info=True)
+        marauder = MarauderJavdb(**{'file': VirtualFile(file), 'request': request})
+        return marauder.to_film()
 
-                    bookmark['status'] = 'done'
+    def __get_bookmarks__(self, bookmarks_file_path):
+        content = []
+        line_index = 0
+        with open(bookmarks_file_path, encoding='utf-8', mode='r') as html_file:
+            while True:
+                line = html_file.readline()
+                if not line:
+                    break
 
-                    task_count = task_count + 1
-                except Exception as error:
-                    bookmark['status'] = 'error'
-                    bookmark['remark'] = error.args
-                    print(error)
+                if 'HREF' in line:
+                    item = self.__get_bookmark_info__(line)
+                    if item is not None:
+                        line_index = line_index + 1
 
-            bookmark_count = bookmark_count - 1
+                        item["index"] = line_index
+                        item["status"] = 'open'
+                        content.append(Bookmark().build(item))
 
-            if task_count == 10 or bookmark_count <= 0:
-                task_count = 0
-                TaskPool.append_task(Task(self.__save_clear_result__, bookmarks))
-
-                if bookmark_count <= 0:
-                    TaskPool.stop()
-
-    def __save_clear_result__(self, bookmarks):
-        bak_file_path = self.__url_file_path__ + ".bak"
-
-        if os.path.exists(bak_file_path):
-            os.remove(bak_file_path)
-
-        os.rename(self.__url_file_path__, bak_file_path)
-
-        with open(self.__url_file_path__, 'w', encoding='utf-8') as json_file:
-            json.dump(
-                bookmarks,
-                json_file,
-                indent=4,
-                ensure_ascii=False)
+        return content
 
     def __get_bookmark_info__(self, bookmark):
         href, title, key = None, None, None
         match = re.compile(r'<A HREF="(.*?)" .*>(.*?)</A>').findall(bookmark)
         if match:
             href = match[0][0]
-            title = match[0][1]
+            title = match[0][1].replace('[FHDwmf]', '').replace('[HD]', '').replace('[FHD]', '').replace('【新提醒】', '')
 
             if title and ('javdb.com/v/' in href
                           or 'javhoo.org/ja/av/' in href

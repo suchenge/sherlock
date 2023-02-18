@@ -75,6 +75,7 @@ class MarauderJavdb(BaseMarauder):
 
     def __build__(self, link, id):
         self.__content__ = self.__get_url_content__(link)
+        self.__url__ = link
 
         if self.__content__ is None:
             raise Exception("没有获取到页面内容:" + link)

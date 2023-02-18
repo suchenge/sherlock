@@ -25,6 +25,7 @@ class BaseMarauder(object):
 
         self.__content__, self.__id__, self.__title__, self.__poster__, self.__stills__ = None, None, None, None, None
         self.__torrents__ = []
+        self.__url__ = None
 
     def to_film(self) -> Film:
         if self.__content__ is None:
@@ -33,6 +34,7 @@ class BaseMarauder(object):
         return Film(self.__file__
                     , content=self.__content__
                     , id=self.__id__
+                    , url=self.__url__
                     , title=self.__format_title__()
                     , poster=self.__get_poster__()
                     , stills=self.__get_stills__()

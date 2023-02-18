@@ -38,6 +38,10 @@ class Porter(object):
     def __init__(self, film: Film):
         self.__film__ = film
 
+    @staticmethod
+    def save_file(url, path, request):
+        TaskPool.append_task(Task(__save_image__, [{"path": path, "url": url}, request]))
+
     def move(self):
         print("移动文件")
         film = self.__film__
@@ -75,6 +79,20 @@ class Porter(object):
 
             # thread_pool = ThreadPool(tasks)
             # thread_pool.execute()
+
+    def __save_information_file__(self, args):
+        print("保存信息文件")
+        source = args["source"]
+        file_name = args["file_name"]
+
+        if not os.path.exists(self.__film__.folder):
+            Path(self.__film__.folder).mkdir(exist_ok=True)
+
+            with open(os.path.join(self.__film__.folder, file_name), 'w', encoding='utf-8') as json_file:
+                json.dump(source, json_file, indent=4, ensure_ascii=False)
+
+    def save_information(self, source, file_name):
+        TaskPool.append_task(Task(self.__save_information_file__, {"source": source, "file_name": file_name}))
 
     def save_torrents(self, request, save_info=False):
         print("种子下载")
