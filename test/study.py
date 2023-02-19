@@ -6,6 +6,7 @@ print(tmp1)
 tmp1 = '{0}, {1:.2f} and {1}, {2}'.format('One', 2, 'Three')
 print(tmp1)
 
+from itertools import count
 from math import pi
 
 tmp1 = '{name} is approximately {value:.2f}'.format(name='数学符号', value=pi)
@@ -42,7 +43,8 @@ class DecoratorAsClassByParameters(object):
 
     def __call__(self, func):
         def wrapper(*args, **kwargs):
-            return ','.join(['DecoratorAsClassByParameters', self.__power_name__, self.__power_type__, func(*args, **kwargs)])
+            return ','.join(
+                ['DecoratorAsClassByParameters', self.__power_name__, self.__power_type__, func(*args, **kwargs)])
 
         return wrapper
 
@@ -299,6 +301,28 @@ print(person.full_name())
 # reduce
 from functools import reduce
 
-
 r = reduce(lambda x, y: x * y, range(1, 11))
 print(r)
+
+
+class TestFactory(object):
+    def __init__(self, name):
+        print(self.__class__.__name__ + name)
+
+
+def factory(cls, *args, **kwargs):
+    return cls(*args, **kwargs)
+
+
+factory(TestFactory, 'Vito1')
+
+
+# staticmethod
+
+class MyClass(object):
+    counter = 0
+
+    @staticmethod
+    def Count(cls):
+        cls.counter += 1
+        print(cls.counter)

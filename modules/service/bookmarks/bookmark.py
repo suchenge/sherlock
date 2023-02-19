@@ -72,28 +72,30 @@ class Bookmark(object):
             self.__status__ = "error"
 
     def inspection(self, request):
+        if self.__status__ == "done":
+            return
+
         path = self.__path__
         information_file_path = os.path.join(path, self.__information_file_name__)
         information = None
-        result = True
 
         if self.__path__ and os.path.exists(path) and os.path.exists(information_file_path):
             with open(information_file_path, 'r', encoding='utf-8') as file:
                 information = json.load(file)
-        else:
-            self.__status__ = "open"
-            result = False
 
-        if information:
+        done = True
+        if information is not None:
             file_infos = [{"name": still["name"], "url": still["url"]} for still in information["stills"]]
             file_infos.append({"name": information["poster"]["name"], "url": information["poster"]["url"]})
 
             for file_info in file_infos:
                 if not os.path.exists(file_info["path"]):
+                    done = False
                     Porter(None).save_file(file_info["url"], os.path.join(path, file_info["path"]), request)
-                    result = False
 
-        return result
+        if done is True:
+            self.__status__ = "done"
+
 
     @property
     def href(self):
