@@ -1,6 +1,7 @@
 import threading
 import queue
 
+from threading import Lock
 from modules.tools.thread_pools.task import Task
 
 
@@ -9,19 +10,34 @@ class TaskPool(object):
     __stop__ = False
     __created__ = False
     __count__ = 10
+    __threads__ = []
+    __lock__ = Lock()
 
     @staticmethod
     def __build__():
+        if TaskPool.__created__ is False:
+            TaskPool.__lock__.acquire()
 
-        TaskPool.__created__ = True
+            if TaskPool.__created__ is False:
+                for i in range(0, TaskPool.__count__):
+                    TaskPool.__threads__.append(threading.Thread(target=TaskPool.__task_executor__))
 
-        threads = []
+                for thread in TaskPool.__threads__:
+                    thread.start()
 
-        for i in range(0, TaskPool.__count__):
-            threads.append(threading.Thread(target=TaskPool.__task_executor__))
+                TaskPool.__created__ = True
 
-        for thread in threads:
-            thread.start()
+            TaskPool.__lock__.release()
+
+    @staticmethod
+    def join():
+        TaskPool.stop()
+
+        for thread in TaskPool.__threads__:
+            thread.join()
+
+        TaskPool.__created__ = False
+        TaskPool.__threads__ = []
 
     @staticmethod
     def set_count(value: int):
@@ -57,8 +73,7 @@ class TaskPool(object):
     def append_task(task: Task):
         TaskPool.__stop__ = False
         TaskPool.__queue__.put(task)
-        if TaskPool.__created__ is False:
-            TaskPool.__build__()
+        TaskPool.__build__()
 
     @staticmethod
     def append_tasks(tasks: []):

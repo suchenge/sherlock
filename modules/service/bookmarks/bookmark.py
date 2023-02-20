@@ -1,6 +1,9 @@
 import os
 import json
 
+from modules.tools.thread_pools.task import Task
+from modules.tools.thread_pools.task_pool import TaskPool
+
 from modules.service.movie_warehouse.collate.film import Film
 from modules.service.movie_warehouse.collate.porter import Porter
 
@@ -68,22 +71,24 @@ class Bookmark(object):
             porter.save_information(self.to_json(True), self.__information_file_name__)
             porter.save_poster(request)
             porter.save_stills(request)
+
+            self.inspection(request)
         except Exception as error:
             self.__status__ = "error"
 
     def inspection(self, request):
-        if self.__status__ == "done":
-            return
+        self.__inspection__(request)
 
+    def __inspection__(self, request):
         path = self.__path__
         information_file_path = os.path.join(path, self.__information_file_name__)
         information = None
+        done = True
 
         if self.__path__ and os.path.exists(path) and os.path.exists(information_file_path):
             with open(information_file_path, 'r', encoding='utf-8') as file:
                 information = json.load(file)
 
-        done = True
         if information is not None:
             file_infos = [{"name": still["name"], "url": still["url"]} for still in information["stills"]]
             file_infos.append({"name": information["poster"]["name"], "url": information["poster"]["url"]})
@@ -92,10 +97,13 @@ class Bookmark(object):
                 if not os.path.exists(file_info["path"]):
                     done = False
                     Porter(None).save_file(file_info["url"], os.path.join(path, file_info["path"]), request)
+        else:
+            done = False
 
         if done is True:
             self.__status__ = "done"
-
+        else:
+            TaskPool.append_task(Task(self.__inspection__, request))
 
     @property
     def href(self):
