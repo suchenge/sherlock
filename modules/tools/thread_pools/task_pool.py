@@ -31,7 +31,7 @@ class TaskPool(object):
 
     @staticmethod
     def join():
-        print("\n等待所有线程完成")
+        print("等待所有线程完成")
 
         TaskPool.__stop__ = True
 
@@ -40,6 +40,8 @@ class TaskPool(object):
 
         TaskPool.__created__ = False
         TaskPool.__threads__ = []
+
+        print("所有线程都结束了")
 
     @staticmethod
     def set_count(value: int):
@@ -51,7 +53,12 @@ class TaskPool(object):
 
     @staticmethod
     def __get_task__() -> Task:
-        return TaskPool.__queue__.get()
+        task = None
+        # TaskPool.__lock__.acquire()
+        task = TaskPool.__queue__.get()
+        # TaskPool.__lock__.release()
+
+        return task
 
     @staticmethod
     def __task_executor__(thread_id):

@@ -38,7 +38,7 @@ class Dustman(object):
         if save_base_path is None:
             save_base_path = self.__bookmarks_json_file_folder__
 
-        TaskPool.set_count(1)
+        TaskPool.set_count(10)
         request = Request(Proxies(**{}))
 
         bookmark_group = self.__bookmarks_groups__.get_items()[0]
