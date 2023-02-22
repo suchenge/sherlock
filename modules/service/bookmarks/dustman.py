@@ -9,45 +9,48 @@ from modules.service.movie_warehouse.collate.file import VirtualFile
 from modules.service.movie_warehouse.collate.marauder.javdb import MarauderJavdb
 
 from modules.service.bookmarks.bookmark import Bookmark
-from modules.service.bookmarks.bookmark_group import BookmarkGroup
+from modules.service.bookmarks.bookmark_group import BookmarkGroup, BookmarkGroups
 
 
 class Dustman(object):
     def __init__(self, bookmarks_html_file_path):
         self.__bookmarks_html_file_path__ = bookmarks_html_file_path
-        self.__bookmarks_json_file_folder = os.path.dirname(bookmarks_html_file_path)
+        self.__bookmarks_json_file_folder__ = os.path.dirname(bookmarks_html_file_path)
+        self.__bookmarks_groups__ = BookmarkGroups(self.__bookmarks_json_file_folder__)
 
     def save(self, group_line_qty=500):
         bookmarks = self.__get_bookmarks__(self.__bookmarks_html_file_path__)
-        bookmarks_groups = [bookmarks[i: i + group_line_qty] for i in range(0, len(bookmarks), group_line_qty)]
+        bookmarks_group = [bookmarks[i: i + group_line_qty] for i in range(0, len(bookmarks), group_line_qty)]
 
         index = 0
-        for bookmarks_group_items in bookmarks_groups:
-            index = index + 1
-            bookmark_group = BookmarkGroup(self.__bookmarks_json_file_folder, index)
-            bookmark_group.items = bookmarks_group_items
-            bookmark_group.inspection()
 
-    def download(self, save_base_path):
-        TaskPool.set_count(10)
+        for bookmarks_group_items in bookmarks_group:
+            index = index + 1
+            bookmark_group = BookmarkGroup(os.path.join(self.__bookmarks_json_file_folder__, "group_%s" % str(index).zfill(5)))
+            bookmark_group.items = bookmarks_group_items
+            bookmark_group.save()
+
+            self.__bookmarks_groups__.append_group_path(bookmark_group.file_path)
+
+        self.__bookmarks_groups__.save()
+
+    def download(self, save_base_path=None):
+        if save_base_path is None:
+            save_base_path = self.__bookmarks_json_file_folder__
+
+        TaskPool.set_count(1)
         request = Request(Proxies(**{}))
 
-        bookmark_groups = []
-
-        for file_name in os.listdir(self.__bookmarks_json_file_folder):
-            bookmark_group = BookmarkGroup.build(os.path.join(self.__bookmarks_json_file_folder, file_name))
-
-            if bookmark_group is not None:
-                bookmark_groups.append(bookmark_group)
-
-        for bookmark_group in bookmark_groups:
-            bookmark_group.download(lambda bookmark: self.__build_film__(bookmark, save_base_path, request), request)
+        bookmark_group = self.__bookmarks_groups__.get_items()[0]
+        bookmark_group.download(lambda bookmark: self.__build_film__(bookmark, bookmark_group.folder, request), request)
+        # for bookmark_group in self.__bookmarks_groups__.get_items():
+        #     bookmark_group.download(lambda bookmark: self.__build_film__(bookmark, bookmark_group.folder, request), request)
 
     def __build_film__(self, bookmark, save_base_path, request):
         file = {
             "name": "",
             "title": bookmark["key"],
-            "folder": os.path.join(save_base_path,bookmark["title"]),
+            "folder": os.path.join(save_base_path, bookmark["title"]),
             "path": save_base_path,
             "url": bookmark["href"]
         }

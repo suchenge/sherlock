@@ -33,7 +33,7 @@ class TaskPool(object):
     def join():
         print("\n等待所有线程完成")
 
-        TaskPool.stop()
+        TaskPool.__stop__ = True
 
         for thread in TaskPool.__threads__:
             thread.join()
@@ -55,21 +55,16 @@ class TaskPool(object):
 
     @staticmethod
     def __task_executor__(thread_id):
-        print("\n线程[" + thread_id + "]开始运行")
-
         while True:
             task = TaskPool.__get_task__()
             if task is not None:
                 task.run()
 
-            # if TaskPool.__stop__ is True:
-                # print("\nstoped, qsize:" + str(TaskPool.__queue__.qsize()))
-
             if TaskPool.__queue__.empty() and TaskPool.__stop__ is True:
-                print("\n线程[" + thread_id + "] break")
+                print("线程[" + thread_id + "] break")
                 break
 
-        print("\n线程[" + thread_id + "]结束运行")
+        print("线程[" + thread_id + "]结束运行")
 
     @staticmethod
     def append_task(task: Task):
