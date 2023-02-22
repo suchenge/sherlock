@@ -29,7 +29,7 @@ class Dustman(object):
             bookmark_group.inspection()
 
     def download(self, save_base_path):
-        TaskPool.set_count(1)
+        TaskPool.set_count(10)
         request = Request(Proxies(**{}))
 
         bookmark_groups = []

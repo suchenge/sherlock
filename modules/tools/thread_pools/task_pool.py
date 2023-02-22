@@ -20,7 +20,7 @@ class TaskPool(object):
 
             if TaskPool.__created__ is False:
                 for i in range(0, TaskPool.__count__):
-                    TaskPool.__threads__.append(threading.Thread(target=TaskPool.__task_executor__))
+                    TaskPool.__threads__.append(threading.Thread(target=TaskPool.__task_executor__, args=str(i)))
 
                 for thread in TaskPool.__threads__:
                     thread.start()
@@ -31,6 +31,8 @@ class TaskPool(object):
 
     @staticmethod
     def join():
+        print("\n等待所有线程完成")
+
         TaskPool.stop()
 
         for thread in TaskPool.__threads__:
@@ -52,8 +54,8 @@ class TaskPool(object):
         return TaskPool.__queue__.get()
 
     @staticmethod
-    def __task_executor__():
-        # print("\n线程[" + thread_id + "]开始运行")
+    def __task_executor__(thread_id):
+        print("\n线程[" + thread_id + "]开始运行")
 
         while True:
             task = TaskPool.__get_task__()
@@ -64,10 +66,10 @@ class TaskPool(object):
                 # print("\nstoped, qsize:" + str(TaskPool.__queue__.qsize()))
 
             if TaskPool.__queue__.empty() and TaskPool.__stop__ is True:
-                # print("\n" + str(TaskPool.__stop__))
+                print("\n线程[" + thread_id + "] break")
                 break
 
-        # print("\n线程[" + thread_id + "]完成运行")
+        print("\n线程[" + thread_id + "]结束运行")
 
     @staticmethod
     def append_task(task: Task):

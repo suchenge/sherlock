@@ -29,8 +29,11 @@ class BookmarkGroup(object):
         if os.path.exists(self.__bak_file_path__):
             os.remove(self.__bak_file_path__)
 
-        os.rename(self.__file_path__, self.__done_file_path__)
-        self.__save__(self.__done_file_path__)
+        if os.path.exists(self.__file_path__):
+            os.rename(self.__file_path__, self.__done_file_path__)
+
+        if os.path.exists(self.__done_file_path__):
+            self.__save__(self.__done_file_path__)
 
     def __bak__(self):
         if os.path.exists(self.__bak_file_path__):
@@ -88,3 +91,4 @@ class BookmarkGroup(object):
         TaskPool.join()
 
 
+   

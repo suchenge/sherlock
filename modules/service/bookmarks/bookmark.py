@@ -50,7 +50,7 @@ class Bookmark(object):
             result["path"] = self.__path__
 
         if self.__information__ and save_information:
-            result["information"] = self.__information__
+            result["resource"] = self.__information__
 
         return result
 
@@ -90,13 +90,15 @@ class Bookmark(object):
                 information = json.load(file)
 
         if information is not None:
-            file_infos = [{"name": still["name"], "url": still["url"]} for still in information["stills"]]
-            file_infos.append({"name": information["poster"]["name"], "url": information["poster"]["url"]})
+            resource = information["resource"]
+            file_infos = [{"name": still["name"], "url": still["url"]} for still in resource["stills"]]
+            file_infos.append({"name": resource["poster"]["name"], "url": resource["poster"]["url"]})
 
             for file_info in file_infos:
-                if not os.path.exists(file_info["path"]):
+                file_path = os.path.join(path, file_info["name"])
+                if not os.path.exists(file_path):
                     done = False
-                    Porter(None).save_file(file_info["url"], os.path.join(path, file_info["path"]), request)
+                    Porter(None).save_file(file_info["url"], file_path, request)
         else:
             done = False
 
