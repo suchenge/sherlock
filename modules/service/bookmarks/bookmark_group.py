@@ -1,7 +1,7 @@
 import os
-import re
 import json
 
+from threading import Lock
 from pathlib import Path
 
 from modules.tools.thread_pools.task import Task
@@ -42,7 +42,7 @@ class BookmarkGroups(object):
 
 class BookmarkGroup(object):
     def __init__(self, folder):
-
+        self.__lock__ = Lock()
         self.__items__ = []
         self.__base_name__ = "bookmarks.json"
         self.__file_path__ = os.path.join(folder, self.__base_name__)
@@ -86,18 +86,29 @@ class BookmarkGroup(object):
             Path(folder).mkdir(exist_ok=True)
 
         with open(file_path, 'w', encoding='utf-8') as file:
-            json.dump([item.to_json() for item in self.__items__], file, indent=4, ensure_ascii=False)
+            json.dump([item.to_json() for item in self.items], file, indent=4, ensure_ascii=False)
 
     def __is_all_done__(self):
-        return len([item for item in self.items if item.status == "done"]) == len(self.items)
+        is_done = True
+
+        for item in self.items:
+            if item.status != "done":
+                is_done = False
+                break
+
+        return is_done
 
     def inspection(self):
+        self.__lock__.acquire()
+
         if len(self.items) > 0:
             if self.__is_all_done__():
                 self.__done__()
             else:
                 self.__bak__()
                 TaskPool.append_task(Task(self.inspection, None))
+
+        self.__lock__.release()
 
     @property
     def items(self):
@@ -116,7 +127,6 @@ class BookmarkGroup(object):
 
         inspection_count = 0
         process_count = 0
-        item_length = len(self.items)
 
         for item in self.items:
             process_count = process_count + 1
@@ -128,7 +138,7 @@ class BookmarkGroup(object):
             item.download(film, request)
             inspection_count = inspection_count + 1
 
-            if inspection_count == 10 or process_count >= item_length:
+            if inspection_count == 10 or process_count >= len(self.items):
                 inspection_count = 0
                 TaskPool.append_task(Task(self.inspection))
 

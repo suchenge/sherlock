@@ -1,6 +1,7 @@
 import os
 import json
 
+from threading import Lock
 from modules.tools.thread_pools.task import Task
 from modules.tools.thread_pools.task_pool import TaskPool
 
@@ -19,6 +20,8 @@ class Bookmark(object):
         self.__information__ = None
 
         self.__information_file_name__ = "information.json"
+
+        self.__lock__ = Lock()
 
     def build(self, item):
         self.__href__ = item["href"]
@@ -80,6 +83,8 @@ class Bookmark(object):
         self.__inspection__(request)
 
     def __inspection__(self, request):
+        self.__lock__.acquire()
+
         path = self.__path__
         information_file_path = os.path.join(path, self.__information_file_name__)
         information = None
@@ -104,8 +109,12 @@ class Bookmark(object):
 
         if done is True:
             self.__status__ = "done"
+            with open(information_file_path, 'w', encoding='utf-8') as file:
+                json.dump(self.to_json(True), file, indent=4, ensure_ascii=False)
         else:
             TaskPool.append_task(Task(self.__inspection__, request))
+
+        self.__lock__.release()
 
     @property
     def href(self):
