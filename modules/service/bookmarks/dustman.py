@@ -12,14 +12,75 @@ from modules.service.bookmarks.bookmark import Bookmark
 from modules.service.bookmarks.bookmark_group import BookmarkGroup, BookmarkGroups
 
 
+def __build_film__(bookmark, save_base_path, request):
+    file = {
+        "name": "",
+        "title": bookmark["key"],
+        "folder": os.path.join(save_base_path, bookmark["title"]),
+        "path": save_base_path,
+        "url": bookmark["href"]
+    }
+
+    marauder = MarauderJavdb(**{'file': VirtualFile(file), 'request': request})
+    return marauder.to_film()
+
+
+def __get_bookmark_info__(bookmark_html_line):
+    href, title, key = None, None, None
+    match = re.compile(r'<A HREF="(.*?)" .*>(.*?)</A>').findall(bookmark_html_line)
+    if match:
+        href = match[0][0]
+        title = match[0][1].replace('[FHDwmf]', '').replace('[HD]', '').replace('[FHD]', '').replace('【新提醒】', '')
+
+        if title and ('javdb.com/v/' in href
+                      or 'javhoo.org/ja/av/' in href
+                      or 'youivr.com/youiv-' in href):
+            key = title.split(' ')[0]
+
+        if 'mgstage.com/product/' in href:
+            href_paths = [path for path in href.split('/') if len(path) > 0]
+            key = href_paths[len(href_paths) - 1]
+
+        if 'www.ivworld.net/?p=' in href and title:
+            title_match = re.compile(r'.*?\[(.*?)\].*?').findall(title)
+            if title_match:
+                key = title_match[0]
+
+        if 'watchjavidol.com' in href and title and 'category' not in href:
+            temp_href = href.replace('https://', '').replace('http://', '').split('/')
+            if len(temp_href) > 2:
+                key = title.split(' ')[0]
+
+        if 'maddawgjav.net' in href and title:
+            temp_href = href.replace('https://', '').replace('http://', '').split('/')
+            if len(temp_href) > 2:
+                temp_title = title.replace('[FHDwmf]', '').replace('[HD]', '').replace('[FHD]', '')
+                key = temp_title.split(' ')[0]
+
+        if key:
+            key = key.upper()
+
+            return {
+                "href": href,
+                "title": title,
+                "key": key
+            }
+    else:
+        return None
+
+
 class Dustman(object):
-    def __init__(self, bookmarks_html_file_path):
+    def __init__(self, bookmarks_html_file_path, bookmark_save_folder=None):
         self.__bookmarks_html_file_path__ = bookmarks_html_file_path
         self.__bookmarks_json_file_folder__ = os.path.dirname(bookmarks_html_file_path)
+
+        if bookmark_save_folder is not None:
+            self.__bookmarks_json_file_folder__ = bookmark_save_folder
+
         self.__bookmarks_groups__ = BookmarkGroups(self.__bookmarks_json_file_folder__)
 
     def save(self, group_line_qty=500):
-        bookmarks = self.__get_bookmarks__(self.__bookmarks_html_file_path__)
+        bookmarks = self.__get_bookmarks__()
         bookmarks_group = [bookmarks[i: i + group_line_qty] for i in range(0, len(bookmarks), group_line_qty)]
 
         index = 0
@@ -34,41 +95,26 @@ class Dustman(object):
 
         self.__bookmarks_groups__.save()
 
-    def download(self, save_base_path=None):
-        if save_base_path is None:
-            save_base_path = self.__bookmarks_json_file_folder__
-
+    def download(self):
         TaskPool.set_count(10)
         request = Request(Proxies(**{}))
 
-        bookmark_group = self.__bookmarks_groups__.get_items()[0]
-        bookmark_group.download(lambda bookmark: self.__build_film__(bookmark, bookmark_group.folder, request), request)
-        # for bookmark_group in self.__bookmarks_groups__.get_items():
-        #     bookmark_group.download(lambda bookmark: self.__build_film__(bookmark, bookmark_group.folder, request), request)
+        for bookmark_group in self.__bookmarks_groups__.get_items():
+            bookmark_group.download(lambda bookmark: __build_film__(bookmark, bookmark_group.folder, request), request)
 
-    def __build_film__(self, bookmark, save_base_path, request):
-        file = {
-            "name": "",
-            "title": bookmark["key"],
-            "folder": os.path.join(save_base_path, bookmark["title"]),
-            "path": save_base_path,
-            "url": bookmark["href"]
-        }
-
-        marauder = MarauderJavdb(**{'file': VirtualFile(file), 'request': request})
-        return marauder.to_film()
-
-    def __get_bookmarks__(self, bookmarks_file_path):
+        TaskPool.join()
+        
+    def __get_bookmarks__(self):
         content = []
         line_index = 0
-        with open(bookmarks_file_path, encoding='utf-8', mode='r') as html_file:
+        with open(self.__bookmarks_html_file_path__, encoding='utf-8', mode='r') as html_file:
             while True:
                 line = html_file.readline()
                 if not line:
                     break
 
                 if 'HREF' in line:
-                    item = self.__get_bookmark_info__(line)
+                    item = __get_bookmark_info__(line)
                     if item is not None:
                         line_index = line_index + 1
 
@@ -77,47 +123,4 @@ class Dustman(object):
                         content.append(Bookmark().build(item))
 
         return content
-
-    def __get_bookmark_info__(self, bookmark):
-        href, title, key = None, None, None
-        match = re.compile(r'<A HREF="(.*?)" .*>(.*?)</A>').findall(bookmark)
-        if match:
-            href = match[0][0]
-            title = match[0][1].replace('[FHDwmf]', '').replace('[HD]', '').replace('[FHD]', '').replace('【新提醒】', '')
-
-            if title and ('javdb.com/v/' in href
-                          or 'javhoo.org/ja/av/' in href
-                          or 'youivr.com/youiv-' in href):
-                key = title.split(' ')[0]
-
-            if 'mgstage.com/product/' in href:
-                href_paths = [path for path in href.split('/') if len(path) > 0]
-                key = href_paths[len(href_paths) - 1]
-
-            if 'www.ivworld.net/?p=' in href and title:
-                title_match = re.compile(r'.*?\[(.*?)\].*?').findall(title)
-                if title_match:
-                    key = title_match[0]
-
-            if 'watchjavidol.com' in href and title and 'category' not in href:
-                temp_href = href.replace('https://', '').replace('http://', '').split('/')
-                if len(temp_href) > 2:
-                    key = title.split(' ')[0]
-
-            if 'maddawgjav.net' in href and title:
-                temp_href = href.replace('https://', '').replace('http://', '').split('/')
-                if len(temp_href) > 2:
-                    temp_title = title.replace('[FHDwmf]', '').replace('[HD]', '').replace('[FHD]', '')
-                    key = temp_title.split(' ')[0]
-
-            if key:
-                key = key.upper()
-
-                return {
-                    "href": href,
-                    "title": title,
-                    "key": key
-                }
-        else:
-            return None
 

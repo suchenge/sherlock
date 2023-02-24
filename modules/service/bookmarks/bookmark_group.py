@@ -73,9 +73,6 @@ class BookmarkGroup(object):
             os.remove(self.__bak_file_path__)
 
         os.popen("copy %s %s" % (self.__file_path__, self.__bak_file_path__))
-        # os.rename(self.__file_path__, self.__bak_file_path__)
-
-        # self.save(self.__bak_file_path__)
 
     def save(self, file_path=None):
         if file_path is None:
@@ -104,11 +101,13 @@ class BookmarkGroup(object):
         if len(self.items) > 0:
             if self.__is_all_done__():
                 self.__done__()
+                self.__lock__.release()
             else:
                 self.__bak__()
-                TaskPool.append_task(Task(self.inspection, None))
-
-        self.__lock__.release()
+                self.__lock__.release()
+                TaskPool.append_task(Task(self.inspection, None, 5))
+        else:
+            self.__lock__.release()
 
     @property
     def items(self):
@@ -142,7 +141,7 @@ class BookmarkGroup(object):
                 inspection_count = 0
                 TaskPool.append_task(Task(self.inspection))
 
-        TaskPool.join()
+        # TaskPool.join()
 
 
    

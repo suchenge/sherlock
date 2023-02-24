@@ -1,7 +1,9 @@
 import os
 import json
 
+from pathlib import Path
 from threading import Lock
+
 from modules.tools.thread_pools.task import Task
 from modules.tools.thread_pools.task_pool import TaskPool
 
@@ -22,10 +24,12 @@ class Bookmark(object):
         self.__information_file_name__ = "information.json"
 
         self.__lock__ = Lock()
+        self.__inspection_count__ = 0
 
     def build(self, item):
         self.__href__ = item["href"]
         self.__title__ = item["title"]
+        # self.__title__ = item["key"]
         self.__key__ = item["key"]
         self.__index__ = item["index"]
         self.__status__ = item["status"]
@@ -90,6 +94,12 @@ class Bookmark(object):
         information = None
         done = True
 
+        self.__inspection_count__ = self.__inspection_count__ + 1
+        if self.__inspection_count__ >= 3:
+            self.__done__(information_file_path)
+            self.__lock__.release()
+            return
+
         if self.__path__ and os.path.exists(path) and os.path.exists(information_file_path):
             with open(information_file_path, 'r', encoding='utf-8') as file:
                 information = json.load(file)
@@ -108,13 +118,21 @@ class Bookmark(object):
             done = False
 
         if done is True:
-            self.__status__ = "done"
-            with open(information_file_path, 'w', encoding='utf-8') as file:
-                json.dump(self.to_json(True), file, indent=4, ensure_ascii=False)
+            self.__done__(information_file_path)
+            self.__lock__.release()
         else:
-            TaskPool.append_task(Task(self.__inspection__, request))
+            self.__lock__.release()
+            TaskPool.append_task(Task(self.__inspection__, request, 3))
 
-        self.__lock__.release()
+    def __done__(self, file_path):
+        self.__status__ = "done"
+
+        folder = os.path.dirname(file_path)
+        if not os.path.exists(folder):
+            Path(folder).mkdir(exist_ok=True)
+
+        with open(file_path, 'w', encoding='utf-8') as file:
+            json.dump(self.to_json(True), file, indent=4, ensure_ascii=False)
 
     @property
     def href(self):

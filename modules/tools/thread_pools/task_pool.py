@@ -1,8 +1,21 @@
 import threading
 import queue
+import time
+import re
 
 from threading import Lock
 from modules.tools.thread_pools.task import Task
+
+
+def __get_method_description__(task: Task):
+    method_info = str(task.__method__)
+    try:
+        match = re.compile(r"<bound method (.*) of.*?").findall(method_info)
+        if match:
+            return match[0]
+    except Exception as error:
+        pass
+    return ""
 
 
 class TaskPool(object):
@@ -20,7 +33,7 @@ class TaskPool(object):
 
             if TaskPool.__created__ is False:
                 for i in range(0, TaskPool.__count__):
-                    TaskPool.__threads__.append(threading.Thread(target=TaskPool.__task_executor__, args=str(i)))
+                    TaskPool.__threads__.append(threading.Thread(target=TaskPool.__task_executor__, args=[str(i)]))
 
                 for thread in TaskPool.__threads__:
                     thread.start()
@@ -31,9 +44,7 @@ class TaskPool(object):
 
     @staticmethod
     def join():
-        print("等待所有线程完成")
-
-        TaskPool.__stop__ = True
+        TaskPool.stop()
 
         for thread in TaskPool.__threads__:
             thread.join()
@@ -48,15 +59,23 @@ class TaskPool(object):
         TaskPool.__count__ = value
 
     @staticmethod
-    def stop():
-        TaskPool.__stop__ = True
+    def stop(stop=True):
+        TaskPool.__lock__.acquire()
+
+        if not TaskPool.__stop__:
+            TaskPool.__stop__ = stop
+
+        TaskPool.__lock__.release()
 
     @staticmethod
     def __get_task__() -> Task:
         task = None
-        # TaskPool.__lock__.acquire()
-        task = TaskPool.__queue__.get()
-        # TaskPool.__lock__.release()
+        TaskPool.__lock__.acquire()
+
+        if not TaskPool.__queue__.empty():
+            task = TaskPool.__queue__.get()
+
+        TaskPool.__lock__.release()
 
         return task
 
@@ -64,18 +83,32 @@ class TaskPool(object):
     def __task_executor__(thread_id):
         while True:
             task = TaskPool.__get_task__()
+
             if task is not None:
+                # print("线程[" + thread_id + "][" + str(time.time()) + "] run " + __get_method_description__(task) + "")
                 task.run()
 
             if TaskPool.__queue__.empty() and TaskPool.__stop__ is True:
-                print("线程[" + thread_id + "] break")
+                print("线程[" + thread_id + "][" + str(time.time()) + "] 结束运行")
                 break
-
-        print("线程[" + thread_id + "]结束运行")
 
     @staticmethod
     def append_task(task: Task):
-        TaskPool.__stop__ = False
+        if task.in_queue_delay_seconds > 0:
+            delay_thread = threading.Thread(target=TaskPool.__task_executor__, args=[task])
+            delay_thread.start()
+            delay_thread.join()
+        else:
+            TaskPool.__in_queue__(task)
+
+    @staticmethod
+    def __delay_in_queue__(task: Task):
+        time.sleep(task.in_queue_delay_seconds)
+        TaskPool.__in_queue__(task)
+
+    @staticmethod
+    def __in_queue__(task: Task):
+        TaskPool.stop(False)
         TaskPool.__queue__.put(task)
         TaskPool.__build__()
 
