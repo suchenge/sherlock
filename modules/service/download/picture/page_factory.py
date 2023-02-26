@@ -11,7 +11,7 @@ class PageFactory(object):
     settings = {
         'xiurenji': PageXiuRenJi,
         'xiannvku': PageXinannvku,
-        'xiurenba': PageXiurenba,
+        'xiuren01': PageXiurenba,
         'xrmn': PageXrmn,
         'jpmnb': PageJpmnb,
         'jpxgmn': PageJpxgmn

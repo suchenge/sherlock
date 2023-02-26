@@ -133,8 +133,12 @@ class BookmarkGroup(object):
                 item.inspection(request)
                 continue
 
-            film = build_film_function(item.to_json())
-            item.download(film, request)
+            try:
+                film = build_film_function(item.to_json())
+                item.download(film, request)
+            except Exception as error:
+                continue
+
             inspection_count = inspection_count + 1
 
             if inspection_count == 10 or process_count >= len(self.items):

@@ -16,7 +16,10 @@ class Task(object):
         if self.__delay_seconds__ > 0:
             time.sleep(self.__delay_seconds__)
 
-        if self.__args__ is None:
-            self.__method__()
-        else:
-            self.__method__(self.__args__)
+        try:
+            if self.__args__ is None:
+                self.__method__()
+            else:
+                self.__method__(self.__args__)
+        except Exception as error:
+            pass
