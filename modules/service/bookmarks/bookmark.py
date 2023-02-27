@@ -2,7 +2,6 @@ import os
 import json
 
 from pathlib import Path
-from threading import Lock
 
 from modules.tools.http_request.request import Request, download
 from modules.tools.thread_pools.task import Task
@@ -26,6 +25,7 @@ class Bookmark(object):
 
         self.__information__ = self.__get_information_by_file__()
         self.__request__ = None
+        self.__inspection_count__ = 0
 
     @property
     def status(self) -> str:
@@ -80,6 +80,8 @@ class Bookmark(object):
                 self.__save_poster__()
 
                 self.__inspection__()
+            else:
+                self.__save__("error")
 
     def __save_information__(self):
         if not os.path.exists(self.__path__):
@@ -110,23 +112,28 @@ class Bookmark(object):
             return Task(download, args={"request": self.__request__, "path": path, "url": url})
 
     def __inspection__(self):
-        items = [{"path": os.path.join(self.__path__, still["name"]), "url": still["url"]} for still in self.__information__.stills]
-        items.append({"path": os.path.join(self.__path__, self.__information__.poster["name"]), "url": self.__information__.poster["url"]})
-
-        done = True
-        if items and len(items) > 0:
-            for item in items:
-                if not os.path.exists(item["path"]):
-                    done = False
-                    TaskPool.append_task(Task(download, args={"request": self.__request__, "path": item["path"], "url": item["url"]}))
-
-        if done:
-            self.__done__()
+        if self.__inspection_count__ >= 5:
+            self.__save__("error")
         else:
-            TaskPool.append_task(Task(self.__inspection__, args=None, in_queue_delay_seconds=5))
+            self.__inspection_count__ = self.__inspection_count__ + 1
 
-    def __done__(self):
-        self.__status__ = "done"
+            items = [{"path": os.path.join(self.__path__, still["name"]), "url": still["url"]} for still in self.__information__.stills]
+            items.append({"path": os.path.join(self.__path__, self.__information__.poster["name"]), "url": self.__information__.poster["url"]})
+
+            done = True
+            if items and len(items) > 0:
+                for item in items:
+                    if not os.path.exists(item["path"]):
+                        done = False
+                        TaskPool.append_task(Task(download, args={"request": self.__request__, "path": item["path"], "url": item["url"]}))
+
+            if done:
+                self.__save__()
+            else:
+                TaskPool.append_task(Task(self.__inspection__, args=None, in_queue_delay_seconds=5))
+
+    def __save__(self, status="done"):
+        self.__status__ = status
 
         folder = os.path.dirname(self.__information_file_path__)
         if not os.path.exists(folder):
@@ -134,3 +141,5 @@ class Bookmark(object):
 
         with open(self.__information_file_path__, 'w', encoding='utf-8') as file:
             json.dump(self.to_json(True), file, indent=4, ensure_ascii=False)
+
+

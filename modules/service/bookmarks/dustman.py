@@ -103,7 +103,7 @@ class Dustman(object):
                         line_index = line_index + 1
 
                         item["index"] = line_index
-                        item["status"] = 'open'
+                        item["status"] = "open"
                         content.append(Bookmark(item))
 
         return content

@@ -15,6 +15,7 @@ class BaseMarauder(object):
 
     def get_movie(self) -> MovieInformation:
         result = None
+
         try:
             self.__html_content__ = self.__request__.get_text(self.__url__)
             if self.__html_content__:
@@ -31,8 +32,8 @@ class BaseMarauder(object):
                     return result
         except Exception as error:
             pass
-
-        return result
+        finally:
+            return result
 
     def __get_id__(self) -> str:
         pass

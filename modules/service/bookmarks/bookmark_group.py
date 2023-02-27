@@ -50,6 +50,8 @@ class BookmarkGroup(object):
         self.__bak_file_path__ = self.__file_path__ + ".bak"
         self.__done_file_path__ = self.__file_path__.replace("json", "done.json")
 
+        self.__inspection_count__ = 0
+
     @property
     def file_path(self):
         return self.__file_path__
@@ -63,7 +65,7 @@ class BookmarkGroup(object):
             os.remove(self.__bak_file_path__)
 
         if os.path.exists(self.__file_path__):
-            os.rename(self.__file_path__, self.__done_file_path__)
+            os.remove(self.__file_path__)
 
         if os.path.exists(self.__done_file_path__):
             self.save(self.__done_file_path__)
@@ -89,25 +91,23 @@ class BookmarkGroup(object):
         is_done = True
 
         for item in self.items:
-            if item.status != "done":
+            if item.status != "done" and item.status != "error":
                 is_done = False
                 break
 
         return is_done
 
-    def inspection(self):
-        self.__lock__.acquire()
+    def __inspection__(self):
+        if self.__inspection_count__ >= len(self.items) * 2:
+            self.save()
+        else:
+            self.__inspection_count__ = self.__inspection_count__ + 1
 
-        if len(self.items) > 0:
             if self.__is_all_done__():
                 self.__done__()
-                self.__lock__.release()
             else:
                 self.__bak__()
-                self.__lock__.release()
-                TaskPool.append_task(Task(self.inspection, None, 5))
-        else:
-            self.__lock__.release()
+                TaskPool.append_task(Task(self.__inspection__, args=None, in_queue_delay_seconds=15, delay_seconds=5))
 
     @property
     def items(self):
@@ -124,22 +124,10 @@ class BookmarkGroup(object):
     def download(self, request):
         self.__bak__()
 
-        inspection_count = 0
-        process_count = 0
-
         for item in self.items:
-            process_count = process_count + 1
+            item.download(request)
 
-            try:
-                item.download(request)
-            except Exception as error:
-                continue
-
-            inspection_count = inspection_count + 1
-
-            if inspection_count == 10 or process_count >= len(self.items):
-                inspection_count = 0
-                TaskPool.append_task(Task(self.inspection, args=None, in_queue_delay_seconds=5))
+        self.__inspection__()
 
 
    
