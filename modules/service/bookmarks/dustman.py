@@ -1,28 +1,12 @@
-import os.path
 import re
+import os.path
 
 from modules.tools.http_request.request import Request
 from modules.tools.http_request.proxy import Proxies
 from modules.tools.thread_pools.task_pool import TaskPool
 
-from modules.service.movie_warehouse.collate.file import VirtualFile
-from modules.service.movie_warehouse.collate.marauder.javdb import MarauderJavdb
-
 from modules.service.bookmarks.bookmark import Bookmark
 from modules.service.bookmarks.bookmark_group import BookmarkGroup, BookmarkGroups
-
-
-def __build_film__(bookmark, save_base_path, request):
-    file = {
-        "name": "",
-        "title": bookmark["key"],
-        "folder": os.path.join(save_base_path, bookmark["title"]),
-        "path": save_base_path,
-        "url": bookmark["href"]
-    }
-
-    marauder = MarauderJavdb(**{'file': VirtualFile(file), 'request': request})
-    return marauder.to_film()
 
 
 def __get_bookmark_info__(bookmark_html_line):
@@ -100,7 +84,7 @@ class Dustman(object):
         request = Request(Proxies(**{}))
 
         for bookmark_group in self.__bookmarks_groups__.get_items():
-            bookmark_group.download(lambda bookmark: __build_film__(bookmark, bookmark_group.folder, request), request)
+            bookmark_group.download(request)
 
         TaskPool.join()
         
@@ -120,7 +104,7 @@ class Dustman(object):
 
                         item["index"] = line_index
                         item["status"] = 'open'
-                        content.append(Bookmark().build(item))
+                        content.append(Bookmark(item))
 
         return content
 

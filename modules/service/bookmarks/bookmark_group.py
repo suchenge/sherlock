@@ -113,7 +113,7 @@ class BookmarkGroup(object):
     def items(self):
         if len(self.__items__) == 0:
             with open(self.__file_path__, 'r', encoding='utf-8') as file:
-                self.__items__ = [Bookmark().build(item) for item in json.load(file)]
+                self.__items__ = [Bookmark(item) for item in json.load(file)]
 
         return self.__items__
 
@@ -121,7 +121,7 @@ class BookmarkGroup(object):
     def items(self, value):
         self.__items__ = value
 
-    def download(self, build_film_function, request):
+    def download(self, request):
         self.__bak__()
 
         inspection_count = 0
@@ -129,13 +129,9 @@ class BookmarkGroup(object):
 
         for item in self.items:
             process_count = process_count + 1
-            if item.status == "done":
-                item.inspection(request)
-                continue
 
             try:
-                film = build_film_function(item.to_json())
-                item.download(film, request)
+                item.download(request)
             except Exception as error:
                 continue
 
@@ -143,9 +139,7 @@ class BookmarkGroup(object):
 
             if inspection_count == 10 or process_count >= len(self.items):
                 inspection_count = 0
-                TaskPool.append_task(Task(self.inspection))
-
-        # TaskPool.join()
+                TaskPool.append_task(Task(self.inspection, args=None, in_queue_delay_seconds=5))
 
 
    

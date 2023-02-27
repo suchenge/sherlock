@@ -4,45 +4,49 @@ import json
 from pathlib import Path
 from threading import Lock
 
+from modules.tools.http_request.request import Request, download
 from modules.tools.thread_pools.task import Task
 from modules.tools.thread_pools.task_pool import TaskPool
 
-from modules.service.movie_warehouse.collate.film import Film
-from modules.service.movie_warehouse.collate.porter import Porter
+from modules.service.movie_marauder.movie_information import MovieInformation
+from modules.service.movie_marauder.javdb_marauder import JavdbMarauder
 
 
 class Bookmark(object):
-    def __init__(self):
-        self.__href__ = None
-        self.__title__ = None
-        self.__key__ = None
-        self.__index__ = None
-        self.__status__ = None
-        self.__path__ = None
-        self.__information__ = None
+    def __init__(self, json_info: {}):
+        self.__href__ = json_info["href"]
+        self.__title__ = json_info["title"]
+        self.__key__ = json_info["key"]
+        self.__index__ = json_info["index"]
+        self.__status__ = json_info["status"]
+        self.__path__ = json_info["path"]
 
         self.__information_file_name__ = "information.json"
+        self.__information_file_path__ = os.path.join(self.__path__, self.__information_file_name__)
 
-        self.__lock__ = Lock()
-        self.__inspection_count__ = 0
+        self.__information__ = self.__get_information_by_file__()
+        self.__request__ = None
 
-    def build(self, item):
-        self.__href__ = item["href"]
-        self.__title__ = item["title"]
-        # self.__title__ = item["key"]
-        self.__key__ = item["key"]
-        self.__index__ = item["index"]
-        self.__status__ = item["status"]
+    @property
+    def status(self) -> str:
+        return self.__status__
 
-        if item.get("path"):
-            self.__path__ = item.get("path")
-            information_file_path = os.path.join(self.__path__, self.__information_file_name__)
+    def __get_information_by_file__(self) -> MovieInformation:
+        if self.__information__ is None:
+            if os.path.exists(self.__information_file_path__):
+                with open(self.__information_file_path__, "r", encoding="utf-8") as file:
+                    content_info = json.load(file)
+                    info = content_info["resource"]
 
-            if os.path.exists(information_file_path):
-                with open(information_file_path, 'r', encoding='utf-8') as file:
-                    self.__information__ = json.load(file)
+                    self.__information__ = MovieInformation()
+                    self.__information__.id = info["id"]
+                    self.__information__.title = info["title"]
+                    self.__information__.url = info["url"]
+                    self.__information__.poster = info["poster"]
+                    self.__information__.stills = info["stills"]
+                    self.__information__.torrents = info["torrents"]
 
-        return self
+        return self.__information__
 
     def to_json(self, save_information=False):
         result = {
@@ -61,123 +65,72 @@ class Bookmark(object):
 
         return result
 
-    def download(self, film: Film, request):
-        self.__path__ = film.folder
-        self.__status__ = 'downloading'
-        self.__information__ = {
-            "id": film.id,
-            "title": film.title,
-            "url": film.url,
-            "poster": {"name": film.poster["name"], "url": film.poster["url"]},
-            "stills": [{"name": still["name"], "url": still["url"]} for still in film.stills],
-            "torrents": [{"name": torrent["name"], "url": torrent["url"], "link": torrent["link"]} for torrent in film.torrents]
-        }
+    def download(self, request: Request):
+        self.__request__ = request
 
-        try:
-            porter = Porter(film)
-            porter.save_information(self.to_json(True), self.__information_file_name__)
-            porter.save_poster(request)
-            porter.save_stills(request)
+        if self.__information__:
+            self.__inspection__()
+        else:
+            movie_info = JavdbMarauder(self.__href__, request).get_movie()
 
-            self.inspection(request)
-        except Exception as error:
-            self.__status__ = "error"
+            if movie_info:
+                self.__information__ = movie_info
+                self.__save_information__()
+                self.__save_stills__()
+                self.__save_poster__()
 
-    def inspection(self, request):
-        self.__inspection__(request)
+                self.__inspection__()
 
-    def __inspection__(self, request):
-        self.__lock__.acquire()
+    def __save_information__(self):
+        if not os.path.exists(self.__path__):
+            Path(self.__path__).mkdir(exist_ok=True)
 
-        path = self.__path__
-        information_file_path = os.path.join(path, self.__information_file_name__)
-        information = None
+        with open(self.__information_file_path__, "w", encoding="utf-8") as file:
+            json.dump(self.to_json(True), file, indent=4, ensure_ascii=False)
+
+    def __save_stills__(self):
+        if self.__information__ and self.__information__.stills and len(self.__information__.stills):
+            self.__append_download_tasks__(self.__information__.stills)
+
+    def __save_poster__(self):
+        if self.__information__ and self.__information__.poster:
+            self.__append_download_task__(self.__information__.poster["path"], self.__information__.poster["url"])
+
+    def __append_download_task__(self, path, url):
+        if path and url:
+            task = Task(download, args={"request": self.__request__, "path": path, "url": url})
+            TaskPool.append_task(task)
+
+    def __append_download_tasks__(self, items):
+        for item in items:
+            self.__append_download_task__(item["path"], item["url"])
+
+    def __build_download_task__(self, path, url):
+        if path and url:
+            return Task(download, args={"request": self.__request__, "path": path, "url": url})
+
+    def __inspection__(self):
+        items = [{"path": os.path.join(self.__path__, still["name"]), "url": still["url"]} for still in self.__information__.stills]
+        items.append({"path": os.path.join(self.__path__, self.__information__.poster["name"]), "url": self.__information__.poster["url"]})
+
         done = True
-
-        self.__inspection_count__ = self.__inspection_count__ + 1
-        if self.__inspection_count__ >= 3:
-            self.__done__(information_file_path)
-            self.__lock__.release()
-            return
-
-        if self.__path__ and os.path.exists(path) and os.path.exists(information_file_path):
-            with open(information_file_path, 'r', encoding='utf-8') as file:
-                information = json.load(file)
-
-        if information is not None:
-            resource = information["resource"]
-            file_infos = [{"name": still["name"], "url": still["url"]} for still in resource["stills"]]
-            file_infos.append({"name": resource["poster"]["name"], "url": resource["poster"]["url"]})
-
-            for file_info in file_infos:
-                file_path = os.path.join(path, file_info["name"])
-                if not os.path.exists(file_path):
+        if items and len(items) > 0:
+            for item in items:
+                if not os.path.exists(item["path"]):
                     done = False
-                    Porter(None).save_file(file_info["url"], file_path, request)
-        else:
-            done = False
+                    TaskPool.append_task(Task(download, args={"request": self.__request__, "path": item["path"], "url": item["url"]}))
 
-        if done is True:
-            self.__done__(information_file_path)
-            self.__lock__.release()
+        if done:
+            self.__done__()
         else:
-            self.__lock__.release()
-            TaskPool.append_task(Task(self.__inspection__, request, 3))
+            TaskPool.append_task(Task(self.__inspection__, args=None, in_queue_delay_seconds=5))
 
-    def __done__(self, file_path):
+    def __done__(self):
         self.__status__ = "done"
 
-        folder = os.path.dirname(file_path)
+        folder = os.path.dirname(self.__information_file_path__)
         if not os.path.exists(folder):
             Path(folder).mkdir(exist_ok=True)
 
-        with open(file_path, 'w', encoding='utf-8') as file:
+        with open(self.__information_file_path__, 'w', encoding='utf-8') as file:
             json.dump(self.to_json(True), file, indent=4, ensure_ascii=False)
-
-    @property
-    def href(self):
-        return self.__href__
-
-    @href.setter
-    def href(self, value):
-        self.__href__ = value
-
-    @property
-    def title(self):
-        return self.__href__
-
-    @title.setter
-    def title(self, value):
-        self.__title__ = value
-
-    @property
-    def key(self):
-        return self.__key__
-
-    @key.setter
-    def key(self, value):
-        self.__key__ = value
-
-    @property
-    def index(self):
-        return self.__index__
-
-    @index.setter
-    def index(self, value):
-        self.__index__ = value
-
-    @property
-    def status(self):
-        return self.__status__
-
-    @status.setter
-    def status(self, value):
-        self.__status__ = value
-
-    @property
-    def path(self):
-        return self.__path__
-
-    @property
-    def information(self):
-        return self.__information__
