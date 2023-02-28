@@ -45,9 +45,9 @@ class Proxies(object):
         if self.__current_item__ is not None and self.__current_item__.available is True:
             return self.__current_item__
 
-        available_items = sorted(
-            [item for item in self.__items__ if item.available is True and item != self.__current_item__],
-            key=lambda x: x.rate, reverse=True)
+        available_items = sorted([item for item in self.__items__ if item.available is True and item != self.__current_item__],
+                                 key=lambda x: x.rate,
+                                 reverse=True)
 
         if available_items and len(available_items) > 0:
             self.__current_item__ = available_items[0]
