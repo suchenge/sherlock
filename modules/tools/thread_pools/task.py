@@ -2,9 +2,10 @@ import time
 
 
 class Task(object):
-    def __init__(self, method, args=None, delay_seconds=0, in_queue_delay_seconds=0):
+    def __init__(self, method, args=(), kwargs=None, delay_seconds=0, in_queue_delay_seconds=0):
         self.__method__ = method
         self.__args__ = args
+        self.__kwargs__ = kwargs
         self.__delay_seconds__ = delay_seconds
         self.__in_queue_delay_seconds__ = in_queue_delay_seconds
 
@@ -17,9 +18,12 @@ class Task(object):
             time.sleep(self.__delay_seconds__)
 
         try:
-            if self.__args__ is None:
-                self.__method__()
+            if self.__kwargs__:
+                self.__method__(**self.__kwargs__)
             else:
-                self.__method__(self.__args__)
+                if self.__args__ is None or len(self.__args__) == 0:
+                    self.__method__()
+                else:
+                    self.__method__(*self.__args__)
         except Exception as error:
             pass

@@ -100,7 +100,7 @@ class Bookmark(object):
 
     def __append_download_task__(self, path, url):
         if path and url:
-            task = Task(download, args={"request": self.__request__, "path": path, "url": url})
+            task = Task(download, kwargs={"request": self.__request__, "path": path, "url": url})
             TaskPool.append_task(task)
 
     def __append_download_tasks__(self, items):
@@ -109,10 +109,16 @@ class Bookmark(object):
 
     def __build_download_task__(self, path, url):
         if path and url:
-            return Task(download, args={"request": self.__request__, "path": path, "url": url})
+            return Task(download, kwargs={"request": self.__request__, "path": path, "url": url})
+
+    def __max_inspection_count__(self):
+        if self.__information__ and self.__information__.stills and len(self.__information__.stills) > 0:
+            return len(self.__information__.stills) * 2
+        else:
+            return 10
 
     def __inspection__(self):
-        if self.__inspection_count__ >= 5:
+        if self.__inspection_count__ >= self.__max_inspection_count__():
             self.__save__("error")
         else:
             self.__inspection_count__ = self.__inspection_count__ + 1
@@ -125,7 +131,7 @@ class Bookmark(object):
                 for item in items:
                     if not os.path.exists(item["path"]):
                         done = False
-                        TaskPool.append_task(Task(download, args={"request": self.__request__, "path": item["path"], "url": item["url"]}))
+                        self.__append_download_task__(item["path"], item["url"])
 
             if done:
                 self.__save__()
