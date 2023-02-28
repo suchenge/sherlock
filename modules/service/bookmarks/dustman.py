@@ -1,7 +1,7 @@
 import re
 import os.path
 
-from modules.tools.http_request.request import Request
+from modules.tools.http_request.http_client import HttpClient
 from modules.tools.http_request.proxy import Proxies
 from modules.tools.thread_pools.task_pool import TaskPool
 
@@ -81,10 +81,10 @@ class Dustman(object):
 
     def download(self):
         TaskPool.set_count(10)
-        request = Request(Proxies(**{}))
+        HttpClient.set_proxies(Proxies())
 
         for bookmark_group in self.__bookmarks_groups__.get_items():
-            bookmark_group.download(request)
+            bookmark_group.download()
 
         TaskPool.join()
         

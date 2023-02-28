@@ -3,7 +3,7 @@ import json
 
 from pathlib import Path
 
-from modules.tools.http_request.request import Request, download
+from modules.tools.http_request.http_client import HttpClient
 from modules.tools.thread_pools.task import Task
 from modules.tools.thread_pools.task_pool import TaskPool
 
@@ -65,13 +65,20 @@ class Bookmark(object):
 
         return result
 
-    def download(self, request: Request):
-        self.__request__ = request
-
+    def download(self):
         if self.__information__:
             self.__inspection__()
         else:
-            movie_info = JavdbMarauder(self.__href__, request).get_movie()
+            javdb_url = self.__href__
+            movie_info = None
+
+            marauder = JavdbMarauder()
+
+            if not marauder.is_match(self.__href__):
+                javdb_url = marauder.search(self.__key__)
+
+            if javdb_url:
+                movie_info = marauder.get_movie(javdb_url)
 
             if movie_info:
                 self.__information__ = movie_info
@@ -100,7 +107,7 @@ class Bookmark(object):
 
     def __append_download_task__(self, path, url):
         if path and url:
-            task = Task(download, kwargs={"request": self.__request__, "path": path, "url": url})
+            task = Task(HttpClient.download, kwargs={"request": self.__request__, "path": path, "url": url})
             TaskPool.append_task(task)
 
     def __append_download_tasks__(self, items):
@@ -109,7 +116,7 @@ class Bookmark(object):
 
     def __build_download_task__(self, path, url):
         if path and url:
-            return Task(download, kwargs={"request": self.__request__, "path": path, "url": url})
+            return Task(HttpClient.download, kwargs={"request": self.__request__, "path": path, "url": url})
 
     def __max_inspection_count__(self):
         if self.__information__ and self.__information__.stills and len(self.__information__.stills) > 0:

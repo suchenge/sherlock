@@ -1,23 +1,37 @@
+import re
+
 from lxml import etree
 
-from modules.tools.http_request.request import Request
-
+from modules.tools.http_request.http_client import HttpClient
 from modules.service.movie_marauder.movie_information import MovieInformation
 
 
-class BaseMarauder(object):
-    def __init__(self, url: str, request: Request):
-        self.__url__ = url
-        self.__request__ = request
+def find_configuration_node(json_setting, name):
+    for website in json_setting:
+        if website['name'] == name:
+            return website['url']
 
+
+def build_torrent_url(magent_url):
+    match = re.compile(r'magnet\:\?xt=urn\:btih\:(.*?)&dn=.*?').findall(magent_url)
+    if match:
+        return 'https://itorrents.org/torrent/%s.torrent' % match[0]
+    else:
+        return None
+
+
+class BaseMarauder(object):
+    def __init__(self):
+        self.__url__ = None
         self.__html_content__ = None
         self.__html_tree__ = None
 
-    def get_movie(self) -> MovieInformation:
+    def get_movie(self, url: str) -> MovieInformation:
+        self.__url__ = url
         result = None
 
         try:
-            self.__html_content__ = self.__request__.get_text(self.__url__)
+            self.__html_content__ = HttpClient.get_text(self.__url__)
             if self.__html_content__:
                 self.__html_tree__ = etree.HTML(self.__html_content__)
                 if self.__html_tree__:

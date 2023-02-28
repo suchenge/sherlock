@@ -121,11 +121,11 @@ class BookmarkGroup(object):
     def items(self, value):
         self.__items__ = value
 
-    def download(self, request):
+    def download(self):
         self.__bak__()
 
         for item in self.items:
-            item.download(request)
+            item.download()
 
         self.__inspection__()
 

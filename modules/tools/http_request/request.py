@@ -1,27 +1,7 @@
-import os
-from pathlib import Path
-
 import requests
+
 from urllib.parse import urlparse
 from datetime import datetime
-
-
-def download(**kwargs):
-    request = kwargs["request"]
-    path = kwargs["path"]
-    url = kwargs["url"]
-
-    if path and url and request:
-        folder = os.path.dirname(path)
-
-        if not os.path.exists(folder):
-            Path(folder).mkdir(exist_ok=True)
-
-        content = request.get(url)
-
-        if content:
-            with open(path, "ab") as file:
-                file.write(content)
 
 
 def __mistiming_time__(start_time, end_time):
@@ -105,9 +85,3 @@ class Request(object):
             return response.content
         else:
             return None
-
-    @monitoring
-    def download(self, url):
-        response = self.__get_response__(url, headers=None)
-
-        return response
