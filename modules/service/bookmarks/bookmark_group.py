@@ -88,14 +88,7 @@ class BookmarkGroup(object):
             json.dump([item.to_json() for item in self.items], file, indent=4, ensure_ascii=False)
 
     def __is_all_done__(self):
-        is_done = True
-
-        for item in self.items:
-            if item.status != "done" and item.status != "error":
-                is_done = False
-                break
-
-        return is_done
+        return all([item.status == "done" for item in self.items])
 
     def __inspection__(self):
         if self.__inspection_count__ >= len(self.items) * 2:

@@ -50,8 +50,15 @@ class JavdbMarauder(BaseMarauder):
             return False
 
     def __get_id__(self):
+        # <h2 class="title is-4">
+        #    <strong>MDBK-036 </strong>
+        #    <strong class="current-title">練所 2 </strong>
+        #      <a href="javascript:;" class="meta-link" data-movie-detail-target="showOriginTitle">顯示原標題</a>
+        #      <span style="display: none" class="origin-title"> パワーアップした第2弾！</span>
+        # </h2>
         if self.__id__ is None or self.__id__ == "":
-            pass
+            element = self.__html_content__.xpath("//div[@class='title is-4']/strong[1]/text()")
+            self.__id__ = element[-1].strip()
 
         return self.__id__
 
@@ -63,7 +70,7 @@ class JavdbMarauder(BaseMarauder):
                 element = self.__html_content__.xpath("//strong[@class='current-title']/text()")
 
             if element:
-                self.__title__ = self.__get_id__() + "" + element[-1]
+                self.__title__ = self.__get_id__() + " " + element[-1]
 
         return self.__title__
 

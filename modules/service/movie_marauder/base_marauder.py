@@ -32,8 +32,10 @@ class BaseMarauder(object):
 
         try:
             self.__html_content__ = HttpClient.get_text(self.__url__)
+
             if self.__html_content__:
                 self.__html_tree__ = etree.HTML(self.__html_content__)
+
                 if self.__html_tree__:
                     result = MovieInformation()
                     result.url = self.__url__
