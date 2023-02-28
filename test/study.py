@@ -1,3 +1,18 @@
+# 集合匹配
+tmpList = [
+            {"path": "path", "status": "done", "id": 1},
+            {"path": "path", "status": "error", "id": 2},
+            {"path": "path", "status": "done", "id": 3},
+            {"path": "path", "status": "downloading", "id": 4}
+]
+
+print(all([item["status"] == "done" for item in tmpList]))
+print(any([item["status"] == "downloading" for item in tmpList]))
+
+
+tmp = list(filter(lambda item: item["status"] == "error", tmpList))
+print(tmp)
+
 # 字符串模版
 
 tmp1 = '{}, {:.4f} and {}'.format('One', 2, 'Three')
