@@ -51,6 +51,7 @@ class BookmarkGroup(object):
         self.__done_file_path__ = self.__file_path__.replace("json", "done.json")
 
         self.__inspection_count__ = 0
+        self.__done_item_length__ = 0
 
     @property
     def file_path(self):
@@ -100,13 +101,29 @@ class BookmarkGroup(object):
                 self.__done__()
             else:
                 self.__bak__()
-                TaskPool.append_task(Task(self.__inspection__, args=None, in_queue_delay_seconds=15, delay_seconds=5))
+
+                current_done_items_count = len(list(filter(lambda item: item.status == "done" or item.status == "error", self.items)))
+                if self.__done_item_length__ == 0 or self.__done_item_length__ != current_done_items_count:
+                    self.__done_item_length__ = current_done_items_count
+                    self.save()
+                    TaskPool.append_task(Task(self.__inspection__, args=None, in_queue_delay_seconds=15, delay_seconds=5))
+
+    def inspection(self):
+        if self.__is_all_done__():
+            self.__done__()
+        else:
+            self.__bak__()
+            self.save()
 
     @property
     def items(self):
         if len(self.__items__) == 0:
             with open(self.__file_path__, 'r', encoding='utf-8') as file:
-                self.__items__ = [Bookmark(item) for item in json.load(file)]
+                for item in json.load(file):
+                    item["group_path"] = self.folder
+                    bookmark = Bookmark(**item)
+                    bookmark.group = self
+                    self.__items__.append(bookmark)
 
         return self.__items__
 
@@ -115,12 +132,10 @@ class BookmarkGroup(object):
         self.__items__ = value
 
     def download(self):
-        self.__bak__()
+        # self.__inspection__()
 
         for item in self.items:
             item.download()
-
-        self.__inspection__()
 
 
    

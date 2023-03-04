@@ -25,7 +25,7 @@ class MovieInformation(object):
 
     @property
     def title(self) -> str:
-        return self.__id__
+        return self.__title__
 
     @title.setter
     def title(self, value: str):

@@ -49,7 +49,7 @@ class JavdbMarauder(BaseMarauder):
         else:
             return False
 
-    def __get_id__(self):
+    def __get_id__(self) -> str:
         # <h2 class="title is-4">
         #    <strong>MDBK-036 </strong>
         #    <strong class="current-title">練所 2 </strong>
@@ -57,25 +57,25 @@ class JavdbMarauder(BaseMarauder):
         #      <span style="display: none" class="origin-title"> パワーアップした第2弾！</span>
         # </h2>
         if self.__id__ is None or self.__id__ == "":
-            element = self.__html_content__.xpath("//div[@class='title is-4']/strong[1]/text()")
+            element = self.__html_tree__.xpath("//h2[@class='title is-4']/strong[1]/text()")
             self.__id__ = element[-1].strip()
 
         return self.__id__
 
-    def __get_title__(self):
+    def __get_title__(self) -> str:
         if self.__title__ is None or self.__title__ == "":
-            element = self.__html_content__.xpath("//span[@class='origin-title']/text()")
+            element = self.__html_tree__.xpath("//span[@class='origin-title']/text()")
 
             if element is None or len(element) >= 0:
-                element = self.__html_content__.xpath("//strong[@class='current-title']/text()")
+                element = self.__html_tree__.xpath("//strong[@class='current-title']/text()")
 
             if element:
                 self.__title__ = self.__get_id__() + " " + element[-1]
 
-        return self.__title__
+        return self.__format_title__(self.__title__)
 
     def __get__poster__(self) -> {}:
-        poster = self.__html_content__.xpath("//img[@class='video-cover']/@src")[-1]
+        poster = self.__html_tree__.xpath("//img[@class='video-cover']/@src")[-1]
         if poster:
             return {
                 "name": self.__get_id__() + os.path.splitext(poster)[-1],

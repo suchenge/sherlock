@@ -36,7 +36,7 @@ class BaseMarauder(object):
             if self.__html_content__:
                 self.__html_tree__ = etree.HTML(self.__html_content__)
 
-                if self.__html_tree__:
+                if self.__html_tree__ is not None:
                     result = MovieInformation()
                     result.url = self.__url__
                     result.id = self.__get_id__()
@@ -65,6 +65,9 @@ class BaseMarauder(object):
 
     def __get_torrents__(self) -> [{}]:
         pass
+
+    def __format_title__(self, title):
+        return re.compile("[?:*'<>./\\\]").sub("", title).strip()[0:150]
 
 
 

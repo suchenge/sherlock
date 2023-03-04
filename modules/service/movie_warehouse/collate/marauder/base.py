@@ -31,14 +31,17 @@ class BaseMarauder(object):
         if self.__content__ is None:
             raise Exception("没有获取到页面内容")
 
-        return Film(self.__file__
-                    , content=self.__content__
-                    , id=self.__id__
-                    , url=self.__url__
-                    , title=self.__format_title__()
-                    , poster=self.__get_poster__()
-                    , stills=self.__get_stills__()
-                    , torrents=self.__get_torrents__())
+        try:
+            return Film(self.__file__
+                        , content=self.__content__
+                        , id=self.__id__
+                        , url=self.__url__
+                        , title=self.__format_title__()
+                        , poster=self.__get_poster__()
+                        , stills=self.__get_stills__()
+                        , torrents=self.__get_torrents__())
+        except Exception as error:
+            raise error
 
     def __get_url_content__(self, url):
         response = self.__http_request__.get(url)

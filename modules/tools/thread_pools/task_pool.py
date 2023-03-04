@@ -95,9 +95,8 @@ class TaskPool(object):
     @staticmethod
     def append_task(task: Task):
         if task.in_queue_delay_seconds > 0:
-            delay_thread = threading.Thread(target=TaskPool.__task_executor__, args=[task])
+            delay_thread = threading.Thread(target=TaskPool.__delay_in_queue__, args=[task])
             delay_thread.start()
-            delay_thread.join()
         else:
             TaskPool.__in_queue__(task)
 
