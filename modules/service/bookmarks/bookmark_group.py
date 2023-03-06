@@ -1,12 +1,6 @@
 import os
 import json
 
-from threading import Lock
-from pathlib import Path
-
-from modules.tools.thread_pools.task import Task
-from modules.tools.thread_pools.task_pool import TaskPool
-
 from modules.service.bookmarks.bookmark import Bookmark
 
 
@@ -42,16 +36,12 @@ class BookmarkGroups(object):
 
 class BookmarkGroup(object):
     def __init__(self, folder):
-        self.__lock__ = Lock()
         self.__items__ = []
         self.__base_name__ = "bookmarks.json"
         self.__file_path__ = os.path.join(folder, self.__base_name__)
 
         self.__bak_file_path__ = self.__file_path__ + ".bak"
         self.__done_file_path__ = self.__file_path__.replace("json", "done.json")
-
-        self.__inspection_count__ = 0
-        self.__done_item_length__ = 0
 
     @property
     def file_path(self):
@@ -60,60 +50,6 @@ class BookmarkGroup(object):
     @property
     def folder(self):
         return os.path.dirname(self.__file_path__)
-
-    def __done__(self):
-        if os.path.exists(self.__bak_file_path__):
-            os.remove(self.__bak_file_path__)
-
-        if os.path.exists(self.__file_path__):
-            os.remove(self.__file_path__)
-
-        if os.path.exists(self.__done_file_path__):
-            self.save(self.__done_file_path__)
-
-    def __bak__(self):
-        if os.path.exists(self.__bak_file_path__):
-            os.remove(self.__bak_file_path__)
-
-        os.popen("copy %s %s" % (self.__file_path__, self.__bak_file_path__))
-
-    def save(self, file_path=None):
-        if file_path is None:
-            file_path = self.__file_path__
-
-        folder = os.path.dirname(file_path)
-        if not os.path.exists(folder):
-            Path(folder).mkdir(exist_ok=True)
-
-        with open(file_path, 'w', encoding='utf-8') as file:
-            json.dump([item.to_json() for item in self.items], file, indent=4, ensure_ascii=False)
-
-    def __is_all_done__(self):
-        return all([item.status == "done" for item in self.items])
-
-    def __inspection__(self):
-        if self.__inspection_count__ >= len(self.items) * 2:
-            self.save()
-        else:
-            self.__inspection_count__ = self.__inspection_count__ + 1
-
-            if self.__is_all_done__():
-                self.__done__()
-            else:
-                self.__bak__()
-
-                current_done_items_count = len(list(filter(lambda item: item.status == "done" or item.status == "error", self.items)))
-                if self.__done_item_length__ == 0 or self.__done_item_length__ != current_done_items_count:
-                    self.__done_item_length__ = current_done_items_count
-                    self.save()
-                    TaskPool.append_task(Task(self.__inspection__, args=None, in_queue_delay_seconds=15, delay_seconds=5))
-
-    def inspection(self):
-        if self.__is_all_done__():
-            self.__done__()
-        else:
-            self.__bak__()
-            self.save()
 
     @property
     def items(self):
@@ -132,10 +68,29 @@ class BookmarkGroup(object):
         self.__items__ = value
 
     def download(self):
-        # self.__inspection__()
-
         for item in self.items:
             item.download()
+
+    def save(self):
+        self.__bak__()
+        self.__save_done_items__()
+        self.__save_not_done_items__()
+
+    def __bak__(self):
+        if os.path.exists(self.__bak_file_path__):
+            os.remove(self.__bak_file_path__)
+
+        os.popen("copy %s %s" % (self.__file_path__, self.__bak_file_path__))
+
+    def __save_done_items__(self):
+        items = list(filter(lambda item: item.status == "done", self.items))
+        with open(self.__done_file_path__, "w", encoding="utf-8") as file:
+            json.dump([item.to_json() for item in items], file, indent=4, ensure_ascii=False)
+
+    def __save_not_done_items__(self):
+        items = list(filter(lambda item: item.status != "done", self.items))
+        with open(self.__file_path__, "w", encoding="utf-8") as file:
+            json.dump([item.to_json() for item in items], file, indent=4, ensure_ascii=False)
 
 
    

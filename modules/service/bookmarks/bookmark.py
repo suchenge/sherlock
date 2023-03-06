@@ -1,5 +1,6 @@
 import os
 import json
+import shutil
 
 from pathlib import Path
 
@@ -109,7 +110,6 @@ class Bookmark(object):
                     self.__save_stills__()
                     self.__save_poster__()
 
-                    # self.__inspection__()
                     TaskPool.append_task(Task(self.__inspection__, args=None, in_queue_delay_seconds=self.__max_inspection_count__()))
                 except Exception as error:
                     self.__save__("error")
@@ -151,21 +151,10 @@ class Bookmark(object):
         if self.__information__ and self.__information__.stills and len(self.__information__.stills):
             self.__inspection_delay_seconds__ = len(self.__information__.stills)
         return self.__inspection_delay_seconds__
-        '''
-        if self.__information__ and self.__information__.stills and len(self.__information__.stills) > 0:
-            return len(self.__information__.stills) * 2
-        else:
-            return 10
-        '''
-
-    def __group_inspection__(self):
-        if self.__group__:
-            self.__group__.inspection()
 
     def __inspection__(self):
         if self.__inspection_count__ >= self.__max_inspection_count__():
             self.__save__("error")
-            self.__group_inspection__()
         else:
             self.__inspection_count__ = self.__inspection_count__ + 1
 
@@ -181,18 +170,18 @@ class Bookmark(object):
 
             if done:
                 self.__save__("done")
-                self.__group_inspection__()
             else:
                 TaskPool.append_task(Task(self.__inspection__, args=None, in_queue_delay_seconds=5))
 
     def __save__(self, status="done"):
         self.__status__ = status
 
-        folder = os.path.dirname(self.__information_file_path__)
-        if not os.path.exists(folder):
-            Path(folder).mkdir(exist_ok=True)
+        if status != "done":
+            if os.path.exists(self.__path__):
+                shutil.rmtree(self.__path__)
+        else:
+            self.__save_information__()
 
-        with open(self.__information_file_path__, 'w', encoding='utf-8') as file:
-            json.dump(self.to_json(True), file, indent=4, ensure_ascii=False)
+        self.__group__.save()
 
 
