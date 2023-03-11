@@ -75,12 +75,7 @@ class BookmarkGroup(object):
 
     def save(self):
         self.__bak__()
-        done_count = self.__save_done_items__()
-        not_done_count = self.__save_not_done_items__()
-
-        if done_count == len(self.items) and not_done_count <= 0:
-            os.remove(self.__bak_file_path__)
-            os.remove(self.__file_path__)
+        self.__save_items__()
 
     def __create_folder__(self, file_path):
         folder = os.path.dirname(file_path)
@@ -96,28 +91,23 @@ class BookmarkGroup(object):
 
         os.popen("copy %s %s" % (self.__file_path__, self.__bak_file_path__))
 
-    def __save_done_items__(self):
-        items = list(filter(lambda item: item.status == "done", self.items))
-        items_length = len(items)
+    def __save_items__(self):
+        done_items = list(filter(lambda item: item.status == "done", self.items))
+        self.__save_items_for_file__(done_items, self.__done_file_path__)
 
-        if items is not None and items_length > 0:
-            self.__create_folder__(self.__done_file_path__)
-            with open(self.__done_file_path__, "w", encoding="utf-8") as file:
-                json.dump([item.to_json() for item in items], file, indent=4, ensure_ascii=False)
+        if len(self.items) == len(done_items):
+            os.remove(self.__file_path__)
 
-        return items_length
+            if os.path.exists(self.__bak_file_path__):
+                os.remove(self.__bak_file_path__)
 
-    def __save_not_done_items__(self):
-        items = list(filter(lambda item: item.status != "done", self.items))
-        items = self.items
-        items_length = len(items)
+    def __save_items_for_file__(self, items, file_path):
+        if items is None or len(items) <= 0:
+            return
 
-        if items is not None and items_length > 0:
-            self.__create_folder__(self.__file_path__)
-            with open(self.__file_path__, "w", encoding="utf-8") as file:
-                json.dump([item.to_json() for item in items], file, indent=4, ensure_ascii=False)
-
-        return items_length
+        self.__create_folder__(file_path)
+        with open(file_path, "w", encoding="utf-8") as file:
+            json.dump([item.to_json() for item in items], file, indent=4, ensure_ascii=False)
 
 
    
