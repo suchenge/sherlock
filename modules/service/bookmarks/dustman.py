@@ -46,7 +46,7 @@ def __get_bookmark_info__(bookmark_html_line):
 
             return {
                 "href": href,
-                "title": title,
+                "title": title, 
                 "key": key
             }
     else:

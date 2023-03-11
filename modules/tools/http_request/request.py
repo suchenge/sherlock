@@ -28,8 +28,15 @@ def monitoring(fun):
         # print("开始获取页面内容:%s" % url)
         task_start_time = datetime.now()
         result = fun(*args, **kwargs)
+
+        descript = ""
+        if result is None:
+            descript = "无法"
+
         task_end_time = datetime.now()
-        print("获取到请求内容[%s]:%s" % (__mistiming_time__(task_start_time, task_end_time), url))
+
+        print("%s获取到请求内容[%s]:%s" % (descript, __mistiming_time__(task_start_time, task_end_time), url))
+
         return result
 
     return wrapper
@@ -49,7 +56,12 @@ class Request(object):
                 raise Exception("没有可用的Proxy，无法获取页面内容")
 
         try:
-            response = requests.get(url, headers, proxies=proxy.address)
+            response = None
+            if proxy:
+                response = requests.get(url, headers, proxies=proxy.address)
+            else:
+                response = requests.get(url, headers)
+
             if response and response.status_code == 200:
                 if proxy:
                     proxy.rate += 1

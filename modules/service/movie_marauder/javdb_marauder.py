@@ -40,6 +40,9 @@ class JavdbMarauder(BaseMarauder):
 
                 if index > -1:
                     result = links[index]
+
+            if self.__base_url__ not in result:
+                result = self.__base_url__ + result
         finally:
             return result
 
@@ -91,10 +94,11 @@ class JavdbMarauder(BaseMarauder):
                 name = os.path.split(url)[-1]
                 type = name.split(".")[-1]
 
-                result.append({
-                    "name": "%s_%s.%s" % (self.__get_id__(), index, type),
-                    "url": url
-                })
+                if type is not None and type != "":
+                    result.append({
+                        "name": "%s_%s.%s" % (self.__get_id__(), index, type),
+                        "url": url
+                    })
 
         return result
 

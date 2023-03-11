@@ -13,6 +13,12 @@ class Task(object):
     def in_queue_delay_seconds(self):
         return self.__in_queue_delay_seconds__
 
+    @property
+    def args(self):
+        if self.__args__:
+            return self.__args__
+        return self.__kwargs__
+
     def run(self):
         if self.__delay_seconds__ > 0:
             time.sleep(self.__delay_seconds__)

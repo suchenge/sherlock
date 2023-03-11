@@ -34,7 +34,9 @@ class HttpClient(object):
             if not os.path.exists(folder):
                 Path(folder).mkdir(exist_ok=True)
 
-            content = HttpClient.get_content(url)
+            # content = HttpClient.get_content(url)
+            req = Request()
+            content = req.get_content(url)
 
             if content:
                 with open(path, "ab") as file:

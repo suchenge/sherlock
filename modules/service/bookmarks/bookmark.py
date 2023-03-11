@@ -21,7 +21,9 @@ class Bookmark(object):
         self.__key__ = kwargs["key"]
         self.__index__ = kwargs["index"]
         self.__status__ = kwargs["status"]
-        self.__group_path__ = kwargs["group_path"]
+
+        if kwargs.get("group_path"):
+            self.__group_path__ = kwargs["group_path"]
 
         self.__path__ = None
         self.__information_file_name__ = "information.json"
@@ -140,7 +142,12 @@ class Bookmark(object):
 
             if not os.path.exists(file_path):
                 self.__inspection_delay_seconds__ = self.__inspection_delay_seconds__ + 1
-                task = Task(HttpClient.download, kwargs={"path": os.path.join(self.__path__, name), "url": url})
+
+                down_path = name
+                if self.__path__ not in down_path:
+                    down_path = os.path.join(self.__path__, name)
+
+                task = Task(HttpClient.download, kwargs={"path": down_path, "url": url})
                 TaskPool.append_task(task)
 
     def __append_download_tasks__(self, items):
@@ -182,6 +189,6 @@ class Bookmark(object):
         else:
             self.__save_information__()
 
-        self.__group__.save()
+        TaskPool.append_task(Task(self.__group__.save, args=None))
 
 
