@@ -54,7 +54,7 @@ def __get_bookmark_info__(bookmark_html_line):
 
 
 class Dustman(object):
-    def __init__(self, bookmarks_html_file_path, bookmark_save_folder=None):
+    def __init__(self, bookmarks_html_file_path):
         self.__html_file_path__ = bookmarks_html_file_path
         self.__json_file_folder__ = os.path.dirname(bookmarks_html_file_path)
 
@@ -78,16 +78,13 @@ class Dustman(object):
         HttpClient.set_proxies(Proxies())
         items = self.open_items
 
-        for item in items:
-            bookmark = Bookmark(**item)
-            item_path = item.get("path")
-
+        for bookmark in items:
             try:
-                if item_path and os.path.exists(item_path):
-                    information = bookmark.get_information(item_path)
-                    bookmark.inspection(information, item_path)
+                if bookmark.path and os.path.exists(bookmark.path):
+                    information = bookmark.get_information(bookmark.path)
+                    bookmark.inspection(information)
                 else:
-                    bookmark.download(item_path)
+                    bookmark.download(self.__json_file_folder__)
             except Exception as error:
                 bookmark.status = "error"
             finally:
@@ -123,14 +120,14 @@ class Dustman(object):
     def __save_items_with_status__(self, items, json_file_path):
         if items and len(items) > 0:
             with open(json_file_path, "w", encoding="utf-8") as file:
-                json.dump([item.to_json() for item in items], file, ensure_ascii=False)
+                json.dump([item.to_json() for item in items], file, indent=4, ensure_ascii=False)
 
     def __build_items__(self, json_file_path):
         if os.path.exists(json_file_path):
             with open(json_file_path, "r", encoding="utf-8") as file:
                 result = json.load(file)
                 if result is not None and len(result) > 0:
-                    return result
+                    return [Bookmark(**item) for item in result]
                 else:
                     return []
 

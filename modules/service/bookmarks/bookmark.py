@@ -12,8 +12,6 @@ from modules.service.movie_marauder.javdb_marauder import JavdbMarauder
 
 class Bookmark(object):
     def __init__(self, **kwargs):
-        self.__information__ = None
-
         self.__href__ = kwargs["href"]
         self.__title__ = kwargs["title"]
         self.__key__ = kwargs["key"]
@@ -21,8 +19,15 @@ class Bookmark(object):
         self.__status__ = kwargs["status"]
 
         self.__path__ = None
-        self.__information_file_name__ = "information.json"
+        if kwargs.get("path"):
+            self.__path__ = kwargs["path"]
 
+        self.__information_file_name__ = "information.json"
+        self.__information__ = None
+
+    @property
+    def path(self):
+        return self.__path__
 
     @property
     def status(self) -> str:
@@ -62,10 +67,13 @@ class Bookmark(object):
         }
 
         if save_path:
-            result["path"] = save_path
+            self.__path__ = result["path"] = save_path
 
         if information:
             result["resource"] = information.to_json()
+
+        if self.__path__:
+            result["path"] = self.__path__
 
         return result
 
@@ -101,21 +109,22 @@ class Bookmark(object):
                     if movie_info.stills and len(movie_info.stills) > 0:
                         for still in movie_info.stills:
                             HttpClient.download(**{"path": os.path.join(save_path, still["name"]), "url": still["url"]})
+                self.__status__ = "done"
         except Exception as error:
             self.delete(save_path)
             raise error
 
-    def inspection(self, information, save_path):
+    def inspection(self, information):
         try:
-            items = [{"path": os.path.join(save_path, still["name"]), "url": still["url"]} for still in information.stills]
-            items.append({"path": os.path.join(save_path, information.poster["name"]), "url": information.poster["url"]})
+            items = [{"path": os.path.join(self.__path__, still["name"]), "url": still["url"]} for still in information.stills]
+            items.append({"path": os.path.join(self.__path__, information.poster["name"]), "url": information.poster["url"]})
 
             if items and len(items) > 0:
                 for item in items:
                     if not os.path.exists(item["path"]):
                         HttpClient.download(**{"path": item["path"], "url": item["url"]})
         except Exception as error:
-            self.delete(save_path)
+            self.delete(self.__path__)
             raise error
 
     def delete(self, save_path):
