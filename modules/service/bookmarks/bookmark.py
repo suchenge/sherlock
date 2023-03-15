@@ -1,6 +1,7 @@
 import os
 import json
 import shutil
+import threading
 
 from pathlib import Path
 
@@ -103,12 +104,21 @@ class Bookmark(object):
                 with open(information_path, "w", encoding="utf-8") as file:
                     json.dump(self.to_json(movie_info, save_path), file, indent=4, ensure_ascii=False)
 
-                    if movie_info.poster:
-                        HttpClient.download(**{"path": os.path.join(save_path, movie_info.poster["name"]), "url": movie_info.poster["url"]})
+                download_tasks = []
+                if movie_info.poster:
+                    download_tasks.append(threading.Thread(target=HttpClient.download, kwargs={"path": os.path.join(save_path, movie_info.poster["name"]), "url": movie_info.poster["url"]}))
 
-                    if movie_info.stills and len(movie_info.stills) > 0:
-                        for still in movie_info.stills:
-                            HttpClient.download(**{"path": os.path.join(save_path, still["name"]), "url": still["url"]})
+                if movie_info.stills and len(movie_info.stills) > 0:
+                    for still in movie_info.stills:
+                        download_tasks.append(threading.Thread(target=HttpClient.download, kwargs={"path": os.path.join(save_path, still["name"]), "url": still["url"]}))
+
+                if len(download_tasks) > 0:
+                    for task in download_tasks:
+                        task.start()
+
+                    for task in download_tasks:
+                        task.join()
+
                 self.__status__ = "done"
         except Exception as error:
             self.delete(save_path)
