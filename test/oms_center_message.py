@@ -30,7 +30,8 @@ COLLATE utf8_general_ci;
 
 # 匹配message的正则
 # message_regex = r'B.R\("(.*?)"([ ]{0,1},[ ]{0,1}"(.*?)"){0,1}\)'
-message_regex = r'"([^\x00-\xff]+)"'
+message_regex = r'"(.*?)"'
+zh_message_regex = r'[\u4e00-\u9fa5]+'
 # 临时表名称
 temp_sys_message_resource_table_name = 'vito_temp_sys_message_resource'
 temp_sys_message_resource_table_exists = False
@@ -362,13 +363,15 @@ def get_message_info_list(file_path):
             match = re.compile(message_regex).findall(line)
             if match and len(match) > 0:
                 for m in match:
-                    message_list.append(
-                        {
-                            "group_name": group_name,
-                            "message": m,
-                            "line": line_index,
-                            "file_path": file_path
-                        })
+                    m_match = re.compile(zh_message_regex).search(m)
+                    if m_match:
+                        message_list.append(
+                            {
+                                "group_name": group_name,
+                                "message": m,
+                                "line": line_index,
+                                "file_path": file_path
+                            })
                 '''
                 for m in match:
                     if m[0] and m[0] != '':
