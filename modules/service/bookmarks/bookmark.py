@@ -17,7 +17,10 @@ class Bookmark(object):
         self.__title__ = kwargs["title"]
         self.__key__ = kwargs["key"]
         self.__index__ = kwargs["index"]
-        self.__status__ = kwargs["status"]
+
+        self.__status__ = "open"
+        if kwargs.get("status"):
+            self.__status__ = kwargs["status"]
 
         self.__path__ = None
         if kwargs.get("path"):

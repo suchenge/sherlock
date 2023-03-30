@@ -1,6 +1,7 @@
 import json
 import re
 import os.path
+import datetime
 
 from modules.tools.http_request.http_client import HttpClient
 from modules.tools.http_request.proxy import Proxies
@@ -55,14 +56,15 @@ def __get_bookmark_info__(bookmark_html_line):
 
 class Dustman(object):
     def __init__(self, bookmarks_html_file_path):
+        datetime_now = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
         self.__html_file_path__ = bookmarks_html_file_path
         self.__json_file_folder__ = os.path.dirname(bookmarks_html_file_path)
 
         self.__download_item_folder = os.path.join(self.__json_file_folder__, "downloading")
         self.__done_item_folder__ = os.path.join(self.__json_file_folder__, "done")
 
-        self.__done_json_file_path__ = os.path.join(self.__json_file_folder__, "done.json")
-        self.__error_json_file_path__ = os.path.join(self.__json_file_folder__, "error.json")
+        self.__done_json_file_path__ = os.path.join(self.__json_file_folder__, "done.%s.json" % datetime_now)
+        self.__error_json_file_path__ = os.path.join(self.__json_file_folder__, "error.%s.json" % datetime_now)
         self.__open_json_file_path__ = os.path.join(self.__json_file_folder__, "open.json")
 
         self.__open_items__ = None

@@ -7,7 +7,7 @@ from modules.service.download.picture.page_factory import PageFactory
 
 class Creeper(object):
     def __init__(self):
-        self.__threadCount__ = 5
+        self.__threadCount__ = 10
         self.xml_path = os.path.abspath("data/source/picture.xml")
         self.download_folder = os.path.abspath("data/download")
         self.page_url = PageUrl(self.xml_path)

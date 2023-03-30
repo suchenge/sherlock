@@ -69,7 +69,7 @@ class JavdbMarauder(BaseMarauder):
         if self.__title__ is None or self.__title__ == "":
             element = self.__html_tree__.xpath("//span[@class='origin-title']/text()")
 
-            if element is None or len(element) >= 0:
+            if element is None or len(element) <= 0:
                 element = self.__html_tree__.xpath("//strong[@class='current-title']/text()")
 
             if element:
