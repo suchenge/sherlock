@@ -29,8 +29,8 @@ COLLATE utf8_general_ci;
 '''
 
 # 匹配message的正则
-# message_regex = r'B.R\("(.*?)"([ ]{0,1},[ ]{0,1}"(.*?)"){0,1}\)'
-message_regex = r'"(.*?)"'
+message_regex = r'B.R\("(.*?)"([ ]{0,1},[ ]{0,1}"(.*?)"){0,1}\)'
+# message_regex = r'"(.*?)"'
 zh_message_regex = r'[\u4e00-\u9fa5]+'
 # 临时表名称
 temp_sys_message_resource_table_name = 'vito_temp_sys_message_resource'
@@ -362,7 +362,7 @@ def get_message_info_list(file_path):
 
             match = re.compile(message_regex).findall(line)
             if match and len(match) > 0:
-                for m in match:
+                for m in match[0]:
                     m_match = re.compile(zh_message_regex).search(m)
                     if m_match:
                         message_list.append(
@@ -474,15 +474,18 @@ def insert_temp_message_resource(message_info, translate_message, database_conne
     print(insert_sql)
     print('------------------------------------------------')
 
-    rowcount = database_cursor.execute(insert_sql)
-    database_connect.commit()
+    try:
+        rowcount = database_cursor.execute(insert_sql)
+        database_connect.commit()
 
-    if rowcount > 0:
-        return {
-            "key": key,
-            "text_ch": message,
-            "text_en": translate_message
-        }
+        if rowcount > 0:
+            return {
+                "key": key,
+                "text_ch": message,
+                "text_en": translate_message
+            }
+    except Exception as error:
+        database_connect.rollback()
     return None
 
 
@@ -493,11 +496,19 @@ def filter_key(message, resource_list):
     return None
 
 
+message_sql_list = []
+
+
 def build_message_sql(new_key_list):
     result = []
     for info in new_key_list:
         for message in info["message"]:
-            result.append("CALL T_MSG('%s','%s','%s');" % (info["key"], message["text"], message["type"]))
+            sql = "CALL T_MSG('%s','%s','%s');" % (info["key"], message["text"], message["type"])
+
+            if sql not in message_sql_list:
+                result.append(sql)
+                message_sql_list.append(sql)
+
     return result
 
 
