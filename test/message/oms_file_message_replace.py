@@ -8,7 +8,7 @@ import pymysql
 from hashlib import md5
 
 group_name = 'Configuration_Common'
-file_path = r'D:\quantum-scm\SCM\Service\SCM.Configration\SCM.Configration.Service\Customize\Watsons\Watsons_SaveOrDelBatchManagement.cs'
+file_path = r'D:\quantum-scm\SCM\Service\SCM.OMS\SCM.OMS.Service\ReciptOrder\Import\ImportReceipt.cs'
 
 mysql_connect = {
     "host": '192.168.100.212',
@@ -217,3 +217,5 @@ for message_info in replace_message_list:
     print('\n')
 
 database_connect.close()
+
+print(file_path)
