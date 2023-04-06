@@ -83,7 +83,9 @@ def search_temp_message_resource(message_list, database_connect):
     result = {}
     sql_param = build_message_param(message_list)
 
-    sql = 'SELECT GROUP_NAME, SEQUENCE_NUMBER, `KEY`, VIEW_TEXT_CH, VIEW_TEXT_EN FROM vito_temp_sys_message_resource WHERE VIEW_TEXT_CH IN (%s)' % sql_param
+    sql = 'SELECT GROUP_NAME, SEQUENCE_NUMBER, `KEY`, VIEW_TEXT_CH, VIEW_TEXT_EN ' \
+          'FROM vito_temp_sys_message_resource ' \
+          'WHERE VIEW_TEXT_CH IN (%s)' % sql_param
 
     database_cursor = database_connect.cursor()
     database_cursor.execute(sql)
@@ -123,6 +125,7 @@ def get_message_list_by_file():
                     continue
 
                 result.append(match.replace('"', ''))
+
     return result
 
 
@@ -135,16 +138,19 @@ def build_message_sql(key, message, message_en):
 
 
 def insert_temp_message_resource(message, message_en, database_connect):
-    search_sql = r"SELECT (CASE WHEN MAX(SEQUENCE_NUMBER) IS NULL THEN 0 ELSE MAX(SEQUENCE_NUMBER) END) AS SEQUENCE_NUMBER FROM vito_temp_sys_message_resource WHERE GROUP_NAME = '%s' ORDER BY SEQUENCE_NUMBER DESC" % group_name
+    search_sql = """SELECT (CASE WHEN MAX(SEQUENCE_NUMBER) IS NULL THEN 0 ELSE MAX(SEQUENCE_NUMBER) END) AS SEQUENCE_NUMBER 
+                   FROM vito_temp_sys_message_resource 
+                   WHERE GROUP_NAME = '%s' ORDER BY SEQUENCE_NUMBER DESC""" % group_name
+    
     database_cursor = database_connect.cursor()
     database_cursor.execute(search_sql)
     database_result = database_cursor.fetchall()
     sequence_number = int(database_result[0][0]) + 1
     key = '%s_%s' % (group_name, str(int(sequence_number)).zfill(6))
 
-    insert_sql = "INSERT vito_temp_sys_message_resource (GROUP_NAME, SEQUENCE_NUMBER, VIEW_TEXT_CH, VIEW_TEXT_EN, FILE_PATH, `KEY`) "
-    insert_sql += "SELECT '%s', %s, '%s','%s','%s','%s' FROM DUAL " % (group_name, sequence_number, message, message_en.replace("\'", "''"), '', key)
-    insert_sql += "WHERE NOT EXISTS(SELECT 1 FROM vito_temp_sys_message_resource WHERE VIEW_TEXT_CH = '%s')" % message
+    insert_sql = """INSERT vito_temp_sys_message_resource (GROUP_NAME, SEQUENCE_NUMBER, VIEW_TEXT_CH, VIEW_TEXT_EN, FILE_PATH, `KEY`)
+                    SELECT '%s', %s, '%s','%s','%s','%s' FROM DUAL " % (group_name, sequence_number, message, message_en.replace("\'", "''"), '', key)
+                    WHERE NOT EXISTS(SELECT 1 FROM vito_temp_sys_message_resource WHERE VIEW_TEXT_CH = '%s')""" % message
 
     try:
         rowcount = database_cursor.execute(insert_sql)
