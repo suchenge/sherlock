@@ -22,8 +22,8 @@ database_connect = pymysql.connect(
     port=mysql_connect["port"],
     db=mysql_connect['db'])
 
-group_name = 'Center_SaleOrder'
-message = r'仓库自定义1标记为Y的上海仓为：{whId_SH.WhId}\n'
+group_name = 'UserDefine_Common'
+message = r'控件类型{valueArgs.ControlType}不支持'
 
 
 def make_md5(s, encoding='utf-8'):
@@ -33,8 +33,8 @@ def make_md5(s, encoding='utf-8'):
 def translate_message(message):
     time.sleep(2)
 
-    appid = '20230329001619824'
-    appkey = 'DrUuH1mrCrXcpXrLkG4H'
+    appid = '20230404001628097'
+    appkey = 'LeUgrn2_LGjZ_UrHgG_d'
     salt = random.randint(32768, 65536)
     sign = make_md5(appid + message + str(salt) + appkey)
     headers = {'Content-Type': 'application/x-www-form-urlencoded'}
