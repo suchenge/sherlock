@@ -64,7 +64,7 @@ def search_message_resource(message_list, database_connect):
     result = {}
     sql_param = build_message_param(message_list)
 
-    sql = 'SELECT RESOURCE_KEY, VIEW_TEXT FROM sys_message_resource WHERE VIEW_TEXT IN (%s)' % sql_param
+    sql = f'SELECT RESOURCE_KEY, VIEW_TEXT FROM sys_message_resource WHERE VIEW_TEXT IN ({sql_param})'
 
     database_cursor = database_connect.cursor()
     database_cursor.execute(sql)
@@ -138,9 +138,9 @@ def build_message_sql(key, message, message_en):
 
 
 def insert_temp_message_resource(message, message_en, database_connect):
-    search_sql = """SELECT (CASE WHEN MAX(SEQUENCE_NUMBER) IS NULL THEN 0 ELSE MAX(SEQUENCE_NUMBER) END) AS SEQUENCE_NUMBER 
+    search_sql = f'''SELECT (CASE WHEN MAX(SEQUENCE_NUMBER) IS NULL THEN 0 ELSE MAX(SEQUENCE_NUMBER) END) AS SEQUENCE_NUMBER 
                    FROM vito_temp_sys_message_resource 
-                   WHERE GROUP_NAME = '%s' ORDER BY SEQUENCE_NUMBER DESC""" % group_name
+                   WHERE GROUP_NAME = '{group_name}' ORDER BY SEQUENCE_NUMBER DESC'''
     
     database_cursor = database_connect.cursor()
     database_cursor.execute(search_sql)
@@ -148,9 +148,11 @@ def insert_temp_message_resource(message, message_en, database_connect):
     sequence_number = int(database_result[0][0]) + 1
     key = '%s_%s' % (group_name, str(int(sequence_number)).zfill(6))
 
-    insert_sql = """INSERT vito_temp_sys_message_resource (GROUP_NAME, SEQUENCE_NUMBER, VIEW_TEXT_CH, VIEW_TEXT_EN, FILE_PATH, `KEY`)
-                    SELECT '%s', %s, '%s','%s','%s','%s' FROM DUAL " % (group_name, sequence_number, message, message_en.replace("\'", "''"), '', key)
-                    WHERE NOT EXISTS(SELECT 1 FROM vito_temp_sys_message_resource WHERE VIEW_TEXT_CH = '%s')""" % message
+    insert_sql = f'''
+                    INSERT vito_temp_sys_message_resource (GROUP_NAME, SEQUENCE_NUMBER, VIEW_TEXT_CH, VIEW_TEXT_EN, FILE_PATH, `KEY`)
+                    SELECT '{group_name}', {sequence_number}, '{message}', '{message_en.replace(r"'", "''")}', '', '{key}'
+                    WHERE NOT EXISTS(SELECT 1 FROM vito_temp_sys_message_resource WHERE VIEW_TEXT_CH = '{message}'
+    '''
 
     try:
         rowcount = database_cursor.execute(insert_sql)
@@ -184,7 +186,7 @@ replace_message_list = []
 for message in file_message_list:
     exists_message_list = list(filter(lambda x: x['message'] == message, replace_message_list))
     
-    if len(exists_message_list > 0):
+    if len(exists_message_list) > 0:
         continue
     
     if message in sys_message_info_list:
