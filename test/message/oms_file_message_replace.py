@@ -182,11 +182,12 @@ for message_key in temp_message_info_list:
 
 replace_message_list = []
 for message in file_message_list:
+    exists_message_list = list(filter(lambda x: x['message'] == message, replace_message_list))
+    
+    if len(exists_message_list > 0):
+        continue
+    
     if message in sys_message_info_list:
-        exists_message = list(filter(lambda x: x['message'] == message, replace_message_list))
-        if len(exists_message) > 0:
-            continue
-
         replace_message_list.append({
             'message': message,
             'key': sys_message_info_list[message]
@@ -194,10 +195,6 @@ for message in file_message_list:
     else:
         message_en = translate_message(message, baidu_api_info)
         message_info = insert_temp_message_resource(message, message_en, database_connect)
-
-        exists_message = list(filter(lambda x: x['message'] == message, replace_message_list))
-        if len(exists_message) > 0:
-            continue
 
         replace_message_list.append({
             'message': message,
