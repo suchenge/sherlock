@@ -150,7 +150,7 @@ def insert_temp_message_resource(message, message_en, database_connect):
 
     insert_sql = f'''
                     INSERT vito_temp_sys_message_resource (GROUP_NAME, SEQUENCE_NUMBER, VIEW_TEXT_CH, VIEW_TEXT_EN, FILE_PATH, `KEY`)
-                    SELECT '{group_name}', {sequence_number}, '{message}', '{message_en.replace(r"'", "''")}', '', '{key}'
+                    SELECT '{group_name}', {sequence_number}, '{message}', '{message_en.replace(r"'", "''")}', '{file_path}', '{key}'
                     WHERE NOT EXISTS(SELECT 1 FROM vito_temp_sys_message_resource WHERE VIEW_TEXT_CH = '{message}'
     '''
 
@@ -219,6 +219,7 @@ for message_info in replace_message_list:
     if 'sql' in message_info:
         for sql in message_info['sql']:
             print(sql)
+            
     print('\n')
 
 database_connect.close()

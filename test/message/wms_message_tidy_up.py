@@ -189,8 +189,6 @@ def write_new_sql_file(new_message_sql_list):
 
 
 new_message_list = read_message_file()
-new_message_sql_list = []
-for message in new_message_list:
-    new_message_sql_list.append(message['sql'])
+new_message_sql_list = [].extend([message['sql'] for message in new_message_list])
 
 write_new_sql_file(new_message_sql_list)
