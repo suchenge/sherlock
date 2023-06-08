@@ -17,7 +17,7 @@ class MarauderJavdb(BaseMarauder):
         else:
             self.__base_url__ = kwargs["url"]
 
-            search_url = self.__base_url__ + 'search?q=' + self.__file__.title + '&f=all'
+            search_url = self.__base_url__ + 'search?q=' + self.__file__.title + '&f=all' 
             html_content = self.__get_url_content__(search_url)
 
             if html_content is None:
