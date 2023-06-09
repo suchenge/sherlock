@@ -84,9 +84,10 @@ class Request(object):
 
         return response
 
-    def get_text(self, url: str):
+    def get_text(self, url: str, encoding='utf-8'):
         response = self.get(url)
         if response:
+            response.encoding = encoding
             return response.text
         else:
             return None

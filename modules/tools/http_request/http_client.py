@@ -16,8 +16,8 @@ class HttpClient(object):
         HttpClient.__request__ = Request(proxies)
 
     @staticmethod
-    def get_text(url: str):
-        return HttpClient.__request__.get_text(url)
+    def get_text(url: str, encoding='utf-8'):
+        return HttpClient.__request__.get_text(url, encoding)
 
     @staticmethod
     def get_content(url: str):
