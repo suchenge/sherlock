@@ -28,7 +28,6 @@ class Resolver(object):
         return self.__strategy__.get_child_page_url()
 
     def __get_page_images__(self, url):
-        url = f'{self.__domain_url__}{url}'
         html = self.__get_page_html_tree__(url)
 
         return self.__strategy__.get_images(html)

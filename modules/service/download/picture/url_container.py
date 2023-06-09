@@ -10,7 +10,7 @@ class UrlContainer(object):
         return [item.replace('\n', '') for item in self.__items__]
 
     def write(self):
-        with open(self.__file_path__, 'a', encoding='utf') as file:
+        with open(self.__file_path__, 'w', encoding='utf') as file:
             file.writelines(self.__items__)
 
     def append(self, url, auto_write=False):

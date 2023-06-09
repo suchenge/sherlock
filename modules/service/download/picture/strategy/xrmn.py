@@ -10,10 +10,16 @@ class Xrmn(Base):
         title = self.__html__.xpath("//h1/text()")[-1]
         return title
 
-    def get_images(self):
-        title = self.get_title()
-        imgs = self.__html__.xpath("//img[contains(@alt, '" + title + "')]/@src")
-        return imgs
+    def get_images(self, html):
+        imgs = html.xpath("//p[@style='text-align: center']/img/@src")
+        return [f'{self.__domain_url__}{item}' for item in imgs]
 
     def get_child_page_url(self):
-        return self.__html__.xpath("//div[@class='page']/a[not(contains(@class, 'current'))]/@href")
+        html_links = self.__html__.xpath("//div[@class='page']/a[not(contains(@class, 'current'))]/@href")
+        page_links = []
+
+        for link in html_links:
+            if link not in page_links and link not in self.__url__:
+                page_links.append(f'{self.__domain_url__}{link}')
+
+        return page_links

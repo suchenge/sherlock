@@ -46,7 +46,7 @@ class Request(object):
     def __init__(self, proxies=None):
         self.__proxies__ = proxies
 
-    def __get_response__(self, url, headers):
+    def __get_response__(self, url, headers, verify=False):
         proxy = None
 
         if self.__proxies__:
@@ -58,9 +58,9 @@ class Request(object):
         try:
             response = None
             if proxy:
-                response = requests.get(url, headers, proxies=proxy.address)
+                response = requests.get(url, headers, proxies=proxy.address, verify=verify)
             else:
-                response = requests.get(url, headers)
+                response = requests.get(url, headers, verify=verify)
 
             if response and response.status_code == 200:
                 if proxy:

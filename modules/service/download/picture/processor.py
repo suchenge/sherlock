@@ -38,6 +38,6 @@ class Processor(object):
                 'url': images[index]
             })
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+        with concurrent.futures.ThreadPoolExecutor() as executor:
             executor.map(self.__download__, save_images)
 

@@ -10,9 +10,9 @@ class Xinannvku(Base):
     def get_title(self):
         return self.__html__.xpath("//meta[@name='description']/@content")[0]
 
-    def get_images(self):
+    def get_images(self, html):
         title = self.get_title()
-        images = self.__html__.xpath("//img[contains(@title, '" + title + "')]/@src")
+        images = html.xpath("//img[contains(@title, '" + title + "')]/@src")
         return images
 
     def get_child_page_url(self):
