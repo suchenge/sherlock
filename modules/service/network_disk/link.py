@@ -20,7 +20,7 @@ def __list__():
 class LinkStatus(object):
     normal = "正常",
     resolve = "解析",
-    notexist = '链接不存在',
+    nonexistent = '链接不存在',
     extractfile = '提取文件'
 
 class Link(object):
@@ -30,6 +30,7 @@ class Link(object):
         self.__url__ = None
         self.__password__ = None
         self.__status__ = LinkStatus.normal
+        self.__save_node__ = None
 
     def __resolve__(self):
         with open(self.__file_path__, 'r') as file:
@@ -49,6 +50,14 @@ class Link(object):
         if success is False:
             self.__status__ = LinkStatus.resolve
 
+    @property
+    def save_node(self):
+        return self.__save_node__
+
+    @save_node.setter
+    def save_node(self, node_title: str):
+        self.__save_node__ = node_title
+
     def write(self, browser: WebDriver):
         try:
             self.__resolve__()
@@ -60,7 +69,7 @@ class Link(object):
             page_title = browser.title
 
             if '链接不存在' in page_title:
-                self.__status__ = LinkStatus.notexist
+                self.__status__ = LinkStatus.nonexistent
                 raise
 
             if '请输入提取码' in page_title:
@@ -72,6 +81,9 @@ class Link(object):
                 print(browser.title)
 
                 browser.find_element(By.XPATH, "//a[@title='保存到网盘']").click()
+
+                self.__select_save_node__(browser)
+
                 browser.find_element(By.XPATH, "//a[@title='确定']").click()
 
                 if self.__success__(browser):
@@ -80,7 +92,12 @@ class Link(object):
                     raise
 
         except Exception as error:
-             os.rename(self.__file_path__, self.__build_file_path_by_status__())
+            os.rename(self.__file_path__, self.__build_file_path_by_status__())
+
+    def __select_save_node__(self, browser):
+        if self.__save_node__:
+            tree_node_element = browser.find_element(By.XPATH, f"//span[contains(@node-path, '{self.__save_node__}')]//..//..")
+            tree_node_element.click()
 
     def __build_file_path_by_status__(self):
         status = self.__status__
@@ -91,7 +108,6 @@ class Link(object):
         file_name = f'{status}.{os.path.basename(self.__file_path__)}.error'
         file_path = os.path.join(os.path.dirname(self.__file_path__), file_name)
         return file_path
-
 
     def __success__(self, browser: WebDriver):
         try:

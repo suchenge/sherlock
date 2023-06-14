@@ -5,13 +5,18 @@ from selenium.webdriver.chrome.webdriver import WebDriver
 
 class ChromeBrowser(WebDriver):
     def __init__(self):
-        option = Options()
-        #option.add_argument('--headless')
-        option.add_argument(r'user-data-dir=C:\Users\vitos\AppData\Local\Google\Chrome\User Data')
-        option.add_argument('--no-sandbox')
-        option.add_argument('--disable-dev-shm-usage')
-        option.add_argument('blink-settings=imagesEnabled=false')
-        option.add_argument('--disable-gpu')
-
         service = Service(executable_path=r'D:\Chrome\chromedriver.114.0.5735.90.exe')
-        super().__init__(options=option, service=service)
+
+        options = Options()
+        # 浏览器用户信息
+        options.add_argument(r'user-data-dir=D:\Chrome\User Data\0')
+        # options.add_argument('--headless')                     # 开启无界面模式
+        # options.add_argument("--disable-gpu")                  # 禁用gpu
+        # options.add_argument('--user-agent=Mozilla/5.0 HAHA')  # 配置对象添加替换User-Agent的命令
+        # options.add_argument('--window-size=1366,768')         # 设置浏览器分辨率（窗口大小）
+        # options.add_argument('--start-maximized')              # 最大化运行（全屏窗口）,不设置，取元素会报错
+        options.add_argument('--disable-infobars')             # 禁用浏览器正在被自动化程序控制的提示
+        # options.add_argument('--incognito')                    # 隐身模式（无痕模式）
+        # options.add_argument('--disable-javascript')           # 禁用javascript
+
+        super().__init__(options=options, service=service)
