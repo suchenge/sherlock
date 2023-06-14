@@ -9,7 +9,7 @@ class Writer(object):
         browser.implicitly_wait(20)
 
         link_folder = os.path.abspath("../data/pan_links")
-        links = [Link(os.path.join(link_folder, file)) for file in os.listdir(link_folder) if file.endswith('.txt')]
+        links = [Link(os.path.join(link_folder, file)) for file in os.listdir(link_folder) if file.endswith('.done') is False]
 
         for link in links:
             link.write(browser)

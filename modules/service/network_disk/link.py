@@ -80,7 +80,18 @@ class Link(object):
                     raise
 
         except Exception as error:
-             os.rename(self.__file_path__, f'{self.__file_path__}.{self.__status__}.error')
+             os.rename(self.__file_path__, self.__build_file_path_by_status__())
+
+    def __build_file_path_by_status__(self):
+        status = self.__status__
+
+        if type(self.__status__) == tuple:
+            status = self.__status__[0]
+
+        file_name = f'{status}.{os.path.basename(self.__file_path__)}.error'
+        file_path = os.path.join(os.path.dirname(self.__file_path__), file_name)
+        return file_path
+
 
     def __success__(self, browser: WebDriver):
         try:
