@@ -5,7 +5,7 @@ path_params = [
 ]
 
 for path in path_params:
-    if path is not None and path is not '':
+    if path is not None and path != '':
         Butcher(path).chop()
 
 print("Done")
