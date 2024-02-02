@@ -1,6 +1,5 @@
 import re
 import os
-import sys
 import platform
 import threading
 
@@ -8,6 +7,7 @@ from ffmpy import FFmpeg
 from datetime import datetime
 from modules.service.movie_cut.file import File
 from modules.service.movie_cut.overseer import Overseer
+from modules.tools.common_methods.unity_tools import UnityTools
 
 
 def __format_time___(time):
@@ -25,7 +25,7 @@ def __is_mac_os__():
     return platform.system() == 'Darwin'
 
 def __ffmpeg_execute_path__():
-    if __is_mac_os__() is False:
+    if UnityTools.is_mac_os() is False:
         return os.path.join(os.path.abspath(os.path.dirname(__file__)), 'ffmpeg.exe')
     else:
         return os.path.join(os.path.abspath(os.path.dirname(__file__)), 'ffmpeg')
