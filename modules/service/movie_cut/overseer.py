@@ -3,6 +3,7 @@ import threading
 
 from os import system
 from datetime import datetime
+from modules.tools.common_methods.unity_tools import UnityTools
 
 
 def __mistiming_time__(start_time, end_time):
@@ -17,9 +18,15 @@ class Overseer(threading.Thread):
         super().__init__()
         self.__tasks__ = tasks
 
+    def __clear__(self):
+        if UnityTools.is_mac_os() is False:
+            system('cls')
+        else:
+            system('Clear')
+
     def run(self):
         while [task for task in self.__tasks__ if task['status'] != 'ending']:
-            system('cls')
+            self.__clear__()
             print(self.__build_content__())
             time.sleep(1)
 

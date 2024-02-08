@@ -1,3 +1,77 @@
+import pyperclip3 as pc
+
+def controlTypeToPrivateCode():
+    control_type = '''
+Label|标签,
+Text|文本,
+LongText|长文本,
+Number|数字,
+NumberWithUnit|单位,
+Decimal|小数,
+Time|时间,
+TimePicker|时间输入框,
+DateTime|日期时间,
+Checkbox|复选,
+Dropdown|下拉菜单,
+MultiDropdown|多选菜单,
+MuitSelect|快速多选,
+QuickSelect|快速选择,
+StatusTimeline|流程图,
+Address|地址
+'''
+    sql = '';
+    control_types = control_type.strip().split(',')
+    for index in range(len(control_types)):
+        type_info = control_types[index].strip().split('|')
+        sql += f'''INSERT INTO privatesyscode (CodeType, CodeID, CodeName, CodeNameEN, TTID, CreatedBy, CreatedDate, UpdatedBy, UpdatedDate, IS_ACTIVE, SORT_NO) 
+SELECT 'ControlType','{type_info[0]}','{type_info[1]}','{type_info[0]}','PUBLIC', 'System', NOW(), 'System', NOW(), 'Y', NULL 
+FROM DUAL
+WHERE NOT EXISTS(SELECT 1 FROM privatesyscode WHERE CodeType = 'ControlType' AND CodeID = '{type_info[0]}');'''
+        sql += '\r\n\r\n'
+    pc.copy(sql)
+
+controlTypeToPrivateCode()
+
+def create_event_receiver():
+    sql = '';
+    for index in range(20):
+        line = index + 1;
+        sql += f'''INSERT INTO reg_event_receiver (`TYPE_FULL_NAME`,`PROPERTY_NAME`,`PROPERTY_TYPE`,`CUSTOM_TYPE`,`IS_USER`,`IS_EMAIL`,`IS_MOBILE`,`REMARK`,`CREATED_DATE`)
+SELECT 'SCM.Message.DTO.OMS.Default.PurchaseOrderEventDTO,SCM.Contract.Message','VendorUdf{line}','EMAIL',NULL,'N','Y','N','自定义{line}',NOW() FROM DUAL
+WHERE NOT EXISTS (SELECT 1 FROM reg_event_receiver WHERE TYPE_FULL_NAME='SCM.Message.DTO.OMS.Default.PurchaseOrderEventDTO,SCM.Contract.Message' AND PROPERTY_NAME='VendorUdf{line}');'''
+        sql += '\n\r'
+        pc.copy(sql)
+
+
+create_event_receiver();
+
+
+
+def createMap(modelName, fieldName, length):
+    sql = '';
+    for index in range(length):
+        line = index + 1;
+        sortId = line * 10;
+        sql += f'''INSERT INTO edit_form_template
+(SYS_ID, MODEL_NAME, FIELD_NAME, SORT_ID, CONTROL_TYPE, GROUP_NAME, IS_HIDDEN, 
+CAN_HIDDEN, IS_REQUIRED, READ_ONLY, EDIT_READ_ONLY, DEFAULT_VALUE, QUICK_SELECT_COLUMN, QUICK_SELECT_COMPLATE, 
+QUICK_SELECT_MODEL, QUICK_SELECT_IS_MATCH, QUICK_SELECT_PAGE_API, QUICK_SELECT_TEXT_API, CHECKED_VALUE, REFER_COLUMN_NAME, DROPDOWN_ALLOW_EMPTY, 
+CONVERT_DATA, DROPDOWN_FORMAT, VALIDATE_RULE, MAX_LENGTH, NUMBER_MAX, NUMBER_MIN, IS_DIGITS, 
+DECIMAL_DIGITS, PROVINCE_COLUMN_NAME, CITY_COLUMN_NAME, COUNTY_COLUMN_NAME, DATE_FORMAT, DATE_DEFAULT_TIME,
+CREATED_BY, CREATED_DATE, UPDATED_BY, UPDATED_DATE, IS_CONVERTIBLE)
+SELECT 'OMS', 'CMST{modelName}', '{fieldName}{line}', {sortId}, 'Text', 'General', 0,
+		1, 0, 0, 0, '', '', '',
+		'', 0, '', '', '', '', 0, 
+		'', '', '', 100, 0.000000, 0.000000, 0,
+		0, '', '', '', '', '', 
+		'DBA', NOW(), 'DBA', NOW(), NULL
+FROM DUAL 
+WHERE NOT EXISTS(SELECT 1 FROM edit_form_template WHERE SYS_ID = 'OMS' AND MODEL_NAME = 'CMST{modelName}' AND FIELD_NAME = '{fieldName}{line}');'''
+        sql += '\n\r'
+    pc.copy(sql)
+    
+createMap('ShippingDetailUdf', 'OSdUdf', 30);
+
 # 集合匹配
 tmpList = [
             {"path": "path", "status": "done", "id": 1},

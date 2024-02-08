@@ -1,11 +1,13 @@
 import re
 import os
+import platform
 import threading
 
 from ffmpy import FFmpeg
 from datetime import datetime
 from modules.service.movie_cut.file import File
 from modules.service.movie_cut.overseer import Overseer
+from modules.tools.common_methods.unity_tools import UnityTools
 
 
 def __format_time___(time):
@@ -19,6 +21,14 @@ def __format_time___(time):
 
     return result.strip()
 
+def __is_mac_os__():
+    return platform.system() == 'Darwin'
+
+def __ffmpeg_execute_path__():
+    if UnityTools.is_mac_os() is False:
+        return os.path.join(os.path.abspath(os.path.dirname(__file__)), 'ffmpeg.exe')
+    else:
+        return os.path.join(os.path.abspath(os.path.dirname(__file__)), 'ffmpeg')
 
 class Butcher(object):
     def __init__(self, path):
@@ -29,7 +39,7 @@ class Butcher(object):
         if self.__file__.type.lower() not in types:
             return
 
-        self.__ffmpeg_path__ = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'ffmpeg.exe')
+        self.__ffmpeg_path__ = __ffmpeg_execute_path__()
 
         if not os.path.exists(self.__ffmpeg_path__):
             return
@@ -83,8 +93,8 @@ class Butcher(object):
 
         overseer.join()
 
-        os.remove(self.__file__.path)
-        os.remove(self.__timer_path__)
+        #os.remove(self.__file__.path)
+        #os.remove(self.__timer_path__)
 
     def __chop__(self, timer_info):
         try:
