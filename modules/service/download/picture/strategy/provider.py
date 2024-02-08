@@ -4,7 +4,8 @@ __settings__ = {
     'xiurenji': 'xiurenji',
     'xiannvku': 'xinannvku',
     'xiuren': 'xrmn',
-    'xrmn': 'xrmn'
+    'xrmn': 'xrmn',
+    'xr': 'xrmn'
 }
 
 def get_module_name(url):

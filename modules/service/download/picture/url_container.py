@@ -36,7 +36,10 @@ class UrlContainer(object):
         return f'{url}\n' in self.__items__
 
     def remove(self, url, auto_write=False):
-        self.__items__.remove(f'{url}\n')
+        item_url = f'{url}\n'
+
+        if item_url in self.__items__:
+            self.__items__.remove(f'{url}\n')
 
         if auto_write:
             self.write()
