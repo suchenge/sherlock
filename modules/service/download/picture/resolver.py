@@ -36,7 +36,7 @@ class Resolver(object):
         urls = self.__get_child_page_url__()
         result = []
 
-        with concurrent.futures.ThreadPoolExecutor() as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
             page_images = executor.map(self.__get_page_images__, urls)
 
             for images in page_images:

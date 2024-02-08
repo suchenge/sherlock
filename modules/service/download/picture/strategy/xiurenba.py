@@ -22,7 +22,7 @@ class Xiurenba(Base):
 
         for link in html_links:
             read_link = f'{self.__domain_url__}{link}'
-            if read_link not in page_links and link not in self.__url__:
+            if read_link not in page_links:
                 page_links.append(read_link)
 
         return page_links

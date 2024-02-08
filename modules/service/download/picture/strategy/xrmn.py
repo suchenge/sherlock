@@ -12,14 +12,17 @@ class Xrmn(Base):
 
     def get_images(self, html):
         imgs = html.xpath("//p[@style='text-align: center']/img/@src")
+        if len(imgs) == 0:
+            imgs = html.xpath("//p[@align='center']/img/@src")
         return [f'{self.__domain_url__}{item}' for item in imgs]
 
     def get_child_page_url(self):
-        html_links = self.__html__.xpath("//div[@class='page']/a[not(contains(@class, 'current'))]/@href")
+        html_links = self.__html__.xpath("//div[@class='page']/a/@href")
         page_links = []
 
         for link in html_links:
-            if link not in page_links and link not in self.__url__:
-                page_links.append(f'{self.__domain_url__}{link}')
+            page_link = f'{self.__domain_url__}{link}'
+            if page_link not in page_links:
+                page_links.append(page_link)
 
         return page_links

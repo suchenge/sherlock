@@ -3,7 +3,7 @@ import importlib
 __settings__ = {
     'xiurenji': 'xiurenji',
     'xiannvku': 'xinannvku',
-    'xiuren5': 'xiurenba',
+    'xiuren': 'xrmn',
     'xrmn': 'xrmn'
 }
 

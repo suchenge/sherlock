@@ -1,5 +1,4 @@
-from urllib.parse import \
-    urlparse
+from urllib.parse import urlparse
 
 
 class Base(object):
