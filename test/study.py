@@ -1,4 +1,104 @@
+import os
+import re
+import pymysql
 import pyperclip3 as pc
+
+mysql_connect = {
+    "host": '192.168.100.212',
+    "port": 3306,
+    "user": 'root',
+    "passwd": 'tiger_scm',
+    "db": 'ironman_scmcloud'
+}
+
+database_connect = pymysql.connect(
+    host=mysql_connect["host"],
+    user=mysql_connect["user"],
+    passwd=mysql_connect["passwd"],
+    port=mysql_connect["port"],
+    db=mysql_connect['db'])
+
+def batch_edit_field(file_path):
+    result = ''
+    lines = []
+    
+    with open(file_path, 'r', encoding='utf-8') as file:
+        lines = file.readlines()
+
+    for line in lines:
+        columns = line.split(',')
+        colunmObj = {}
+        colunmObj["FiledId"] = columns[0]
+        colunmObj["FiledName"] = columns[1]
+        colunmObj["ModelName"] = columns[2]
+        colunmObj["ControlType"] = columns[3]
+        colunmObj["ReferenceCode"] = columns[4]
+
+        result += insert_batch_edit_field_sql(colunmObj)
+
+    pc.copy(result)
+
+def insert_batch_edit_field_sql(columns):
+    return f'''
+INSERT INTO batch_edit_field (FIELD_ID, FIELD_NAME, MODEL_NAME, CONTROL_TYPE, REFERENCE_CODE, IS_ACTIVE)
+SELECT '{columns["FiledId"]}', '{columns["FiledName"]}', '{columns["ModelName"]}', '{columns["ControlType"]}', '{columns["ReferenceCode"]}', 1
+FROM DUAL
+WHERE NOT EXISTS(SELECT 1 FROM batch_edit_field WHERE FIELD_ID = '{columns["FiledId"]}' AND MODEL_NAME = '{columns["ModelName"]}');
+''' 
+
+batch_edit_field(r'E:\Download\batcheditfield.txt')
+
+def build_in_param(keys):
+    message_array = ["'%s'" % x for x in keys]
+    message_param = ','.join(message_array)
+    return message_param
+
+def get_database_message_key(sql):
+    database_cursor = database_connect.cursor()
+    database_cursor.execute(sql)
+    database_result = database_cursor.fetchall()
+
+    if len(database_result) <= 0:
+        return {}
+
+    result = {}
+    for row in database_result:
+        result[row[1]] = row[0]
+
+    return result
+
+def find_resource(keys):
+    result = []
+    in_keys = build_in_param(keys)
+    sql = "SELECT view_text, resource_key FROM sys_resource sr WHERE sr.resource_key IN (%s) AND sr.language_type = 'zh-cn';" % in_keys
+    resource_result = get_database_message_key(sql)
+
+    for message_info in resource_result:
+        key_info = {}
+        key_info["key"] = message_info
+        key_info["text"] = resource_result[message_info]
+        result.append(key_info)
+    
+    return result
+
+def extract_key(content):
+    pattern = re.compile(r'/// ([^<].*)');
+    return re.findall(pattern, content)
+
+def appendComment(file_path):
+    content = None
+    with open(file_path, 'r', encoding='utf-8') as file:
+        content = file.read()
+
+    keys = extract_key(content)
+    resources = find_resource(keys)
+    for resource in resources:
+        content = content.replace('/// %s' % resource["key"], '/// %s' % resource["text"])
+
+    pc.copy(content)
+    
+
+appendComment(r'D:\quantum-scm\power-scm\scm.configration\SCM.Configration\SCM.Configration.Service\Modules\Vendor\Response\VendorQueryResponse.cs')
 
 def controlTypeToPrivateCode():
     control_type = '''

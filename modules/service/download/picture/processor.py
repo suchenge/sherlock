@@ -19,6 +19,10 @@ class Processor(object):
     def __get_picture_suffix__(self, image_url):
         picture_name = os.path.split(image_url)[-1]
         picture_suffix = picture_name.split(".")[-1]
+        
+        if picture_suffix == 'webp':
+            picture_suffix = 'jpg'
+
         return picture_suffix
 
     def __download__(self, image):
