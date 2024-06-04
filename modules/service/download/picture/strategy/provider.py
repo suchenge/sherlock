@@ -1,11 +1,7 @@
 import importlib
 
 __settings__ = {
-    'xiurenji': 'xiurenji',
-    'xiannvku': 'xinannvku',
-    'xiuren': 'xrmn',
-    'xrmn': 'xrmn',
-    'xr': 'xrmn',
+    'xiuren.biz': 'xiurenbiz',
     '12378': 'xrmn',
     'spacemiss': 'spacemiss'
 }
