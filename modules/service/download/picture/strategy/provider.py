@@ -6,6 +6,7 @@ __settings__ = {
     'xiuren': 'xrmn',
     'xrmn': 'xrmn',
     'xr': 'xrmn',
+    '12378': 'xrmn',
     'spacemiss': 'spacemiss'
 }
 

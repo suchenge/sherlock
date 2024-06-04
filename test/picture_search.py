@@ -76,7 +76,7 @@ def search(keyword):
     url = search_url % keyword
     response = HttpClient.get_text(url)
     html = etree.HTML(response)
-    page_links = ['https://www.xrmn02.cc/plus/search/index.asp%s' % link for link in html.xpath("//div[@class='page']/a/@href")]
+    page_links = ['https://www.123783.xyz/plus/search/index.asp%s' % link for link in html.xpath("//div[@class='page']/a/@href")]
 
     picture_links = []
 
@@ -104,4 +104,4 @@ def get_current_page_links(url):
     return links
 
 
-batch_search('梦梦', '张思允', '玉兔', '久久')
+batch_search('王雅姗', '梦心月', '潘思沁', '苏苏阿')
