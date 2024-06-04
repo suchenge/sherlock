@@ -5,7 +5,8 @@ __settings__ = {
     'xiannvku': 'xinannvku',
     'xiuren': 'xrmn',
     'xrmn': 'xrmn',
-    'xr': 'xrmn'
+    'xr': 'xrmn',
+    'spacemiss': 'spacemiss'
 }
 
 def get_module_name(url):
