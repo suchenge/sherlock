@@ -16,6 +16,12 @@ def get_mp3(page, title, audio_info):
     else:
         return get_mp3(page, title, audio_info)
 
+def format_title(title):
+    title = title.replace('\'', '')
+    title = title.replace('"', '')
+    title = title.replace(':', '')
+    return title
+
 def download_mp3(main_url):
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(headless=True)
@@ -23,6 +29,7 @@ def download_mp3(main_url):
         page.goto(main_url)
 
         title = page.locator('xpath=//h1').first.text_content().replace('有声小说', '')
+        title = format_title(title)
         audio_list = page.locator('xpath=//div[@class="plist"]/ul/li/a').all()
         audio_urls = []
         mp3_urls = []
