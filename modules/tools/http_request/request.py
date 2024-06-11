@@ -24,7 +24,10 @@ def header(base_url):
 
 def monitoring(fun):
     def wrapper(*args, **kwargs):
-        url = args[1]
+        if len(args) > 1:
+            url = args[1]
+        else:
+            url = args[0]
         # print("开始获取页面内容:%s" % url)
         task_start_time = datetime.now()
         result = fun(*args, **kwargs)

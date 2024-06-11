@@ -27,6 +27,7 @@ class HttpClient(object):
     def download(**kwargs):
         path = kwargs["path"]
         url = kwargs["url"]
+        executor = kwargs['executor']
 
         if path and url:
             folder = os.path.dirname(path)
@@ -34,9 +35,11 @@ class HttpClient(object):
             if not os.path.exists(folder):
                 Path(folder).mkdir(exist_ok=True)
 
-            # content = HttpClient.get_content(url)
-            req = Request()
-            content = req.get_content(url)
+            if executor is None:
+                req = Request()
+                content = req.get_content(url)
+            else:
+                content = executor(url, **kwargs)
 
             if content:
                 with open(path, "ab") as file:
