@@ -1,16 +1,13 @@
 import requests
 import eyed3
 import os
-import mutagen
 
-from mutagen.easyid3 import EasyID3
 from playwright.sync_api import sync_playwright
 
 from modules.tools.http_request.http_client import HttpClient
 from modules.tools.http_request.request import monitoring
 from modules.tools.thread_pools.task import Task
 from modules.tools.thread_pools.task_pool import TaskPool
-from modules.tools.thread_pools.task_pool_factory import TaskPoolFactory
 
 save_path = 'D:\\'
 
