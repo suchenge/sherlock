@@ -1,7 +1,8 @@
-import requests
-import eyed3
 import os
+import eyed3
+import requests
 
+from ffmpy import FFmpeg
 from playwright.sync_api import sync_playwright
 
 from modules.tools.http_request.http_client import HttpClient
@@ -9,7 +10,8 @@ from modules.tools.http_request.request import monitoring
 from modules.tools.thread_pools.task import Task
 from modules.tools.thread_pools.task_pool import TaskPool
 
-save_path = 'D:\\'
+save_path = r'E:\Download'
+ffmpeg_path = r'D:\my-project\sherlock\modules\service\movie_cut\ffmpeg.exe'
 
 @monitoring
 def executor(*args, **image):
@@ -36,30 +38,40 @@ def download(**image):
     path = image['path']
     title = image['title']
     name = image['name']
+    format = image['format']
 
     HttpClient.download(**image)
 
     if os.path.exists(path):
-        audio_file = eyed3.load(path)
-        if audio_file.tag is None:
-            audio_file.initTag()
+        new_path = path
+
+        if format is True:
+            new_path = path.replace(f'.{image["suffix"]}', '_1.mp3')
+            FFmpeg(
+                    inputs={path: []},
+                    outputs={new_path: []},
+                    executable=ffmpeg_path
+                  ).run(stdout=None)
+
+        audio_file = eyed3.load(new_path)
+        audio_file.initTag()
 
         audio_file.tag.title = f'{title}-{name}'
         audio_file.tag.album = f'{title}'
         audio_file.tag.save()
 
+        if new_path != path:
+            os.remove(path)
+            os.rename(new_path, path)
 
-def get_mp3(page, title, audio_info):
-    url = audio_info['url']
-    print(url)
-    page.goto(url)
+def get_mp3(page, audio_info):
+    page.goto(audio_info['url'])
     page.wait_for_timeout(2000)
     page.wait_for_load_state('load')
     mp3_url = page.locator('#jp_audio_0').first.get_attribute('src')
 
     if mp3_url is not None:
-        print(mp3_url)
-        name = audio_info['title']
+        name = audio_info['name']
         url_split = mp3_url.split('.')
         suffix = url_split[len(url_split)-1]
         if suffix is None:
@@ -67,15 +79,18 @@ def get_mp3(page, title, audio_info):
 
         info = {
                     'url': mp3_url,
-                    'title': title,
+                    'title': audio_info['title'],
                     'name': name,
-                    'path': f'{save_path}/{title}/{name}.{suffix}',
-                    'executor': executor
+                    'path': f'{save_path}/{audio_info['title']}/{name}.{suffix}',
+                    'executor': executor,
+                    'format': audio_info['format'],
+                    'suffix': suffix
                 }
         print(info)
+
         return info
     else:
-        return get_mp3(page, title, audio_info)
+        return get_mp3(page, audio_info)
 
 def format_title(title):
     title = title.replace('\'', '')
@@ -84,13 +99,11 @@ def format_title(title):
     return title
 
 def download_mp3(**kwargs):
-    title = kwargs['title']
-    audio_info = kwargs['audio_info']
-
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(headless=True)
         page = browser.new_page()
-        mp3_url = get_mp3(page, title, audio_info)
+        mp3_url = get_mp3(page, kwargs)
+        mp3_url['format'] = kwargs['format']
         page.close()
         browser.close()
 
@@ -98,40 +111,40 @@ def download_mp3(**kwargs):
 
 
 def download_story(main_url):
+    format = main_url.startswith('F|')
+    url = main_url.replace('F|', '')
+
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(headless=True)
         page = browser.new_page()
-        page.goto(main_url)
+        page.goto(url)
 
         title = page.locator('xpath=//h1').first.text_content().replace('有声小说', '')
         title = format_title(title)
-
-        print(title)
 
         audio_list = page.locator('xpath=//div[@class="plist"]/ul/li/a').all()
         audio_urls = []
 
         for audio_page in audio_list:
             page_url = audio_page.get_attribute('href')
-            page_info = {'url': 'https://www.nianyin.com' + page_url, 'name': title, 'title': audio_page.text_content()}
+            page_info = {'url': 'https://www.nianyin.com' + page_url, 'title': title, 'name': audio_page.text_content(), 'format': format}
             audio_urls.append(page_info)
             print(page_info)
 
+        page.close()
         browser.close()
 
         for audio_url in audio_urls:
-            mp3_url = {
-                'title': title,
-                'audio_info': audio_url
-            }
-
-            TaskPool.append_task(Task(download_mp3, kwargs=mp3_url))
+            # download_mp3(**audio_url)
+            TaskPool.append_task(Task(download_mp3, kwargs=audio_url))
 
 
 if __name__ == '__main__':
     urls = [
-        'https://www.nianyin.com/wuxiaxuanhuan/1623.html',
+        'https://www.nianyin.com/tuilixuanyi/1537.html',
     ]
+
+    TaskPool.set_count(10)
 
     for url in urls:
         download_story(url)
