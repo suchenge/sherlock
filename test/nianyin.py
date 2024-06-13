@@ -1,6 +1,9 @@
 import requests
-import concurrent.futures
+import eyed3
+import os
+import mutagen
 
+from mutagen.easyid3 import EasyID3
 from playwright.sync_api import sync_playwright
 
 from modules.tools.http_request.http_client import HttpClient
@@ -31,13 +34,45 @@ def executor(*args, **image):
     response = requests.get(url, headers=headers)
     return response.content
 
+def download(**image):
+    path = image['path']
+    title = image['title']
+    name = image['name']
+
+    HttpClient.download(**image)
+
+    if os.path.exists(path):
+        audio_file = eyed3.load(path)
+        if audio_file.tag is None:
+            audio_file.initTag()
+
+        audio_file.tag.title = f'{title}-{name}'
+        audio_file.tag.album = f'{title}'
+        audio_file.tag.save()
+
+
 def get_mp3(page, title, audio_info):
-    page.goto(audio_info['url'])
+    url = audio_info['url']
+    print(url)
+    page.goto(url)
+    page.wait_for_timeout(2000)
     page.wait_for_load_state('load')
     mp3_url = page.locator('#jp_audio_0').first.get_attribute('src')
 
     if mp3_url is not None:
-        return {'url': mp3_url, 'path': f'{save_path}/{title}/{audio_info["title"]}.mp3', 'executor': executor}
+        print(mp3_url)
+        name = audio_info['title']
+        url_split = mp3_url.split('.')
+        suffix = url_split[len(url_split)-1]
+        info = {
+                    'url': mp3_url,
+                    'title': title,
+                    'name': name,
+                    'path': f'{save_path}/{title}/{name}.{suffix}',
+                    'executor': executor
+                }
+        print(info)
+        return info
     else:
         return get_mp3(page, title, audio_info)
 
@@ -47,7 +82,21 @@ def format_title(title):
     title = title.replace(':', '')
     return title
 
-def download_mp3(main_url):
+def download_mp3(**kwargs):
+    title = kwargs['title']
+    audio_info = kwargs['audio_info']
+
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch(headless=True)
+        page = browser.new_page()
+        mp3_url = get_mp3(page, title, audio_info)
+        page.close()
+        browser.close()
+
+    download(**mp3_url)
+
+
+def download_story(main_url):
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(headless=True)
         page = browser.new_page()
@@ -57,24 +106,31 @@ def download_mp3(main_url):
         title = format_title(title)
         audio_list = page.locator('xpath=//div[@class="plist"]/ul/li/a').all()
         audio_urls = []
-        mp3_urls = []
 
         for audio_page in audio_list:
             page_url = audio_page.get_attribute('href')
             audio_urls.append({'url': 'https://www.nianyin.com' + page_url, 'title': audio_page.text_content()})
 
-        for audio_url in audio_urls:
-            mp3_urls.append(get_mp3(page, title, audio_url))
-
         browser.close()
 
-        TaskPool.set_count(10)
+        for audio_url in audio_urls:
+            mp3_url = {
+                'title': title,
+                'audio_info': audio_url
+            }
 
-        for mp3_url in mp3_urls:
-            TaskPool.append_task(Task(HttpClient.download, kwargs=mp3_url))
-
-        TaskPool.join()
+            TaskPool.append_task(Task(download_mp3, kwargs=mp3_url))
 
 
 if __name__ == '__main__':
-    download_mp3('https://www.nianyin.com/tuilixuanyi/1727.html')
+    urls = [
+        'https://www.nianyin.com/tuilixuanyi/1501.html',
+        'https://www.nianyin.com/wuxiaxuanhuan/1623.html',
+        'https://www.nianyin.com/tuilixuanyi/1499.html',
+        'https://www.nianyin.com/wenxuemingzhu/1914.html',
+    ]
+
+    TaskPool.set_count(10)
+    for url in urls:
+        download_story(url)
+    TaskPool.join()
