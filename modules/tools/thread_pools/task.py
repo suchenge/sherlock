@@ -29,7 +29,9 @@ class Task(object):
             else:
                 if self.__args__ is None or len(self.__args__) == 0:
                     self.__method__()
-                else:
+                elif self.__method__.__code__.co_argcount > 1:
                     self.__method__(*self.__args__)
+                else:
+                    self.__method__(self.__args__)
         except Exception as error:
             pass
