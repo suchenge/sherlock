@@ -1,9 +1,7 @@
-import \
-    os
+import os
 
 from modules.service.download.cartoon.strategy.provider import CartoonStrategyProvider
-from modules.tools.http_request.http_client import \
-    HttpClient
+from modules.tools.http_request.http_client import HttpClient
 
 
 def __get_picture_suffix__(image_url):
@@ -17,7 +15,7 @@ def __get_picture_suffix__(image_url):
 
 if __name__ == '__main__':
     urls = [
-        'https://186sky.com/manga-info/5699221',
+        'https://186sky.com/manga-info/5701183',
     ]
 
     for url in urls:
@@ -27,15 +25,23 @@ if __name__ == '__main__':
             title = strategy.get_title()
             images = strategy.get_image()
 
-            save_folder = fr'E:\Download\{title}'
+            save_folder = f'/Users/vito/Downloads/Picture/Cartoon/{title}'
 
             save_images = []
 
             for index in range(len(images)):
                 image_info = images[index]
+
+                name = image_info['name']
+                url = image_info['url']
+
+                image_path = fr'{save_folder}/{name}.{str(index).zfill(5)}.{__get_picture_suffix__(url)}'
+
                 image = {
-                    'path': f'{save_folder}/{image_info['name']}.{str(index).zfill(5)}.{__get_picture_suffix__(image_info['url'])}',
-                    'url': image_info['url']
+                    'path': image_path,
+                    'url': url
                 }
 
                 HttpClient.download(**image)
+
+
