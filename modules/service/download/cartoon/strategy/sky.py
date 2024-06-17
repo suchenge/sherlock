@@ -21,7 +21,7 @@ class SkyCartoonStrategy(BaseCartoonStrategy):
         base_url = self.__parse_url__()
         pages = [f'{base_url[0] + item}' for item in pages]
 
-        index = 1
+        index = 0
         result = []
         for page in pages:
             page_content = HttpClient.get_text(page)
@@ -29,6 +29,7 @@ class SkyCartoonStrategy(BaseCartoonStrategy):
             title = page_html.xpath("//h2/text()")[0]
             pictures = page_html.xpath("//img[@class='lazy']/@data-original")
 
+            index = index + 1
             for picture in pictures:
                 result.append({"name": str(index).zfill(5), "url": picture})
 
