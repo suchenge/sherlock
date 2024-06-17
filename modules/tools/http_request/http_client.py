@@ -27,7 +27,10 @@ class HttpClient(object):
     def download(**kwargs):
         path = kwargs["path"]
         url = kwargs["url"]
-        executor = kwargs['executor']
+
+        executor = None
+        if 'executor' in kwargs:
+            executor = kwargs['executor']
 
         if path and url:
             folder = os.path.dirname(path)

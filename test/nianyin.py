@@ -141,7 +141,7 @@ def download_story(main_url):
 
 if __name__ == '__main__':
     urls = [
-        'https://www.nianyin.com/tuilixuanyi/1537.html',
+        'https://www.nianyin.com/kongbulingyi/1552.html',
     ]
 
     TaskPool.set_count(10)
