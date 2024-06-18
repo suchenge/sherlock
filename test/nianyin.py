@@ -1,4 +1,5 @@
 import os
+import re
 import eyed3
 import requests
 
@@ -57,7 +58,7 @@ def download(**image):
         audio_file.initTag()
 
         audio_file.tag.title = f'{title}-{name}'
-        audio_file.tag.album = f'{title}'
+        audio_file.tag.album = f'有声小说.{title}'
         audio_file.tag.save()
 
         if new_path != path:
@@ -71,7 +72,7 @@ def get_mp3(page, audio_info):
     mp3_url = page.locator('#jp_audio_0').first.get_attribute('src')
 
     if mp3_url is not None:
-        name = audio_info['name']
+        name = re.compile(r'\d+').findall(audio_info['name'])[0].zfill(3)
         url_split = mp3_url.split('.')
         suffix = url_split[len(url_split)-1]
         if suffix is None:
@@ -141,7 +142,7 @@ def download_story(main_url):
 
 if __name__ == '__main__':
     urls = [
-        'https://www.nianyin.com/kongbulingyi/1552.html',
+        'https://www.nianyin.com/tuilixuanyi/1480.html',
     ]
 
     TaskPool.set_count(10)
