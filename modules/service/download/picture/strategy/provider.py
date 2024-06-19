@@ -1,20 +1,15 @@
-import importlib
+from modules.service.download.picture.strategy.spacemiss import Spacemiss
+from modules.service.download.picture.strategy.xiurenbiz import Xiurenbiz
+from modules.service.download.picture.strategy.xrmn import Xrmn
+from modules.service.download.picture.strategy.sky import Sky
 
-__settings__ = {
-    'xiuren.biz': 'xiurenbiz',
-    '12378': 'xrmn',
-    'spacemiss': 'spacemiss'
-}
 
-def get_module_name(url):
-    for key in __settings__.keys():
-        if url.find(key) > -1:
-            return __settings__[key]
 class ResolverStrategyProvider(object):
-    @staticmethod
-    def build(url, html):
-        base_name = 'modules.service.download.picture.strategy'
-        module_name = get_module_name(url)
-        module = importlib.import_module(f'{base_name}.{module_name}')
+    __strategies__ = [Spacemiss, Xrmn, Xiurenbiz, Sky]
 
-        return module.build(url, html)
+    @staticmethod
+    def get_strategy(url, html):
+        for strategy in ResolverStrategyProvider.__strategies__:
+            if strategy.is_match(url, html):
+                return strategy(url, html)
+

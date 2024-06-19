@@ -1,12 +1,13 @@
 from modules.service.download.picture.strategy.base import Base
 
-def build(url, html):
-    return Xiurenbiz(url, html)
-
 
 class Xiurenbiz(Base):
     def __init__(self, url, html):
         super().__init__(url, html)
+
+    @staticmethod
+    def is_match(url, html):
+        return url.find('xiuren.biz') > -1
 
     def get_title(self):
         title = self.__html__.xpath("//h1/text()")[-1]

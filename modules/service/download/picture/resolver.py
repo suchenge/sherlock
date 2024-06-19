@@ -7,6 +7,7 @@ from modules.tools.http_request.http_client import HttpClient
 
 from modules.service.download.picture.strategy.provider import ResolverStrategyProvider
 
+
 class Resolver(object):
     def __init__(self, url):
         self.__url__ = url
@@ -14,7 +15,7 @@ class Resolver(object):
         self.__domain_url__, self.__url_path__ = self.__parse_url__()
 
         self.__html__ = self.__get_page_html_tree__(self.__url__)
-        self.__strategy__ = ResolverStrategyProvider.build(self.__url__, self.__html__)
+        self.__strategy__ = ResolverStrategyProvider.get_strategy(self.__url__, self.__html__)
 
     def __parse_url__(self):
         url_info = urlparse(self.__url__)
