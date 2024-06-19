@@ -37,10 +37,20 @@ class Processor(object):
         save_images = []
 
         for index in range(len(images)):
-            save_images.append({
-                'path': f'{save_folder}/{str(index).zfill(5)}.{self.__get_picture_suffix__(images[index])}',
-                'url': images[index]
-            })
+            image = images[index]
+            is_dict = isinstance(image, dict)
+
+            image_path = None
+            image_url = None
+
+            if is_dict:
+                image_url = image['url']
+                image_path = f'{save_folder}/{image['name']}'
+            else:
+                image_url = image
+                image_path = f'{save_folder}/{str(index).zfill(5)}.{self.__get_picture_suffix__(image_url)}'
+
+            save_images.append({'path': image_path, 'url': image_url})
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
             executor.map(self.__download__, save_images)
