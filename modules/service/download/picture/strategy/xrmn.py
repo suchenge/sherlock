@@ -14,10 +14,12 @@ class Xrmn(Base):
         return title
 
     def get_images(self, html, page_index=0):
-        imgs = html.xpath("//p[@style='text-align: center']/img/@src")
-        if len(imgs) == 0:
-            imgs = html.xpath("//p[@align='center']/img/@src")
-        return [f'{self.__domain_url__}{item}' for item in imgs]
+        src = html.xpath("//p[@style='text-align: center']/img/@src")
+
+        if len(src) == 0:
+            src = html.xpath("//p[@align='center']/img/@src")
+
+        return [f'{self.__domain_url__}{item}' for item in src]
 
     def get_child_page_url(self):
         html_links = self.__html__.xpath("//div[@class='page']/a/@href")

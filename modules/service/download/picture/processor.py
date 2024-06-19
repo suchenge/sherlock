@@ -1,7 +1,7 @@
-import os
 import concurrent.futures
 
 from modules.tools.http_request.http_client import HttpClient
+from modules.tools.common_methods.unity_tools import UnityTools
 from modules.service.download.picture.resolver import Resolver
 
 
@@ -15,15 +15,6 @@ class Processor(object):
     @property
     def url(self):
         return self.__url__
-
-    def __get_picture_suffix__(self, image_url):
-        picture_name = os.path.split(image_url)[-1]
-        picture_suffix = picture_name.split(".")[-1]
-        
-        if picture_suffix == 'webp':
-            picture_suffix = 'jpg'
-
-        return picture_suffix
 
     def __download__(self, image):
         HttpClient.download(**image)
@@ -48,7 +39,7 @@ class Processor(object):
                 image_path = f'{save_folder}/{image['name']}'
             else:
                 image_url = image
-                image_path = f'{save_folder}/{str(index).zfill(5)}.{self.__get_picture_suffix__(image_url)}'
+                image_path = f'{save_folder}/{str(index).zfill(5)}.{UnityTools.get_file_suffix(image_url)}'
 
             save_images.append({'path': image_path, 'url': image_url})
 

@@ -1,3 +1,4 @@
+from modules.tools.common_methods.unity_tools import UnityTools
 from modules.service.download.picture.strategy.base import Base
 
 
@@ -16,11 +17,10 @@ class Sky(Base):
 
     def get_child_page_url(self):
         pages = self.__html__.xpath("//div[@class='scroll-content']/a/@href")
-        base_url = self.__parse_url__()
-        pages = [{'index': index + 1, 'url': f'{base_url[0] + item}'} for index, item in enumerate(pages)]
+        pages = [{'index': index + 1, 'url': f'{self.__domain_url__ + item}'} for index, item in enumerate(pages)]
         return pages
 
     def get_images(self, html, page_index=None):
         pictures = html.xpath("//img[@class='lazy']/@data-original")
-        result = [{"name": f'{str(page_index).zfill(5)}.{str(index).zfill(5)}.{self.__get_picture_suffix__(pic)}', "url": pic} for index, pic in enumerate(pictures)]
+        result = [{"name": f'{str(page_index).zfill(5)}.{str(index).zfill(5)}.{UnityTools.get_file_suffix(pic)}', "url": pic} for index, pic in enumerate(pictures)]
         return result

@@ -1,8 +1,8 @@
 import concurrent.futures
 
 from lxml import etree
-from urllib.parse import urlparse
 
+from modules.tools.common_methods.unity_tools import UnityTools
 from modules.tools.http_request.http_client import HttpClient
 
 from modules.service.download.picture.strategy.provider import ResolverStrategyProvider
@@ -12,14 +12,10 @@ class Resolver(object):
     def __init__(self, url):
         self.__url__ = url
 
-        self.__domain_url__, self.__url_path__ = self.__parse_url__()
+        self.__domain_url__, self.__url_path__ = UnityTools.parse_url(url)
 
         self.__html__ = self.__get_page_html_tree__(self.__url__)
         self.__strategy__ = ResolverStrategyProvider.get_strategy(self.__url__, self.__html__)
-
-    def __parse_url__(self):
-        url_info = urlparse(self.__url__)
-        return url_info.scheme + "://" + url_info.netloc, url_info.path
 
     def __get_page_html_tree__(self, url):
         html = HttpClient.get_text(url)
