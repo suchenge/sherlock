@@ -32,5 +32,5 @@ class Base(object):
     def get_child_page_url(self):
         return []
 
-    def get_images(self, html):
+    def get_images(self, html, page_index=None):
         return []

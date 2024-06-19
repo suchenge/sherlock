@@ -15,7 +15,7 @@ class Spacemiss(Base):
         title = title.split('-')[0].strip().replace('|', '')
         return title
 
-    def get_images(self, html):
+    def get_images(self, html, page_index=None):
         try:
             result = html.xpath("//img[@decoding='async']/@src")
             return result

@@ -13,7 +13,7 @@ class Xiurenbiz(Base):
         title = self.__html__.xpath("//h1/text()")[-1]
         return title
 
-    def get_images(self, html):
+    def get_images(self, html, page_index=None):
         result = html.xpath("//img[@decoding='async']/@src")
         result = [item for item in result if item.find('.webp') > -1]
         return result

@@ -28,10 +28,18 @@ class Resolver(object):
     def __get_child_page_url__(self):
         return self.__strategy__.get_child_page_url()
 
-    def __get_page_images__(self, url):
-        html = self.__get_page_html_tree__(url)
+    def __get_page_images__(self, page):
+        page_index = None
+        page_url = None
 
-        return self.__strategy__.get_images(html)
+        if isinstance(page, dict):
+            page_url = page['url']
+            page_index = page['index']
+        else:
+            page_url = page
+
+        html = self.__get_page_html_tree__(page_url)
+        return self.__strategy__.get_images(html, page_index)
 
     def __get_images__(self):
         urls = self.__get_child_page_url__()

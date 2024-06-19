@@ -13,7 +13,7 @@ class Xrmn(Base):
         title = self.__html__.xpath("//h1/text()")[-1]
         return title
 
-    def get_images(self, html):
+    def get_images(self, html, page_index=0):
         imgs = html.xpath("//p[@style='text-align: center']/img/@src")
         if len(imgs) == 0:
             imgs = html.xpath("//p[@align='center']/img/@src")
