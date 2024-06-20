@@ -8,7 +8,7 @@ from datetime import datetime
 from modules.service.movie_cut.file import File
 from modules.service.movie_cut.overseer import Overseer
 
-from modules.tools.common_methods.unity_tools import UnityTools
+from modules.tools.common_methods.unity_tools import ffmpeg_execute_path
 
 
 def __format_time___(time):
@@ -31,7 +31,7 @@ class Butcher(object):
         if self.__file__.type.lower() not in types:
             return
 
-        self.__ffmpeg_path__ = UnityTools.ffmpeg_execute_path()
+        self.__ffmpeg_path__ = ffmpeg_execute_path()
 
         if not os.path.exists(self.__ffmpeg_path__):
             return

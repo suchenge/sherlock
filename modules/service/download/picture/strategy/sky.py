@@ -1,4 +1,4 @@
-from modules.tools.common_methods.unity_tools import UnityTools
+from modules.tools.common_methods.unity_tools import get_file_suffix
 from modules.service.download.picture.strategy.base import Base
 
 
@@ -22,5 +22,5 @@ class Sky(Base):
 
     def get_images(self, html, page_index=None):
         pictures = html.xpath("//img[@class='lazy']/@data-original")
-        result = [{"name": f'{str(page_index).zfill(5)}.{str(index).zfill(5)}.{UnityTools.get_file_suffix(pic)}', "url": pic} for index, pic in enumerate(pictures)]
+        result = [{"name": f'{str(page_index).zfill(5)}.{str(index).zfill(5)}.{get_file_suffix(pic)}', "url": pic} for index, pic in enumerate(pictures)]
         return result

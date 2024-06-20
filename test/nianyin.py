@@ -7,13 +7,13 @@ from ffmpy import FFmpeg
 from playwright.sync_api import sync_playwright
 
 from modules.tools.http_request.http_client import HttpClient
-from modules.tools.common_methods.unity_tools import UnityTools
+from modules.tools.common_methods.unity_tools import format_title, ffmpeg_execute_path
 from modules.tools.http_request.request import monitoring
 from modules.tools.thread_pools.task import Task
 from modules.tools.thread_pools.task_pool import TaskPool
 
 save_path = r'E:\Download'
-ffmpeg_path = UnityTools.ffmpeg_execute_path()
+ffmpeg_path = ffmpeg_execute_path()
 
 @monitoring
 def executor(*args, **image):
@@ -94,11 +94,6 @@ def get_mp3(page, audio_info):
     else:
         return get_mp3(page, audio_info)
 
-def format_title(title):
-    title = title.replace('\'', '')
-    title = title.replace('"', '')
-    title = title.replace(':', '')
-    return title
 
 def download_mp3(**kwargs):
     with sync_playwright() as playwright:

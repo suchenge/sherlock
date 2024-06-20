@@ -1,7 +1,7 @@
 import concurrent.futures
 
 from modules.tools.http_request.http_client import HttpClient
-from modules.tools.common_methods.unity_tools import UnityTools
+from modules.tools.common_methods.unity_tools import get_file_suffix
 from modules.service.download.picture.resolver import Resolver
 
 
@@ -39,7 +39,7 @@ class Processor(object):
                 image_path = f'{save_folder}/{image['name']}'
             else:
                 image_url = image
-                image_path = f'{save_folder}/{str(index).zfill(5)}.{UnityTools.get_file_suffix(image_url)}'
+                image_path = f'{save_folder}/{str(index).zfill(5)}.{get_file_suffix(image_url)}'
 
             save_images.append({'path': image_path, 'url': image_url})
 

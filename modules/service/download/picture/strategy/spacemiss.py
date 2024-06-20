@@ -16,11 +16,7 @@ class Spacemiss(Base):
         return title
 
     def get_images(self, html, page_index=None):
-        try:
-            result = html.xpath("//img[@decoding='async']/@src")
-            return result
-        except Exception as error:
-            print(error)
+        return html.xpath("//img[@decoding='async']/@src")
 
     def get_child_page_url(self):
         return [self.__url__]

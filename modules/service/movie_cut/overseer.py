@@ -3,7 +3,7 @@ import threading
 
 from os import system
 from datetime import datetime
-from modules.tools.common_methods.unity_tools import UnityTools
+from modules.tools.common_methods.unity_tools import is_mac_os
 
 
 def __mistiming_time__(start_time, end_time):
@@ -19,7 +19,7 @@ class Overseer(threading.Thread):
         self.__tasks__ = tasks
 
     def __clear__(self):
-        if UnityTools.is_mac_os() is False:
+        if is_mac_os() is False:
             system('cls')
         else:
             system('Clear')
