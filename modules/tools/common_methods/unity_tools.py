@@ -24,6 +24,11 @@ def format_title(title):
     title = title.replace('\'', '')
     title = title.replace('"', '')
     title = title.replace(':', '')
+    title = title.replace('?', '')
+    title = title.replace('*', '')
+    title = title.replace('"', '')
+    title = title.replace('<', '')
+    title = title.replace('>', '')
     return title
 
 def ffmpeg_execute_path():
