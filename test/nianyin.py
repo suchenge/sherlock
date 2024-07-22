@@ -104,7 +104,8 @@ def download_mp3(**kwargs):
         page.close()
         browser.close()
 
-    download(**mp3_url)
+    if mp3_url is not None and os.path.exists(mp3_url['path']) is False:
+        download(**mp3_url)
 
 
 def download_story(main_url):
@@ -138,7 +139,7 @@ def download_story(main_url):
 
 if __name__ == '__main__':
     urls = [
-        'https://www.nianyin.com/tuilixuanyi/1537.html',
+        'https://www.nianyin.com/tuilixuanyi/1935.html',
     ]
 
     TaskPool.set_count(10)
