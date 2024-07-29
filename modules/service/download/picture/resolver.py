@@ -1,5 +1,7 @@
 import concurrent.futures
+import urllib.parse
 
+from urllib.parse import urlparse
 from lxml import etree
 
 from modules.tools.common_methods.unity_tools import parse_url, format_title
@@ -35,7 +37,8 @@ class Resolver(object):
             page_url = page
 
         html = self.__get_page_html_tree__(page_url)
-        return self.__strategy__.get_images(html, page_index)
+        images = self.__strategy__.get_images(html, page_index)
+        return images
 
     def __get_images__(self):
         urls = self.__get_child_page_url__()

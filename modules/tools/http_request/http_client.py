@@ -16,6 +16,10 @@ class HttpClient(object):
         HttpClient.__request__ = Request(proxies)
 
     @staticmethod
+    def get_proxies():
+        return HttpClient.__proxies__
+
+    @staticmethod
     def get_text(url: str, encoding='utf-8'):
         return HttpClient.__request__.get_text(url, encoding)
 
@@ -39,7 +43,7 @@ class HttpClient(object):
                 Path(folder).mkdir(exist_ok=True)
 
             if executor is None:
-                req = Request()
+                req = Request(HttpClient.get_proxies())
                 content = req.get_content(url)
             else:
                 content = executor(url, **kwargs)

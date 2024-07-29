@@ -36,7 +36,7 @@ class Processor(object):
 
             if is_dict:
                 image_url = image['url']
-                image_path = f'{save_folder}/{image['name']}'
+                image_path = f"{save_folder}/{image['name']}"
             else:
                 image_url = image
                 image_path = f'{save_folder}/{str(index).zfill(5)}.{get_file_suffix(image_url)}'
