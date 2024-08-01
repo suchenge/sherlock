@@ -2,12 +2,12 @@ from modules.service.download.picture.strategy.base import Base
 
 
 class Xrmn(Base):
-    def __init__(self, url, html):
-        super().__init__(url, html)
+    def __init__(self, url):
+        super().__init__(url)
 
     @staticmethod
-    def is_match(url, html):
-        return url.find('12378') > -1
+    def is_match(url):
+        return url.find('1231238') > -1 or url.find('xiuren009') > -1
 
     def get_title(self):
         title = self.__html__.xpath("//h1/text()")[-1]

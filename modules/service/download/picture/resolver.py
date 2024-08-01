@@ -1,7 +1,5 @@
 import concurrent.futures
 
-from lxml import etree
-
 from modules.tools.common_methods.unity_tools import parse_url, format_title
 
 from modules.service.download.picture.strategy.provider import ResolverStrategyProvider
@@ -12,16 +10,7 @@ class Resolver(object):
         self.__url__ = url
 
         self.__domain_url__, self.__url_path__ = parse_url(url)
-
-        self.__html__ = self.__get_page_html_tree__(self.__url__)
-        self.__strategy__ = ResolverStrategyProvider.get_strategy(self.__url__, self.__html__)
-
-    def __get_page_html_tree__(self, url):
-        html = self.__strategy__.get_html(url)
-        return etree.HTML(html)
-
-    def __get_child_page_url__(self):
-        return self.__strategy__.get_child_page_url()
+        self.__strategy__ = ResolverStrategyProvider.get_strategy(self.__url__)
 
     def __get_page_images__(self, page):
         page_index = None
@@ -33,12 +22,16 @@ class Resolver(object):
         else:
             page_url = page
 
-        html = self.__get_page_html_tree__(page_url)
+        if page_url == self.__url__:
+            html = self.__strategy__.html
+        else:
+            html = self.__strategy__.get_tree(page_url)
+
         images = self.__strategy__.get_images(html, page_index)
         return images
 
     def __get_images__(self):
-        urls = self.__get_child_page_url__()
+        urls = self.__strategy__.get_child_page_url()
         result = []
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
@@ -57,5 +50,5 @@ class Resolver(object):
     def get_images(self):
         return self.__get_images__()
 
-    def download_images(self, **images):
-        self.__strategy__.download_images(**images);
+    def download_image(self, **images):
+        self.__strategy__.download_image(**images)

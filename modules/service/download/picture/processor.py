@@ -37,7 +37,7 @@ class Processor(object):
                 image_url = image
                 image_path = f'{save_folder}/{str(index).zfill(5)}.{get_file_suffix(image_url)}'
 
-            save_images.append({'path': image_path, 'url': image_url, 'executor': resolver.download_images})
+            save_images.append({'path': image_path, 'url': image_url, 'executor': resolver.download_image})
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
             executor.map(self.__download__, save_images)

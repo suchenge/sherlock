@@ -1,20 +1,28 @@
 import os
 
 from pathlib import Path
+from lxml import etree
 
 from modules.tools.common_methods.unity_tools import parse_url
 from modules.tools.http_request.request import Request
 
 class Base(object):
-    def __init__(self, url, html):
+    def __init__(self, url):
         self.__url__ = url
-        self.__html__ = html
         self.__domain_url__, self.__url_path__ = parse_url(url)
-        self.__request__ = Request()
+        self.__request__ = self.__get_request__()
+        self.__html__ = self.get_tree(url)
 
     @staticmethod
-    def is_match(url, html):
+    def is_match(url):
         return False
+
+    @property
+    def html(self):
+        return self.__html__
+
+    def __get_request__(self):
+        return Request()
 
     def get_title(self):
         return None
@@ -25,11 +33,12 @@ class Base(object):
     def get_images(self, html, page_index=None):
         return []
 
-    def get_html(self, url=None):
-        if url is None:
-            return self.__request__.get_text(self.__url__)
-        else:
-            return self.__request__.get_text(url)
+    def get_html(self, url):
+        return self.__request__.get_text(url)
+
+    def get_tree(self, url):
+        html = self.get_html(url)
+        return etree.HTML(html)
 
     def download_image(self, **kwargs):
         path = kwargs["path"]

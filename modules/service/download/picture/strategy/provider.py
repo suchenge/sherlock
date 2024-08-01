@@ -8,8 +8,8 @@ class ResolverStrategyProvider(object):
     __strategies__ = [Spacemiss, Xrmn, Xiurenbiz, Sky]
 
     @staticmethod
-    def get_strategy(url, html):
+    def get_strategy(url):
         for strategy in ResolverStrategyProvider.__strategies__:
-            if strategy.is_match(url, html):
-                return strategy(url, html)
+            if strategy.is_match(url):
+                return strategy(url)
 

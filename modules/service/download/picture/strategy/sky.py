@@ -3,11 +3,11 @@ from modules.service.download.picture.strategy.base import Base
 
 
 class Sky(Base):
-    def __init__(self, url, html):
-        super().__init__(url, html)
+    def __init__(self, url):
+        super().__init__(url)
 
     @staticmethod
-    def is_match(url, html):
+    def is_match(url):
         return url.find('186sky') > -1
 
     def get_title(self):

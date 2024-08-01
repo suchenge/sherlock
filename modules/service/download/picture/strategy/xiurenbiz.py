@@ -2,11 +2,11 @@ from modules.service.download.picture.strategy.base import Base
 
 
 class Xiurenbiz(Base):
-    def __init__(self, url, html):
-        super().__init__(url, html)
+    def __init__(self, url):
+        super().__init__(url)
 
     @staticmethod
-    def is_match(url, html):
+    def is_match(url):
         return url.find('xiuren.biz') > -1
 
     def get_title(self):
