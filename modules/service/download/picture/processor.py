@@ -1,6 +1,5 @@
 import concurrent.futures
 
-from modules.tools.http_request.http_client import HttpClient
 from modules.tools.common_methods.unity_tools import get_file_suffix
 from modules.service.download.picture.resolver import Resolver
 
@@ -17,7 +16,7 @@ class Processor(object):
         return self.__url__
 
     def __download__(self, image):
-        HttpClient.download(**image)
+        image['executor'](**image)
 
     def download(self):
         resolver = Resolver(self.__url__)
@@ -31,9 +30,6 @@ class Processor(object):
             image = images[index]
             is_dict = isinstance(image, dict)
 
-            image_path = None
-            image_url = None
-
             if is_dict:
                 image_url = image['url']
                 image_path = f"{save_folder}/{image['name']}"
@@ -41,7 +37,7 @@ class Processor(object):
                 image_url = image
                 image_path = f'{save_folder}/{str(index).zfill(5)}.{get_file_suffix(image_url)}'
 
-            save_images.append({'path': image_path, 'url': image_url})
+            save_images.append({'path': image_path, 'url': image_url, 'executor': resolver.download_images})
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
             executor.map(self.__download__, save_images)

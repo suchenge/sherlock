@@ -1,11 +1,8 @@
 import concurrent.futures
-import urllib.parse
 
-from urllib.parse import urlparse
 from lxml import etree
 
 from modules.tools.common_methods.unity_tools import parse_url, format_title
-from modules.tools.http_request.http_client import HttpClient
 
 from modules.service.download.picture.strategy.provider import ResolverStrategyProvider
 
@@ -20,7 +17,7 @@ class Resolver(object):
         self.__strategy__ = ResolverStrategyProvider.get_strategy(self.__url__, self.__html__)
 
     def __get_page_html_tree__(self, url):
-        html = HttpClient.get_text(url)
+        html = self.__strategy__.get_html(url)
         return etree.HTML(html)
 
     def __get_child_page_url__(self):
@@ -59,3 +56,6 @@ class Resolver(object):
 
     def get_images(self):
         return self.__get_images__()
+
+    def download_images(self, **images):
+        self.__strategy__.download_images(**images);

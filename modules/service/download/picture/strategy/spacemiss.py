@@ -1,7 +1,7 @@
-from modules.service.download.picture.strategy.base import Base
+from modules.service.download.picture.strategy.proxy_base import ProxyBase
 
 
-class Spacemiss(Base):
+class Spacemiss(ProxyBase):
     def __init__(self, url, html):
         super().__init__(url, html)
 
