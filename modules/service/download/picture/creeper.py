@@ -1,5 +1,4 @@
 import os
-import concurrent.futures
 
 from modules.service.download.picture.url_container import UrlContainer
 from modules.service.download.picture.processor import Processor

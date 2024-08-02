@@ -45,14 +45,14 @@ class Base(object):
         url = kwargs["url"]
 
         if path and url:
-            folder = os.path.dirname(path)
-
-            if not os.path.exists(folder):
-                Path(folder).mkdir(exist_ok=True)
-
             content = self.__request__.get_content(url)
 
             if content:
+                folder = os.path.dirname(path)
+
+                if not os.path.exists(folder):
+                    Path(folder).mkdir(exist_ok=True)
+
                 with open(path, "ab") as file:
                     file.write(content)
                 return True
