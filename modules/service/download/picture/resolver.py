@@ -51,4 +51,4 @@ class Resolver(object):
         return self.__get_images__()
 
     def download_image(self, **images):
-        self.__strategy__.download_image(**images)
+        return self.__strategy__.download_image(**images)

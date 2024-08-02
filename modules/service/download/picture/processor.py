@@ -16,12 +16,18 @@ class Processor(object):
         return self.__url__
 
     def __download__(self, image):
-        image['executor'](**image)
+        return image['executor'](**image)
 
     def download(self):
+        print(f'解析地址：{self.__url__}')
+
         resolver = Resolver(self.__url__)
+
         title = resolver.get_title()
+        print(f'解析到title:{title}')
+
         images = resolver.get_images()
+        print(f'解析到图片：{str(len(images))}条')
 
         save_folder = f'{self.__save_path__}/{title}'
         save_images = []
@@ -39,6 +45,15 @@ class Processor(object):
 
             save_images.append({'path': image_path, 'url': image_url, 'executor': resolver.download_image})
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-            executor.map(self.__download__, save_images)
+        print("开始下载解析到的所有图片")
 
+        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+            results = executor.map(self.__download__, save_images)
+
+            success_result = [result for result in results if result is True]
+            error_results = [result for result in results if result is False]
+
+            print(f'下载图片完成，成功{str(len(success_result))}条，失败{(str(len(error_results)))}条')
+
+            if len(error_results) > 0:
+                raise Exception(f'含有下载出错')

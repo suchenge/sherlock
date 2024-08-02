@@ -55,4 +55,9 @@ class Base(object):
             if content:
                 with open(path, "ab") as file:
                     file.write(content)
+                return True
+            else:
+                print(f'图片[{url}]下载出错')
+                return False
+
 
