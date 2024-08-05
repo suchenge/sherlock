@@ -23,7 +23,8 @@ class MarauderJavdb(BaseMarauder):
             if html_content is None:
                 raise Exception("没有获取到页面内容:" + search_url)
 
-            tree = etree.HTML(html_content)
+            parser = etree.HTMLParser(encoding='utf-8')
+            tree = etree.HTML(html_content, parser)
 
             links = tree.xpath("//div[@class='item']/a/@href")
             uids = tree.xpath("//div[@class='video-title']/strong/text()")
@@ -80,7 +81,8 @@ class MarauderJavdb(BaseMarauder):
         if self.__content__ is None:
             raise Exception("没有获取到页面内容:" + link)
 
-        tree = etree.HTML(self.__content__)
+        parser = etree.HTMLParser(encoding='utf-8')
+        tree = etree.HTML(self.__content__, parser)
 
         self.__id__ = id
 

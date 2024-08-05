@@ -95,9 +95,10 @@ class Request(object):
         else:
             return None
 
-    def get_content(self, url: str):
+    def get_content(self, url: str, encoding='utf-8'):
         response = self.get(url)
         if response:
+            response.encoding = encoding
             return response.content
         else:
             return None
