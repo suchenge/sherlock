@@ -1,7 +1,7 @@
 from modules.service.movie_warehouse.collate.collator import Collator
 from modules.tools.exception_container.exception_list import ExceptionList
 
-path_param = r"/Users/vito/Downloads/Picture/SDDE-499.mkv"
+path_param = r"/Users/vito/Downloads/Picture/SDDE-497.mkv"
 # path_param = "F:\软件\Done\MBRAP-023"
 # path_param = ["E:\\Picture\\BAKU-005.mp4", "E:\\Picture\\CJOD-310.mp4", "E:\\Picture\\JUFE-338"]
 

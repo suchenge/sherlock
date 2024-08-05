@@ -23,6 +23,7 @@ class MarauderJavdb(BaseMarauder):
             if html_content is None:
                 raise Exception("没有获取到页面内容:" + search_url)
 
+
             parser = etree.HTMLParser(encoding='utf-8')
             tree = etree.HTML(html_content, parser)
 
