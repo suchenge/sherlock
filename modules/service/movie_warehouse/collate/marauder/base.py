@@ -44,10 +44,10 @@ class BaseMarauder(object):
             raise error
 
     def __get_url_content__(self, url):
-        response = self.__http_request__.get(url)
+        response = self.__http_request__.get_content(url)
 
         if response:
-            return response.text
+            return response
         else:
             raise Exception('get url content error, response status code:' + str(response.status_code))
 
