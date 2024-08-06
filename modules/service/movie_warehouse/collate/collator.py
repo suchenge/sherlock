@@ -62,7 +62,7 @@ class Collator(object):
             porter.move()
             porter.save_poster(self.__request__)
             porter.save_stills(self.__request__)
-            porter.append_to_dictionary()
+            # porter.append_to_dictionary()
 
         print("处理文件完成 " + file.path)
 

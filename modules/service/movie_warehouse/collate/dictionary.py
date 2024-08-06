@@ -23,6 +23,8 @@ def add(file_info: File):
 
 
 def exists(file_info: File):
+    return False
+    '''
     file_path = dict_path + file_info.name + ".json"
     json_exists = os.path.exists(file_path)
     if json_exists:
@@ -36,7 +38,7 @@ def exists(file_info: File):
                 return True
 
         return False
-
+    '''
 
 def search(keyword):
     result = []
