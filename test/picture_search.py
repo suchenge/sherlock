@@ -1,7 +1,7 @@
 import os
 import re
 import concurrent.futures
-import pyperclip3 as pc
+import pyperclip as pc
 
 from lxml import etree
 

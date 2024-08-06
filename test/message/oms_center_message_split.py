@@ -3,7 +3,7 @@ import requests
 import random
 import re
 import pymysql
-import pyperclip3 as pc
+import pyperclip as pc
 
 from hashlib import md5
 
