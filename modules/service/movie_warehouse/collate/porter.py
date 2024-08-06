@@ -124,4 +124,4 @@ class Porter(object):
 
         if film.file.type is not None and film.file.type not in excluded_types:
             print('写入字典')
-            dictionary.add(film.file)
+            # dictionary.add(film.file)
