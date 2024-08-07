@@ -27,3 +27,11 @@ class File(object):
     @property
     def type(self):
         return self.__type__
+
+    @property
+    def is_movie(self):
+        types = ['mkv', 'mp4', 'avi', 'wmv']
+        if self.__type__.lower() in types:
+            return True
+        else:
+            return False
