@@ -19,7 +19,7 @@ from modules.tools.thread_pools.task_pool import TaskPool
 from modules.tools.common_methods.unity_tools import ffmpeg_execute_path
 
 
-class Materials(File):
+class Material(File):
     def __init__(self, path):
         self.__is_usable__ = False
         file = File(path)
@@ -71,6 +71,8 @@ class Materials(File):
             for blueprint in self.__blueprints__:
                 self.__move_file__(blueprint.output_path, film_folder)
 
+        self = Material(movie_file.path)
+
     def __move_file__(self, source_path, target_folder):
         if os.path.exists(source_path):
             source_file = File(source_path)
@@ -81,25 +83,34 @@ class Materials(File):
 
     def merge(self):
         if self.__is_usable__ and len(self.__blueprints__) > 0:
-            with open(self.__concat_file_path__, 'w', encoding='utf') as merge_file:
-                for blueprint in self.__blueprints__:
-                    merge_file.write(f'file \'{blueprint.output_path}\'')
+            merge_list = []
 
-            try:
-                FFmpeg(
-                    global_options=['-f', 'concat'],
-                    inputs={self.__concat_file_path__: ['-safe', '0']},
-                    outputs={self.__merge_file_path__: ['-c', 'copy']},
-                    executable=self.__ffmpeg_path__
-                ).run()
+            for blueprint in self.__blueprints__:
+                if os.path.exists(blueprint.output_path):
+                    merge_list.append(f'file \'{blueprint.output_path}\'')
+                else:
+                    print(f'{blueprint.output_path} does not exist')
 
-                os.remove(self.__concat_file_path__)
+            if len(merge_list) > 0:
+                with open(self.__concat_file_path__, 'w', encoding='utf') as merge_file:
+                    for line in merge_list:
+                        merge_file.write(line)
 
-                for blueprint in self.__blueprints__:
-                    os.remove(blueprint.output_path)
+                try:
+                    FFmpeg(
+                        global_options=['-f', 'concat'],
+                        inputs={self.__concat_file_path__: ['-safe', '0']},
+                        outputs={self.__merge_file_path__: ['-c', 'copy']},
+                        executable=self.__ffmpeg_path__
+                    ).run()
 
-            except Exception as error:
-                print(error)
+                    os.remove(self.__concat_file_path__)
+
+                    for blueprint in self.__blueprints__:
+                        os.remove(blueprint.output_path)
+
+                except Exception as error:
+                    print(error)
         
     def clip(self):
         if self.__is_usable__:
