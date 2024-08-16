@@ -1,13 +1,18 @@
 from modules.tools.http_request.request import Request
 
-from modules.service.movie_library.archive.label import Label
+from modules.service.movie.analysis.information import Information
 
-class Analyzer(object):
+
+class AnalyzerBase(object):
     def __init__(self, request: Request):
         self.__request__ = request
 
-    def create_label(self, id: str) -> Label:
+    def get_information(self, uid: str) -> Information:
         pass
+
+    @property
+    def request(self):
+        return self.__request__
 
     def __get_url_content__(self, url):
         response = self.__request__.get_content(url)

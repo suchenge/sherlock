@@ -1,5 +1,7 @@
+import os
 import requests
 
+from pathlib import Path
 from urllib.parse import urlparse
 from datetime import datetime
 
@@ -102,3 +104,19 @@ class Request(object):
             return response.content
         else:
             return None
+
+    def download(self, **kwargs):
+        path = kwargs["path"]
+        url = kwargs["url"]
+
+        if path and url:
+            folder = os.path.dirname(path)
+
+            if not os.path.exists(folder):
+                Path(folder).mkdir(exist_ok=True)
+
+        content = self.get_content(url)
+
+        if content:
+            with open(path, "ab") as file:
+                file.write(content)

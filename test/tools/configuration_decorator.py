@@ -7,8 +7,9 @@ def find_configuration_node(json_setting, name):
             return website['url']
 
 
-@configuration_setting('../config/movie-website.json', key='website_base_url',
-                       find_node_handler=lambda json: find_configuration_node(json, 'default'))
+@configuration_setting(
+    '../../config/movie-website.json', key='website_base_url',
+    find_node_handler=lambda json: find_configuration_node(json, 'default'))
 class TestConfig(object):
     def __init__(self, **kwargs):
         self.__p__ = kwargs['path']

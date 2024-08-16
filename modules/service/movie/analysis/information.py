@@ -1,4 +1,4 @@
-class Label(object):
+class Information(object):
     def __init__(self):
         self.__url__ = None
         self.__title__ = None
@@ -16,7 +16,7 @@ class Label(object):
 
     @property
     def uid(self) -> str:
-        return self.__uid__
+        return self.__uid__.upper()
 
     @uid.setter
     def uid(self, value: str):

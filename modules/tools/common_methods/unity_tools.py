@@ -1,5 +1,4 @@
 import os
-import re
 import platform
 
 from urllib.parse import urlparse
@@ -31,7 +30,7 @@ def format_title(title):
     title = title.replace('<', '')
     title = title.replace('>', '')
 
-    return re.compile("[?:*'<>./\\\]").sub("", title).strip()[0:150]
+    return title.strip()[0:150]
 
 def ffmpeg_execute_path():
     if is_mac_os() is False:
