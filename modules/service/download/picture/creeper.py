@@ -6,9 +6,9 @@ from modules.service.download.picture.processor import Processor
 
 class Creeper(object):
     def __init__(self):
-        source_url_path = os.path.abspath("../data/picture_url/new.txt")
-        done_url_path = os.path.abspath("../data/picture_url/done.txt")
-        save_path = os.path.abspath("../data/picture_url/download/")
+        source_url_path = os.path.abspath("../../data/picture_url/186sky.txt")
+        done_url_path = os.path.abspath("../../data/picture_url/done.txt")
+        save_path = os.path.abspath("../../data/picture_url/download/")
 
         self.__done_url_container__ = UrlContainer(done_url_path)
         self.__source_url_container__ = UrlContainer(source_url_path, True)

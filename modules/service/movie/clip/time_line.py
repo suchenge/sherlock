@@ -8,7 +8,7 @@ from modules.service.movie.video.video_file import VideoFile
 class TimeLine(object):
     def __init__(self, video: VideoFile, timer_index: int, timer):
         self.__output_name__ = '%s_%s.%s' % (video.title, str(timer_index + 1).zfill(5), video.type)
-        self.__output_path__ = os.path.join(video.path, self.__output_name__)
+        self.__output_path__ = os.path.join(video.parent, self.__output_name__)
 
         self.__start_time__ = timer['start']
         self.__end_time__ = timer['end']

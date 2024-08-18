@@ -15,15 +15,15 @@ from modules.service.movie.clip.overseer import Overseer
 
 
 class ClipFile(VideoFile):
-    def __init__(self, path):
-        super().__init__(path)
+    def __init__(self, video: VideoFile):
+        super().__init__(video.path)
 
         self.__is_usable__ = False
         self.__need_merge__ = False
         self.__ffmpeg_path__ = ffmpeg_execute_path()
-        self.__time_line_file_path__ = f'{os.path.join(self.__parent__, self.__uid__ + '.txt')}'
+        self.__time_line_file_path__ = str(os.path.join(self.__parent__, self.__uid__ + '.txt'))
         self.__concat_file_path__ = f'{self.__path__}.merge.txt'
-        self.__merge_file_path__ = f'{os.path.join(self.__parent__, self.__uid__ + f'.merge.{self.__type__}')}'
+        self.__merge_file_path__ = str(os.path.join(self.__parent__, self.__uid__ + f'.merge.{self.__type__}'))
 
         self.__time_lines__ = self.__build_time_lines__()
         if self.__time_lines__ is not None and len(self.__time_lines__) > 0:

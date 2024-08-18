@@ -1,6 +1,9 @@
 from modules.tools.common_methods.unity_tools import get_file_suffix
 from modules.service.download.picture.strategy.base import Base
 
+from tools.http_request.proxy import Proxies
+from tools.http_request.request import Request
+
 
 class Sky(Base):
     def __init__(self, url):
@@ -14,6 +17,9 @@ class Sky(Base):
         title = self.__html__.xpath('//h1')
         title = title[0].text
         return title
+
+    def __get_request__(self):
+        return Request(Proxies())
 
     def get_child_page_url(self):
         pages = self.__html__.xpath("//div[@class='scroll-content']/a/@href")

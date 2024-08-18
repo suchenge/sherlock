@@ -47,7 +47,7 @@ class Processor(object):
 
         print("开始下载解析到的所有图片")
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=15) as executor:
             results = executor.map(self.__download__, save_images)
 
             success_result = [result for result in results if result is True]

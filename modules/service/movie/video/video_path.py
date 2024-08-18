@@ -37,7 +37,12 @@ class VideoPath(object):
 
     @property
     def title(self) -> str:
-        return self.__title__
+        result = self.__title__
+
+        if self.__title__ is None or self.__title__ == '':
+            result = self.__uid__
+
+        return result
 
     @property
     def type(self) -> str:

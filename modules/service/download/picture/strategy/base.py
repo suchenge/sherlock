@@ -44,6 +44,8 @@ class Base(object):
         path = kwargs["path"]
         url = kwargs["url"]
 
+        print(kwargs)
+
         if path and url:
             content = self.__request__.get_content(url)
 
