@@ -1,5 +1,7 @@
 import os
 
+from modules.tools.common_methods.unity_tools import is_file
+
 
 class VideoPath(object):
     def __init__(self, path):
@@ -10,7 +12,8 @@ class VideoPath(object):
     def __analysis__(self):
         self.__parent__, self.__name__ = os.path.split(self.__path__)
 
-        if os.path.isfile(self.__path__):
+
+        if is_file(self.__path__):
             self.__type__ = self.__name__.split('.')[-1]
             self.__uid__ = self.__name__.replace(self.__type__, '').strip('.').split(' ')[0]
             self.__title__ = self.__name__.replace(self.__uid__, '').replace(self.__type__, '').strip('.')

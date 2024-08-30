@@ -78,6 +78,10 @@ class Proxy(object):
         }
 
     @property
+    def proxy_address(self):
+        return self.__address__
+
+    @property
     def rate(self): return self.__rate__
 
     @rate.setter

@@ -22,6 +22,7 @@ def format_title(title):
         return None
 
     title = title.replace('\'', '')
+    title = title.replace('/', '')
     title = title.replace('"', '')
     title = title.replace(':', '')
     title = title.replace('?', '')
@@ -37,4 +38,14 @@ def ffmpeg_execute_path():
         return os.path.join(os.path.abspath(os.path.dirname(__file__)), 'ffmpeg.exe')
     else:
         return os.path.join(os.path.abspath(os.path.dirname(__file__)), 'ffmpeg')
+
+def is_file(path):
+    types = ['mkv', 'MKV', 'mp4', 'MP4', 'avi', 'AVI', 'wmv', 'WMV']
+
+    for file_type in types:
+        if path.endswith(f'.{file_type}'):
+            return True
+
+    return False
+
 

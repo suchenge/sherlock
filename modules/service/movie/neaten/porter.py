@@ -4,6 +4,8 @@ import concurrent.futures
 
 from pathlib import Path
 
+from modules.tools.common_methods.unity_tools import format_title
+
 from modules.service.movie.analysis.analyst import Analyst
 
 from modules.service.movie.video.video_folder import VideoFolder
@@ -20,7 +22,8 @@ class Porter(object):
         self.__analyst__ = Analyst(self.__video__.uid)
         self.__information__ = self.__analyst__.get_information()
 
-        video_name = f'{self.__video__.uid} {self.__information__.title}'
+        video_name = format_title(self.__information__.title)
+        video_name = f'{self.__video__.uid} {video_name}'
         video_path = os.path.join(self.__video__.parent, video_name)
 
         if isinstance(self.__video__, VideoFolder):
