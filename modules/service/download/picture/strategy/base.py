@@ -44,6 +44,9 @@ class Base(object):
         path = kwargs["path"]
         url = kwargs["url"]
 
+        if os.path.exists(path):
+            return
+
         print(kwargs)
 
         if path and url:
