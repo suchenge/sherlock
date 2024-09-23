@@ -9,11 +9,11 @@ class Xrmn(Base):
     def is_match(url):
         return url.find('1231238') > -1 or url.find('xiuren009') > -1
 
-    def get_title(self):
+    def __inner_get_title__(self):
         title = self.__html__.xpath("//h1/text()")[-1]
         return title
 
-    def get_images(self, html, page_index=0):
+    def __inner_get_images_by_sub_page__(self, html, page_index=0):
         src = html.xpath("//p[@style='text-align: center']/img/@src")
 
         if len(src) == 0:
@@ -21,7 +21,7 @@ class Xrmn(Base):
 
         return [f'{self.__domain_url__}{item}' for item in src]
 
-    def get_child_page_url(self):
+    def __inner_get_sub_page_url__(self):
         html_links = self.__html__.xpath("//div[@class='page']/a/@href")
         page_links = []
 
