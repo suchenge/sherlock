@@ -1,10 +1,13 @@
 import pymysql
 
+from threading import Lock
 from pymysql.cursors import SSDictCursor
 
 from modules.service.download.picture.saver.base import BaseSaver
 from modules.service.download.picture.image import Image
 
+__delete_image_queue__ = []
+__delete_image_queue_lock__ = Lock()
 
 class DatabaseSaver(BaseSaver):
     def __init__(self):
@@ -32,6 +35,24 @@ class DatabaseSaver(BaseSaver):
                 content = cursor.fetchall()
                 return [Image.build(x) for x in content]
 
+    def delete_one(self, image_url: str):
+        with __delete_image_queue_lock__:
+            __delete_image_queue__.append(image_url)
+
+            if len(__delete_image_queue__) >= 10:
+                sql = "delete from picture where url in ("
+                index = 0
+                for image in __delete_image_queue__:
+                    sql += f"'{image.url}'"
+                    if index < len(__delete_image_queue__):
+                        sql += ", "
+                sql += ");"
+
+                with self.__get_connection__() as connection:
+                    with connection.cursor() as cursor:
+                        cursor.execute(sql)
+                    connection.commit()
+
     def insert_by_batch(self, images: list[Image]):
         sql = "insert into picture(url, file_name, main_url, main_title, sub_url, sub_title)"
         sql += " value "
@@ -51,4 +72,7 @@ class DatabaseSaver(BaseSaver):
             with connection.cursor() as cursor:
                 cursor.execute(sql)
             connection.commit()
+
+        print("写入图片信息到数据库")
+
 

@@ -21,19 +21,30 @@ class Base(object):
         self.__open_saver__ = False
         self.__has_by_saver__ = False
         self.__images_by_saver__: None | list[Image] = []
+        self.__saver__ = self.__get_by_saver__()
 
         if not self.__has_by_saver__:
             self.__domain_url__, self.__url_path__ = parse_url(url)
             self.__request__ = self.__inner_get_request__()
             self.__html__ = self.get_tree(url)
 
-    def __get_by_saver__(self):
+    def __get_by_saver__(self) -> None | DatabaseSaver:
         if self.__open_saver__:
             saver = DatabaseSaver()
             images = saver.query(self.__url__)
 
             self.__images_by_saver = images
             self.__has_by_saver__ = images is not None and len(images) > 0
+
+            return saver
+
+    def __insert_image_by_saver__(self, images: list[Image]):
+        if self.__open_saver__ and len(images) > 0:
+            self.__saver__.insert_by_batch(images)
+
+    def __delete_image_by_saver__(self, url: str):
+        if self.__open_saver__:
+            self.__saver__.delete_one(url)
 
     @staticmethod
     def is_match(url) -> bool:
@@ -58,7 +69,7 @@ class Base(object):
     def __inner_get_sub_page_title__(self, html_tree=None) -> str:
         return ''
 
-    def _build_sub_page__(self, page_info):
+    def __build_sub_page__(self, page_info):
         page = Page()
         page.url = page_info['url']
         page.index = page_info['index']
@@ -73,7 +84,7 @@ class Base(object):
             page_infos = [{'url': item, 'index': index} for index, item in page_urls]
 
             with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-                pages = executor.map(self._build_sub_page__, page_infos)
+                pages = executor.map(self.__build_sub_page__, page_infos)
         else:
             page = Page()
             page.url = page_urls[0]
@@ -121,14 +132,18 @@ class Base(object):
         if self.__has_by_saver__:
             return self.__images_by_saver__
         else:
-            sub_page = self.__get_sub_page__()
             result = []
+            sub_page = self.__get_sub_page__()
+
             with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
                 page_images = executor.map(self.__get_images_sub_page__, sub_page)
 
                 for images in page_images:
                     for image in images:
                         result.append(image)
+
+            self.__insert_image_by_saver__(result)
+
             return result
 
     def get_html(self, url):
@@ -158,6 +173,8 @@ class Base(object):
 
                 with open(path, "ab") as file:
                     file.write(content)
+
+                self.__delete_image_by_saver__(url)
                 return True
             else:
                 print(f'图片[{url}]下载出错')
