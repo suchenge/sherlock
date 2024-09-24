@@ -18,9 +18,9 @@ class Base(object):
         self.__url__ = url
         self.__title__ = None
 
-        self.__open_saver__ = False
+        self.__open_saver__ = self.__inner_open_saver__()
         self.__has_by_saver__ = False
-        self.__images_by_saver__: None | list[Image] = []
+        self.__images_by_saver__: None | list[Image]
         self.__saver__ = self.__get_by_saver__()
 
         if not self.__has_by_saver__:
@@ -31,12 +31,15 @@ class Base(object):
     def __get_by_saver__(self) -> None | DatabaseSaver:
         if self.__open_saver__:
             saver = DatabaseSaver()
-            images = saver.query(self.__url__)
+            save_images = saver.query(self.__url__)
 
-            self.__images_by_saver = images
-            self.__has_by_saver__ = images is not None and len(images) > 0
+            self.__images_by_saver__ = save_images
+            self.__has_by_saver__ = save_images is not None and len(save_images) > 0
 
             return saver
+
+    def __inner_open_saver__(self):
+        return False
 
     def __insert_images_by_saver__(self, images: list[Image]):
         if self.__open_saver__ and len(images) > 0:
@@ -85,7 +88,7 @@ class Base(object):
         page_urls = self.__inner_get_sub_page_url__()
 
         if len(page_urls) > 0 and page_urls[0] != self.__url__:
-            page_infos = [{'url': item, 'index': index} for index, item in page_urls]
+            page_infos = [{'url': item, 'index': index} for index, item in enumerate(page_urls)]
 
             with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
                 pages = executor.map(self.__build_sub_page__, page_infos)
@@ -99,7 +102,7 @@ class Base(object):
         return list(pages)
 
     def __get_images_sub_page__(self, page) -> list[Image]:
-        image_urls = self.__inner_get_images__(page)
+        image_urls = self.__inner_get_images__(page.html)
         result = []
 
         index = 0

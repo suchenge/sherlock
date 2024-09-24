@@ -6,7 +6,9 @@ from modules.tools.http_request.request import Request
 class Sky(Base):
     def __init__(self, url):
         super().__init__(url)
-        self.__open_saver__ = True
+
+    def __inner_open_saver__(self):
+        return True
 
     @staticmethod
     def is_match(url):
@@ -22,7 +24,7 @@ class Sky(Base):
 
     def __inner_get_sub_page_url__(self):
         pages = self.__html__.xpath("//div[@class='scroll-content']/a/@href")
-        return [f'{self.__domain_url__ + item}' for item in enumerate(pages)]
+        return [f'{self.__domain_url__}{item}' for index, item in enumerate(pages)]
 
     def __inner_get_images__(self, html_tree):
         return html_tree.xpath("//img[@class='lazy']/@data-original")
