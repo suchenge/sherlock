@@ -35,38 +35,59 @@ class DatabaseSaver(BaseSaver):
                 content = cursor.fetchall()
                 return [Image.build(x) for x in content]
 
-    def delete_one(self, image_url: str):
-        with __delete_image_queue_lock__:
-            __delete_image_queue__.append(image_url)
+    def delete(self, image_url: str):
+        sql = f"delete from picture where url = '{image_url}'"
 
-            if len(__delete_image_queue__) >= 10:
-                sql = "delete from picture where url in ("
-                index = 0
-                for image in __delete_image_queue__:
-                    sql += f"'{image.url}'"
-                    if index < len(__delete_image_queue__):
-                        sql += ", "
-                sql += ");"
+        with self.__get_connection__() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(sql)
+            connection.commit()
 
-                with self.__get_connection__() as connection:
-                    with connection.cursor() as cursor:
-                        cursor.execute(sql)
-                    connection.commit()
+    def delete_batch(self, image_urls: list[str]):
+        urls = ''
+        for url in image_urls:
+            urls += f"'{url}',"
+
+        urls = urls[:-1]
+
+        sql = f"delete from picture where url in ({urls})"
+
+        with self.__get_connection__() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(sql)
+            connection.commit()
+
+    def __build_insert_sql__(self, image: Image):
+        sql = 'insert into picture(url, file_name, main_url, main_title, sub_url, sub_title) '
+        sql += f"select '{image.url}', '{image.file_name}', '{image.main_url}', '{image.main_title}', '{image.sub_url}', '{image.sub_title}' "
+        sql += 'from dual '
+        sql += 'where not exists '
+        sql += f"(select 1 from picture where url = '{image.url}');"
+
+        return sql
+
+    def insert(self, image: Image):
+        sql = self.__build_insert_sql__(image)
+
+        with self.__get_connection__() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(sql)
+            connection.commit()
 
     def insert_by_batch(self, images: list[Image]):
-        sql = "insert into picture(url, file_name, main_url, main_title, sub_url, sub_title)"
-        sql += " value "
+        """
+        sql = "insert into picture(url, file_name, main_url, main_title, sub_url, sub_title) "
+        sql += "values "
 
-        index = 0
         for image in images:
-            sql += f"('{image.url}', '{image.file_name}', '{image.main_url}', '{image.main_title}', '{image.sub_url}')"
+            sql += f"('{image.url}', '{image.file_name}', '{image.main_url}', '{image.main_title}', '{image.sub_url}'),"
 
-            if index < len(images):
-                sql += ", "
-            else:
-                sql += "; "
+        sql = sql[:-1]
+        """
 
-            index += 1
+        sql = ''
+        for image in images:
+            sql += self.__build_insert_sql__(image)
 
         with self.__get_connection__() as connection:
             with connection.cursor() as cursor:

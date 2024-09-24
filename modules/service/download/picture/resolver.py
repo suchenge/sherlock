@@ -15,7 +15,7 @@ class Resolver(object):
         return format_title(title)
 
     def get_images(self):
-        return self.__strategy__.__get_images__()
+        return self.__strategy__.get_images()
 
     def download_image(self, **images):
         return self.__strategy__.download_image(**images)

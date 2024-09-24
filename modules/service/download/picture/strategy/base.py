@@ -38,13 +38,17 @@ class Base(object):
 
             return saver
 
-    def __insert_image_by_saver__(self, images: list[Image]):
+    def __insert_images_by_saver__(self, images: list[Image]):
         if self.__open_saver__ and len(images) > 0:
             self.__saver__.insert_by_batch(images)
 
-    def __delete_image_by_saver__(self, url: str):
+    def __insert_image_by_saver__(self, image: Image):
         if self.__open_saver__:
-            self.__saver__.delete_one(url)
+            self.__saver__.insert(image)
+
+    def delete_image_by_urls(self, url: list[str]):
+        if self.__open_saver__ and len(url) > 0:
+            self.__saver__.delete_batch(url)
 
     @staticmethod
     def is_match(url) -> bool:
@@ -142,8 +146,7 @@ class Base(object):
                     for image in images:
                         result.append(image)
 
-            self.__insert_image_by_saver__(result)
-
+            self.__insert_images_by_saver__(result)
             return result
 
     def get_html(self, url):
@@ -153,12 +156,12 @@ class Base(object):
         html = self.get_html(url)
         return etree.HTML(html)
 
-    def download_image(self, **kwargs):
+    def download_image(self, **kwargs) -> None | str:
         path = kwargs["path"]
         url = kwargs["url"]
 
         if os.path.exists(path):
-            return
+            return url
 
         print(kwargs)
 
@@ -174,10 +177,9 @@ class Base(object):
                 with open(path, "ab") as file:
                     file.write(content)
 
-                self.__delete_image_by_saver__(url)
-                return True
+                return url
             else:
                 print(f'图片[{url}]下载出错')
-                return False
+                return None
 
 
