@@ -22,10 +22,11 @@ class Base(object):
         self.__has_by_saver__ = False
         self.__images_by_saver__: None | list[Image]
         self.__saver__ = self.__get_by_saver__()
+        self.__request__ = self.__inner_get_request__()
 
         if not self.__has_by_saver__:
             self.__domain_url__, self.__url_path__ = parse_url(url)
-            self.__request__ = self.__inner_get_request__()
+
             self.__html__ = self.get_tree(url)
 
     def __get_by_saver__(self) -> None | DatabaseSaver:
@@ -48,6 +49,10 @@ class Base(object):
     def __insert_image_by_saver__(self, image: Image):
         if self.__open_saver__:
             self.__saver__.insert(image)
+
+    def __delete_image_by_url__(self, url: str):
+        if self.__open_saver__:
+            self.__saver__.delete(url)
 
     def delete_image_by_urls(self, url: list[str]):
         if self.__open_saver__ and len(url) > 0:
@@ -180,6 +185,7 @@ class Base(object):
                 with open(path, "ab") as file:
                     file.write(content)
 
+                self.__delete_image_by_url__(url)
                 return url
             else:
                 print(f'图片[{url}]下载出错')

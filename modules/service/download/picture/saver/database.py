@@ -16,6 +16,9 @@ class DatabaseSaver(BaseSaver):
             "db": 'sea'
         }
 
+    def get_connection(self):
+        return self.__get_connection__()
+
     def __get_connection__(self):
         return pymysql.connect(host=self.__connect__["host"],
                                user=self.__connect__["user"],

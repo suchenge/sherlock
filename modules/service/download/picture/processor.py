@@ -31,8 +31,8 @@ class Processor(object):
         save_folder = f'{self.__save_path__}/{title}'
         save_images = [
                         {
-                            'path': f"{save_folder}/{item['file_name']}",
-                            'url': item['url'],
+                            'path': f"{save_folder}/{item.file_name}",
+                            'url': item.url,
                             'executor': resolver.download_image
                         }
                         for item in images
@@ -40,15 +40,13 @@ class Processor(object):
 
         print("开始下载解析到的所有图片")
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=15) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
             results = executor.map(self.__download__, save_images)
 
             success_result = [result for result in results if result is not None]
             error_results = [result for result in results if result is None]
 
             print(f'下载图片完成，成功{str(len(success_result))}条，失败{(str(len(error_results)))}条')
-
-            resolver.delete_image_by_urls(success_result)
 
             if len(error_results) > 0:
                 raise Exception(f'含有下载出错的记录')
