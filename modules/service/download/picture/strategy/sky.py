@@ -1,7 +1,5 @@
-from modules.service.download.picture.strategy.base import Base
+from modules.service.download.picture.strategy.proxy_base import ProxyBase
 
-from modules.tools.http_request.proxy import Proxies
-from modules.tools.http_request.request import Request
 
 class Sky(ProxyBase):
     def __init__(self, url):
