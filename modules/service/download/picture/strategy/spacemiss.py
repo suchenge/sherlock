@@ -15,8 +15,8 @@ class Spacemiss(ProxyBase):
         title = title.split('-')[0].strip().replace('|', '')
         return title
 
-    def __inner_get_images_by_sub_page__(self, html, page_index=None):
-        return html.xpath("//img[@decoding='async']/@src")
+    def __inner_get_images__(self, html_tree):
+        return html_tree.xpath("//img[@decoding='async']/@src")
 
     def __inner_get_sub_page_url__(self):
         return [self.__url__]

@@ -13,11 +13,11 @@ class Xrmn(Base):
         title = self.__html__.xpath("//h1/text()")[-1]
         return title
 
-    def __inner_get_images_by_sub_page__(self, html, page_index=0):
-        src = html.xpath("//p[@style='text-align: center']/img/@src")
+    def __inner_get_images__(self, html_tree):
+        src = html_tree.xpath("//p[@style='text-align: center']/img/@src")
 
         if len(src) == 0:
-            src = html.xpath("//p[@align='center']/img/@src")
+            src = html_tree.xpath("//p[@align='center']/img/@src")
 
         return [f'{self.__domain_url__}{item}' for item in src]
 
