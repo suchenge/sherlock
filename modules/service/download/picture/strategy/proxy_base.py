@@ -7,5 +7,5 @@ class ProxyBase(Base):
     def __init__(self, url):
         super().__init__(url)
 
-    def __get_request__(self):
+    def __inner_get_request__(self):
         return Request(Proxies())
