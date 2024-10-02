@@ -5,6 +5,8 @@ from pathlib import Path
 from urllib.parse import urlparse
 from datetime import datetime
 
+from modules.tools.http_request.proxy import Proxies
+
 
 def __mistiming_time__(start_time, end_time):
     seconds = (end_time - start_time).seconds
@@ -48,7 +50,7 @@ def monitoring(fun):
 
 
 class Request(object):
-    def __init__(self, proxies=None):
+    def __init__(self, proxies:Proxies = None):
         self.__proxies__ = proxies
 
     def __get_response__(self, url, headers, verify=False):
@@ -58,6 +60,7 @@ class Request(object):
             proxy = self.__proxies__.get()
 
             if proxy is None:
+                proxy = self.__proxies__.items[0]
                 raise Exception("没有可用的Proxy，无法获取页面内容")
 
         try:

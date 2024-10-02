@@ -169,6 +169,7 @@ class Base(object):
         url = kwargs["url"]
 
         if os.path.exists(path):
+            self.__delete_image_by_url__(url)
             return url
 
         print(kwargs)

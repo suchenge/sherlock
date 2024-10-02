@@ -40,6 +40,10 @@ class Proxies(object):
         self.__items__ = [Proxy(proxy, authentication) for proxy in self.__proxies__]
         self.__current_item__ = None
 
+    @property
+    def items(self):
+        return self.__items__
+
     @monitoring
     def get(self):
         if self.__current_item__ is not None and self.__current_item__.available is True:

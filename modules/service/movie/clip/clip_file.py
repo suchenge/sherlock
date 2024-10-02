@@ -50,7 +50,7 @@ class ClipFile(VideoFile):
             if len(merge_list) > 0:
                 with open(self.__concat_file_path__, 'w', encoding='utf') as merge_file:
                     for line in merge_list:
-                        merge_file.write(line)
+                        merge_file.write(f'{line}\r\n')
 
                 try:
                     FFmpeg(
@@ -141,7 +141,7 @@ class ClipFile(VideoFile):
             try:
                 FFmpeg(
                     inputs={self.__path__: [
-                        '-y', '-itsoffset', '00:00:00.600'
+                        '-y', '-itsoffset', '00:00:00.100'
                     ]},
                     outputs={time_line.output_path: [
                         '-ss', time_line.start_time,
