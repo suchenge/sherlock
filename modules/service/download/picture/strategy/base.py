@@ -92,7 +92,7 @@ class Base(object):
     def __get_sub_page__(self) -> list[Page]:
         page_urls = self.__inner_get_sub_page_url__()
 
-        if len(page_urls) > 0 and page_urls[0] != self.__url__:
+        if len(page_urls) > 0:
             page_infos = [{'url': item, 'index': index} for index, item in enumerate(page_urls)]
 
             with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
@@ -113,10 +113,14 @@ class Base(object):
         index = 0
         for image_url in image_urls:
             image = Image(image_url)
-            image.file_name = f'{str(index).zfill(5)}.{image.suffix}'
 
+            image.file_name = f'{str(index).zfill(5)}.{image.suffix}'
+            image.file_name = f'{str(page.index).zfill(5)}.{image.file_name}'
+
+            '''
             if page.url != self.__url__:
                 image.file_name = f'{str(page.index).zfill(5)}.{image.file_name}'
+            '''
 
             image.main_title = self.__title__
             image.main_url = self.__url__

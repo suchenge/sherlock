@@ -12,7 +12,7 @@ class Xrmn(Base):
                 or url.find('xiuren51') > -1)
 
     def __inner_get_title__(self):
-        title = self.__html__.xpath("//h1/text()")[-1]
+        title = self.__html__.xpath("//div[@class='container']/h1/text()")[-1]
         return title
 
     def __inner_get_images__(self, html_tree):
