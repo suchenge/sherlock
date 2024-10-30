@@ -7,7 +7,7 @@ class Xrmn(Base):
 
     @staticmethod
     def is_match(url):
-        return (url.find('123781') > -1)
+        return (url.find('123781') > -1 or url.find('123784') > -1)
 
     def __inner_get_title__(self):
         title = self.__html__.xpath("//div[@class='container']/h1/text()")[-1]
