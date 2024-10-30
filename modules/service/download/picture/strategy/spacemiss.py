@@ -1,4 +1,5 @@
 from modules.service.download.picture.strategy.proxy_base import ProxyBase
+from modules.tools.common_methods.unity_tools import format_title
 
 
 class Spacemiss(ProxyBase):
@@ -12,7 +13,7 @@ class Spacemiss(ProxyBase):
     def __inner_get_title__(self):
         title = self.__html__.xpath("//h1[@class='tdb-title-text']")
         title = title[0].text
-        #title = title.split('-')[0].strip().replace('|', '')
+        title = format_title(title)
         return title
 
     def __inner_get_images__(self, html_tree):

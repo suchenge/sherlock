@@ -30,6 +30,7 @@ def format_title(title):
     title = title.replace('"', '')
     title = title.replace('<', '')
     title = title.replace('>', '')
+    title = title.replace('|', '')
 
     return title.strip()[0:150]
 
