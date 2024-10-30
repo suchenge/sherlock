@@ -1,3 +1,4 @@
+from modules.service.download.picture.strategy.base import Base
 from modules.service.download.picture.strategy.proxy_base import ProxyBase
 from modules.tools.common_methods.unity_tools import format_title
 
@@ -17,7 +18,8 @@ class Spacemiss(ProxyBase):
         return title
 
     def __inner_get_images__(self, html_tree):
-        return html_tree.xpath("//img[@decoding='async']/@src")
+        images = html_tree.xpath("//img[@decoding='async']/@src")
+        return filter(lambda x: x.find('blob') == -1, images)
 
     def __inner_get_sub_page_url__(self):
         return [self.__url__]

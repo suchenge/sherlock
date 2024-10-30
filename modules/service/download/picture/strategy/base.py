@@ -92,17 +92,18 @@ class Base(object):
     def __get_sub_page__(self) -> list[Page]:
         page_urls = self.__inner_get_sub_page_url__()
 
-        if len(page_urls) > 0:
-            page_infos = [{'url': item, 'index': index} for index, item in enumerate(page_urls)]
-
-            with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-                pages = executor.map(self.__build_sub_page__, page_infos)
-        else:
+        if len(page_urls) == 1:
             page = Page()
             page.url = page_urls[0]
             page.index = 0
             page.html = self.__html__
             page.title = self.__title__
+            pages = [page]
+        else:
+            page_infos = [{'url': item, 'index': index} for index, item in enumerate(page_urls)]
+
+            with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+                pages = executor.map(self.__build_sub_page__, page_infos)
 
         return list(pages)
 
