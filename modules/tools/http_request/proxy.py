@@ -1,5 +1,7 @@
 import os
 import json
+from random import \
+    randint
 
 from modules.framework.decorators.base_decorator import singleton
 from modules.framework.configuration_manager.configuration_setting import configuration_setting
@@ -45,19 +47,28 @@ class Proxies(object):
         return self.__items__
 
     @monitoring
-    def get(self):
+    def get(self, circulation_proxy: bool = False):
         if self.__current_item__ is not None and self.__current_item__.available is True:
             return self.__current_item__
 
-        available_items = sorted([item for item in self.__items__ if item.available is True and item != self.__current_item__],
-                                 key=lambda x: x.rate,
-                                 reverse=True)
+        if circulation_proxy:
+            available_items = sorted([item for item in self.__items__ if item != self.__current_item__],
+                                     key=lambda x: x.rate,
+                                     reverse=True)
 
-        if available_items and len(available_items) > 0:
-            self.__current_item__ = available_items[0]
+            item_index = randint(0, len(available_items) - 1)
+            self.__current_item__ = available_items[item_index]
             return self.__current_item__
         else:
-            return None
+            available_items = sorted([item for item in self.__items__ if item.available is True and item != self.__current_item__],
+                                     key=lambda x: x.rate,
+                                     reverse=True)
+
+            if available_items and len(available_items) > 0:
+                self.__current_item__ = available_items[0]
+                return self.__current_item__
+            else:
+                return None
 
     def close(self):
         self.__config__['proxies'] = sorted(self.__config__['proxies'], key=lambda x: x['rate'], reverse=True)

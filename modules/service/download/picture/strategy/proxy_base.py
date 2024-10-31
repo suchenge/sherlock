@@ -8,4 +8,4 @@ class ProxyBase(Base):
         super().__init__(url)
 
     def __inner_get_request__(self):
-        return Request(Proxies())
+        return Request(Proxies(), True)

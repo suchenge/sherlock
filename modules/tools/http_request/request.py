@@ -50,8 +50,9 @@ def monitoring(fun):
 
 
 class Request(object):
-    def __init__(self, proxies:Proxies = None):
+    def __init__(self, proxies: Proxies = None, circulation_proxy: bool = False):
         self.__proxies__ = proxies
+        self.__circulation_proxy__ = circulation_proxy
 
     def __get_response__(self, url, headers, verify=False):
         proxy = None
@@ -66,9 +67,9 @@ class Request(object):
         try:
             response = None
             if proxy:
-                response = requests.get(url, headers, proxies=proxy.address, verify=verify)
+                response = requests.get(url, headers, proxies=proxy.address, verify=verify, timeout=60)
             else:
-                response = requests.get(url, headers, verify=verify)
+                response = requests.get(url, headers, verify=verify, timeout=60)
 
             if response and response.status_code == 200:
                 if proxy:
