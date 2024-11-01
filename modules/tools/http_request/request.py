@@ -58,7 +58,7 @@ class Request(object):
         proxy = None
 
         if self.__proxies__:
-            proxy = self.__proxies__.get()
+            proxy = self.__proxies__.get(self.__circulation_proxy__)
 
             if proxy is None:
                 proxy = self.__proxies__.items[0]

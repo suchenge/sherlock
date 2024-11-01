@@ -52,12 +52,10 @@ class Proxies(object):
             return self.__current_item__
 
         if circulation_proxy:
-            available_items = sorted([item for item in self.__items__ if item != self.__current_item__],
-                                     key=lambda x: x.rate,
-                                     reverse=True)
+            items = [item for item in self.__items__ if item != self.__current_item__]
 
-            item_index = randint(0, len(available_items) - 1)
-            self.__current_item__ = available_items[item_index]
+            item_index = randint(0, len(items) - 1)
+            self.__current_item__ = items[item_index]
             return self.__current_item__
         else:
             available_items = sorted([item for item in self.__items__ if item.available is True and item != self.__current_item__],
