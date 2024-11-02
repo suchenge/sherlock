@@ -33,7 +33,8 @@ class Editor(object):
         first_video = self.__videos__[0]
 
         merge_time_line_file_path = f'{first_video.parent}/{uuid.uuid4().hex}.txt'
-        merge_file_path = f'{first_video.parent}/{first_video.name.replace(first_video.type, '')}merge.{first_video.type}'
+        merge_file_name = first_video.name.replace(first_video.type, '')
+        merge_file_path = f'{first_video.parent}/{merge_file_name}merge.{first_video.type}'
 
         with open(merge_time_line_file_path, 'w', encoding='utf') as merge_file:
             for video_file in video_file_paths:
