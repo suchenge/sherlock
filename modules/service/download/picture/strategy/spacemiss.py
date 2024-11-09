@@ -12,7 +12,8 @@ class Spacemiss(ProxyBase):
         return url.find('spacemiss') > -1
 
     def __inner_get_title__(self):
-        title = self.__html__.xpath("//h1[@class='tdb-title-text']")
+        #title = self.__html__.xpath("//h1[@class='tdb-title-text']")
+        title = self.__html__.xpath("//h1")
         title = title[0].text
         title = format_title(title)
         return title

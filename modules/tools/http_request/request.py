@@ -75,6 +75,8 @@ class Request(object):
                 if proxy:
                     proxy.rate += 1
                 return response
+            elif response.status_code == 404:
+                return None
             else:
                 if proxy:
                     proxy.available = False
