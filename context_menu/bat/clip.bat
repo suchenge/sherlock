@@ -1,1 +1,1 @@
-"C:\Program Files\Python39\python.exe" D:\Project\sherlock\command\clip.py %1
+python D:\Project\sherlock\command\clip.py %1
