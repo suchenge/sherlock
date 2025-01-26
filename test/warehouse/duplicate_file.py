@@ -9,60 +9,40 @@ warehouse_reference_path = r"D:\warehouse"
 
 warehouse_paths = [
     {
-        "driver": "G",
-        "paths": [
-            r"G:\传输\describe",
-            r"G:\传输\javdb"
-        ]
-    },
-    {
-        "driver": "Seagate Expansion Drive",
-        "paths": [
-            r"H:\教学\编程\move\AV"
-        ]
+        "driver": "4T.Picture.2025",
+        "path": r"H:\\",
     },
     {
         "driver": "4T.Temp.2017",
-        "paths": [
-            r"H:\无码",
-            r"H:\无码",
-            r"H:\有码",
-        ]
+        "path": r"K:\\",
     },
     {
-        "driver": "8T.Save.2023",
-        "paths": [
-            r"J:\New\视频\Temp",
-            r"J:\New\视频\VR",
-            r"J:\New\视频\写真",
-            r"J:\New\视频\有码",
-            r"J:\Save\视频\VR",
-            r"J:\Save\视频\写真",
-            r"J:\Save\视频\有码",
-        ]
+        "driver": "4T.Temp.2018",
+        "path": r"J:\\",
     },
     {
-        "driver": "4T.Save.2018",
-        "paths": [
-            r"K:\Temp",
-            r"K:\写真",
-            r"K:\有码"
-        ]
-    },
-    {
-        "driver": "4T.Temp.2019",
-        "paths": [
-            r"M:\写真",
-            r"M:\有码",
-        ]
-    },
-    {
-        "driver": "4T.Temp.2021",
-        "paths": [
-            r"N:\Temp\视频\AV",
-        ]
+        "driver": "4T.Actor.03",
+        "path": r"I:\\",
     }
 ]
+
+unusable_folders = ['图片', '种子', '$RECYCLE.BIN', '.DS_Store', 'Recovery', 'System Volume Information']
+
+def build_driver_group():
+    result = []
+    for warehouse_path in warehouse_paths:
+        warehouse = {
+            "driver": warehouse_path["driver"]
+        }
+        folders = []
+        for folder in os.listdir(warehouse_path["path"]):
+            if folder in unusable_folders:
+                continue
+            folder_path = os.path.join(warehouse_path["path"], folder)
+            folders.append(folder_path)
+        warehouse["paths"] = folders
+        result.append(warehouse)
+    return result
 
 def build_warehouse_item_id(item_id):
     result = item_id.split(" ")[0]
@@ -106,7 +86,7 @@ def build_warehouse_item(file_item, parent_path):
         "files": files
     }
 
-def build_warehouse_reference():
+def build_warehouse_reference(warehouse_paths):
     reference_paths = []
     for warehouse_path in warehouse_paths:
         references = []
@@ -183,5 +163,5 @@ def build_duplicate_reference():
 
 
 if __name__ == '__main__':
-    build_warehouse_reference()
+    build_warehouse_reference(build_driver_group())
     build_duplicate_reference()

@@ -1,7 +1,6 @@
 import os
 import json
-from random import \
-    randint
+from random import randint
 
 from modules.framework.decorators.base_decorator import singleton
 from modules.framework.configuration_manager.configuration_setting import configuration_setting
