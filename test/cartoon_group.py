@@ -4,7 +4,7 @@ import shutil
 from itertools import groupby
 from pathlib import Path
 
-file_path = "E:\Temp\Done\漫画"
+file_path = "G:\传输\书籍"
 files = []
 file_group = []
 

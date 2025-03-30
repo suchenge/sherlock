@@ -10,20 +10,20 @@ warehouse_reference_path = r"D:\warehouse"
 warehouse_paths = [
     {
         "driver": "4T.Picture.2025",
-        "path": r"H:\\",
+        "path": r"I:\\",
     },
     {
         "driver": "4T.Temp.2017",
-        "path": r"K:\\",
-    },
-    {
-        "driver": "4T.Temp.2018",
         "path": r"J:\\",
     },
     {
-        "driver": "4T.Actor.03",
-        "path": r"I:\\",
-    }
+        "driver": "4T.Temp.2018",
+        "path": r"K:\\",
+    },
+    {
+        "driver": "8T.Save.2023",
+        "path": r"H:\\",
+    },
 ]
 
 unusable_folders = ['图片', '种子', '$RECYCLE.BIN', '.DS_Store', 'Recovery', 'System Volume Information']
