@@ -65,6 +65,11 @@ class Editor(object):
                     print(f'自动合并剪辑文件')
                     clip_file.merge()
 
+                if clip_file.need_delete:
+                    print('删除源文件和分割line')
+                    clip_file.delete()
+
+
                 print(f'剪辑文件{clip_file.__path__}完成')
 
 

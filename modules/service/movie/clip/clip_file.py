@@ -19,6 +19,7 @@ class ClipFile(VideoFile):
 
         self.__is_usable__ = False
         self.__need_merge__ = False
+        self.__need_delete__ = False
         self.__ffmpeg_path__ = ffmpeg_execute_path()
         self.__time_line_file_path__ = str(os.path.join(self.__parent__, self.__uid__ + '.txt'))
         self.__concat_file_path__ = f'{self.__path__}.merge.txt'
@@ -35,6 +36,14 @@ class ClipFile(VideoFile):
     @property
     def need_merge(self):
         return self.__need_merge__
+
+    @property
+    def need_delete(self):
+        return self.__need_delete__
+
+    def delete(self):
+        os.remove(self.__time_line_file_path__)
+        os.remove(self.path)
 
     def merge(self):
         if self.__is_usable__ and len(self.__time_lines__) > 0:
@@ -80,6 +89,10 @@ class ClipFile(VideoFile):
 
                     if line == "merge":
                         self.__need_merge__ = True
+                        continue
+
+                    if line == "delete":
+                        self.__need_delete__ = True
                         continue
 
                     lines = line.split(' ')
