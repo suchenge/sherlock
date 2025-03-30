@@ -19,7 +19,7 @@ class ClipFile(VideoFile):
 
         self.__is_usable__ = False
         self.__need_merge__ = False
-        self.__need_delete__ = False
+        self.__need_delete__ = True
         self.__ffmpeg_path__ = ffmpeg_execute_path()
         self.__time_line_file_path__ = str(os.path.join(self.__parent__, self.__uid__ + '.txt'))
         self.__concat_file_path__ = f'{self.__path__}.merge.txt'
