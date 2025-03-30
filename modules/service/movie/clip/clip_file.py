@@ -87,6 +87,8 @@ class ClipFile(VideoFile):
                     if not line:
                         break
 
+                    line = line.strip()
+
                     if line == "merge":
                         self.__need_merge__ = True
                         continue
