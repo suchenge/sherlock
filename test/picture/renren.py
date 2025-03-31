@@ -24,7 +24,7 @@ def get_urls():
 
 def deduplication():
     for source_item in source_container.items():
-        if source_item.url in done_container.items():
+        if source_item in done_container.items():
             source_container.remove(source_item)
 
     source_container.write()
@@ -32,7 +32,14 @@ def deduplication():
 async def get_images(page, url):
     await page.goto(url)
     title = await page.locator("//h1[@id='subject_tpc']").inner_text()
+    categories = await page.locator("//div[@id='breadCrumb']/a").all()
+    category = await categories[2].inner_text()
     images = await page.locator("//img[@class='preview-img']").all()
+
+    dir = f'{save_path}/{category}'
+
+    if not os.path.exists(dir):
+        os.makedirs(dir)
 
     items = []
     index = 0
@@ -42,14 +49,15 @@ async def get_images(page, url):
         image_item = Image(url)
         item = {
             'url': url,
-            'path': f'{save_path}/{title}/{str(index).zfill(5)}.{image_item.suffix}',
+            'path': f'{dir}/{title}/{str(index).zfill(5)}.{image_item.suffix}',
         }
         items.append(item)
     return items
 
 async def main():
+    deduplication()
     async with async_playwright() as playwright:
-        browser = await playwright.chromium.launch(headless=False)
+        browser = await playwright.chromium.launch(headless=True)
         page = await browser.new_page()
 
         await page.goto(home_url)
