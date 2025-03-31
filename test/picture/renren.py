@@ -6,19 +6,28 @@ from pathlib import Path
 from playwright.async_api import async_playwright
 
 from modules.service.download.picture.image import Image
-from modules.service.download.picture.url_container import \
-    UrlContainer
+from modules.service.download.picture.url_container import UrlContainer
 from modules.tools.http_request.proxy import Proxies
 from modules.tools.http_request.request import Request
 
 home_url = r'https://dsws.ok3753682.com/'
 source_url_path = os.path.abspath("../../data/picture_url/new.txt")
+done_url_path = os.path.abspath("../../data/picture_url/done.txt")
 save_path = os.path.abspath("../../data/picture_url/download/")
 
 request = Request(Proxies(), True)
+done_container = UrlContainer(done_url_path)
+source_container = UrlContainer(source_url_path, True)
 
 def get_urls():
     return open(source_url_path, 'r', encoding='utf-8').readlines()
+
+def deduplication():
+    for source_item in source_container.items():
+        if source_item.url in done_container.items():
+            source_container.remove(source_item)
+
+    source_container.write()
 
 async def get_images(page, url):
     await page.goto(url)
@@ -47,8 +56,7 @@ async def main():
 
         await page.locator("//p[@class='enter-btn']").first.click()
 
-        new_items = UrlContainer(source_url_path, True)
-        urls = new_items.items()
+        urls = source_container.items()
 
         for url in urls:
             try:
@@ -65,7 +73,8 @@ async def main():
                     if len(error_results) > 0:
                         raise Exception(f'含有下载出错的记录')
 
-                    new_items.remove(url, True)
+                    done_container.append(url, True)
+                    source_container.remove(url, True)
             except Exception as e:
                 print(e)
 
