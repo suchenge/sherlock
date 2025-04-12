@@ -7,6 +7,7 @@ from playwright.async_api import async_playwright
 
 from modules.service.download.picture.image import Image
 from modules.service.download.picture.url_container import UrlContainer
+from modules.tools.common_methods.unity_tools import format_title
 from modules.tools.http_request.proxy import Proxies
 from modules.tools.http_request.request import Request
 
@@ -32,6 +33,7 @@ def deduplication():
 async def get_images(page, url):
     await page.goto(url)
     title = await page.locator("//h1[@id='subject_tpc']").inner_text()
+    title = format_title(title)
     categories = await page.locator("//div[@id='breadCrumb']/a").all()
     category = await categories[2].inner_text()
     images = await page.locator("//img[@class='preview-img']").all()
