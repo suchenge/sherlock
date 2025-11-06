@@ -196,5 +196,6 @@ class Base(object):
             else:
                 print(f'图片[{url}]下载出错')
                 return None
+        return None
 
 

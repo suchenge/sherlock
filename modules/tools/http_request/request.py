@@ -53,15 +53,20 @@ def monitoring(fun):
             url = args[0]
         # print("开始获取页面内容:%s" % url)
         task_start_time = datetime.now()
+        tryCount = 0
         result = fun(*args, **kwargs)
 
         descript = ""
         if result is None:
-            descript = "无法"
+            tryCount += 1
+            if tryCount < 3:
+                result = fun(*args, **kwargs)
+            else:
+                descript = "无法"
 
         task_end_time = datetime.now()
 
-        print("%s获取到请求内容[%s]:%s" % (descript, __mistiming_time__(task_start_time, task_end_time), url))
+        print("%s获取[%s]到请求内容[%s]:%s" % (descript, str(tryCount), __mistiming_time__(task_start_time, task_end_time), url))
 
         return result
 
@@ -110,6 +115,7 @@ class Request(object):
         url_parse = urlparse(url)
         base_url = '%s://%s/' % (url_parse.scheme, url_parse.hostname)
         headers = header(base_url)
+
         response = self.__get_response__(url, headers)
 
         return response

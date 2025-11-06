@@ -1,3 +1,4 @@
+from tools.http_request.proxy import Proxies
 from modules.tools.http_request.request import Request
 
 from modules.service.download.picture.strategy.proxy_base import ProxyBase

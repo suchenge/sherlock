@@ -9,6 +9,7 @@ class Xiuren(Base):
     def is_match(url):
         return (url.find('xiuren009') > -1
                 or url.find('xiuren51') > -1
+                or url.find('xiuren58') > -1
                 or url.find('876515') > -1)
 
     def __inner_get_title__(self):
