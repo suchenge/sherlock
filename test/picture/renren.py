@@ -4,6 +4,7 @@ import concurrent.futures
 
 from pathlib import Path
 from playwright.async_api import async_playwright
+from playwright.sync_api import ProxySettings
 
 from modules.service.download.picture.image import Image
 from modules.service.download.picture.url_container import UrlContainer
@@ -57,10 +58,19 @@ async def get_images(page, url):
     return items
 
 async def main():
-    deduplication()
+    #deduplication()
+    proxy = {
+        'server': f'https://{Proxies().get().proxy_address}',
+        'username': 'suchenge',
+        'password': 'suyuan2UnionPay',
+    }
+
+    proxy_settings = ProxySettings(proxy)
+
     async with async_playwright() as playwright:
-        browser = await playwright.chromium.launch(headless=True)
-        page = await browser.new_page()
+        browser = await playwright.chromium.launch(headless=False, proxy=proxy_settings)
+        context = await browser.new_context(ignore_https_errors=True)
+        page = await context.new_page()
 
         await page.goto(home_url)
 

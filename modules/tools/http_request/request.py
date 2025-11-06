@@ -25,25 +25,6 @@ def header(base_url):
         'Cookie': 'locale=zh; path=/; expires=Thu, 24 Jun 2027 10:54:57 GMT; SameSite=Lax;_jdb_session=qEIOkqLiro+wLxE8nnC1PHm9a9Y7dDcL2UQFPfOm5Blufq3JC8xLZL9h4W0pjzUJfMWLpNoVYjUBp831fhZPq+QDa7JLMxeLiKIpUM7oXid84ZWuj17GmdVC78Js5IOeDo8MPoOfBK9h07bhOiJK2tjg5t+ObflPYm0wnbeb5nBOsiXczMfozhvnLfrmhxaYuVhOqGUCzEZ5BkNUAly3k9K7sCrDXZf5hHL47nNg1LfKY9jHHypUgaa0s7AtQDZE/FQhOMb4nhXLpIQf92/JXg4n7+7MEheHTxvQPn3CTpNJLI6XXRoaqr9B+euXeSPgHfytv1M5s+a1OhD038IRBM+7I6xagj/7vLuXi53YiKCEu06EEaA0YleWnwVpwQ6MFcs=--4UMlp4y7NikHbzbx--XVysO9JH6l+uzpQjI0BS0A==; path=/; expires=Sat, 09 Jul 2022 10:54:57 GMT; secure; HttpOnly; SameSite=None'
     }
 
-def header_renren(base_url):
-    return {
-        "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-        "accept-language": "en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7,ja;q=0.6,zh-TW;q=0.5",
-        "cache-control": "max-age=0",
-        "priority": "u=0, i",
-        "sec-ch-ua": "\"Chromium\";v=\"134\", \"Not:A-Brand\";v=\"24\", \"Google Chrome\";v=\"134\"",
-        "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-platform": "\"Windows\"",
-        "sec-fetch-dest": "document",
-        "sec-fetch-mode": "navigate",
-        "sec-fetch-site": "same-origin",
-        "sec-fetch-user": "?1",
-        "upgrade-insecure-requests": "1",
-        "cookie": "a22e7_coolimg_29=img; a22e7_coolimg_28=img; a22e7_coolimg_27=img; a22e7_coolimg_26=img; a22e7_coolimg_24=img; a22e7_coolimg_277=img; a22e7_coolimg_278=img; a22e7_coolimg_320=img; a22e7_coolimg_333=img; a22e7_coolimg_345=img; _safe=05A21E544E39F815E2AF08EA7827E240,1743166902; zh_choose=n; a22e7_coolimg_275=img; a22e7_threadlog=%2C277%2C24%2C345%2C27%2C275%2C278%2C29%2C320%2C; a22e7_lastpos=T18001795; a22e7_lastvisit=12021%091743196117%09%2Fread.php%3Ftid%3D18001795%26fpage%3D9; a22e7_ol_offset=388; a22e7_readlog=%2C17471633%2C17471918%2C17472164%2C17471812%2C17472213%2C17568201%2C18001785%2C18001795%2C",
-        "Referer": "https://dsws.ok3753682.com/thread.php?fid=320&type=736&page=9",
-        "Referrer-Policy": "strict-origin-when-cross-origin"
-    }
-
 
 def monitoring(fun):
     def wrapper(*args, **kwargs):
@@ -74,12 +55,16 @@ def monitoring(fun):
 
 
 class Request(object):
-    def __init__(self, proxies: Proxies = None, circulation_proxy: bool = False):
+    def __init__(self, proxies: Proxies = None, circulation_proxy: bool = False, headers: dict = None):
         self.__proxies__ = proxies
         self.__circulation_proxy__ = circulation_proxy
+        self.__headers__ = headers
 
     def __get_response__(self, url, headers, verify=False):
         proxy = None
+
+        if self.__headers__:
+            headers = self.__headers__
 
         if self.__proxies__:
             proxy = self.__proxies__.get(self.__circulation_proxy__)
