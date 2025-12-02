@@ -137,13 +137,16 @@ class Kv58(object):
         return f'{self.__data_path__}/{location}{region}'
 
     def __get_lady__(self, lady):
+        '''
         print(f'{lady.get("provinceCity")}-{lady.get("region")}-{lady.get("address")}')
         print(f'{lady.get("titlename")}')
         print(f'{lady.get("characteristics")}')
+        '''
 
         parent_path = self.__get_lady_files__(lady)
 
-        title = lady.get('titlename')
+        lady_id = lady.get('ladyid')
+        title = f'{lady_id}-{lady.get("titlename")}'
         item_folder_path = f'{parent_path}/{title}'
 
         files = []
@@ -155,14 +158,17 @@ class Kv58(object):
             with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
                 download_result = executor.map(self.__download__, files)
 
-        return lady.get('ladyid')
+        return lady_id
 
     def __append_files__(self, files, file_path, item, property_name):
         file_urls = item.get(property_name)
 
         if file_urls is not None:
             for url in file_urls:
-                file_name = url.split('/')[-1].replace('.poker', '.jpg')
+                index = len(files)
+                #file_name = url.split('/')[-1].replace('.poker', '.jpg')
+                file_name = url.split('/')[-1]
+                file_name = f'{str(index).zfill(5)}-{file_name}'
                 files.append(
                     {
                         'path': f'{file_path}/{file_name}',
