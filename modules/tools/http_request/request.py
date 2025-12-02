@@ -60,6 +60,9 @@ class Request(object):
         self.__circulation_proxy__ = circulation_proxy
         self.__headers__ = headers
 
+    def set_headers(self, headers: dict):
+        self.__headers__ = headers
+
     def __get_response__(self, url, headers, verify=False):
         proxy = None
 
@@ -99,7 +102,11 @@ class Request(object):
     def get(self, url):
         url_parse = urlparse(url)
         base_url = '%s://%s/' % (url_parse.scheme, url_parse.hostname)
-        headers = header(base_url)
+
+        if self.__headers__:
+            headers = self.__headers__
+        else:
+            headers = header(base_url)
 
         response = self.__get_response__(url, headers)
 

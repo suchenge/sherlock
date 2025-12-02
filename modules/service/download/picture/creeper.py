@@ -42,4 +42,5 @@ class Creeper(object):
                 self.__source_url_container__.remove(processor.url, auto_write=True)
             except Exception as error:
                 print(f'error:{processor.url}')
+                print(error)
 
