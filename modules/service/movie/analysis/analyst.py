@@ -24,7 +24,8 @@ class Analyst:
         return self.__request__
 
     def get_information(self) -> Information:
-        proxy_request = Request(Proxies())
+        '''proxy_request = Request(Proxies())'''
+        proxy_request = Request()
 
         analyzer_creator = [
             lambda x: AnalyzerJavdb(proxy_request),
