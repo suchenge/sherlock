@@ -12,7 +12,7 @@ from modules.tools.http_request.request import monitoring
 from modules.tools.thread_pools.task import Task
 from modules.tools.thread_pools.task_pool import TaskPool
 
-save_path = r'E:\Download'
+save_path = r'/Users/vito/Downloads'
 ffmpeg_path = ffmpeg_execute_path()
 
 @monitoring
@@ -79,11 +79,13 @@ def get_mp3(page, audio_info):
         if suffix is None:
             suffix = 'mp3'
 
+        title = audio_info['title']
+
         info = {
                     'url': mp3_url,
                     'title': audio_info['title'],
                     'name': name,
-                    'path': f'{save_path}/{audio_info['title']}/{name}.{suffix}',
+                    'path': f'{save_path}/{title}/{name}.{suffix}',
                     'executor': executor,
                     'format': audio_info['format'],
                     'suffix': suffix
@@ -107,6 +109,12 @@ def download_mp3(**kwargs):
     if mp3_url is not None and os.path.exists(mp3_url['path']) is False:
         download(**mp3_url)
 
+def get_exist_audio(path):
+    if os.path.exists(path):
+        files = os.listdir(path)
+        return [{'full_path': os.path.join(path, f), 'filename': os.path.splitext(f)[0]} for f in files]
+    return []
+
 
 def download_story(main_url):
     format = main_url.startswith('F|')
@@ -120,12 +128,22 @@ def download_story(main_url):
         title = page.locator('xpath=//h1').first.text_content().replace('有声小说', '')
         title = format_title(title)
 
+        audio_path = f'{save_path}/{title}'
+        exist_audio_list = get_exist_audio(audio_path)
+
         audio_list = page.locator('xpath=//div[@class="plist"]/ul/li/a').all()
         audio_urls = []
 
         for audio_page in audio_list:
             page_url = audio_page.get_attribute('href')
-            page_info = {'url': 'https://www.nianyin.com' + page_url, 'title': title, 'name': audio_page.text_content(), 'format': format}
+
+            page_name = audio_page.text_content()
+            page_index = re.compile(r'\d+').findall(page_name)[0].zfill(3)
+
+            if any(page_index == audio['filename'] for audio in exist_audio_list):
+                continue
+
+            page_info = {'url': 'https://www.nianyin.com' + page_url, 'title': title, 'name': page_name, 'index': page_index,  'format': format}
             audio_urls.append(page_info)
             print(page_info)
 
@@ -139,7 +157,7 @@ def download_story(main_url):
 
 if __name__ == '__main__':
     urls = [
-        'https://www.nianyin.com/tuilixuanyi/1689.html'
+        'https://www.nianyin.com/wenxuemingzhu/1488.html'
     ]
 
     TaskPool.set_count(10)
